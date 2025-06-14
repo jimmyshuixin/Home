@@ -591,10 +591,10 @@
                 
                 async function fetchBilibiliData() {
                     const userId = '520237303';
-                    const workerUrl = 'https://api.xvyin.com'; // <-- 替换为您自己的Worker地址
+                    const workerUrl = 'https://api.xvyin.com/'; // <-- 请确保这是您正确的、以斜杠结尾的Worker地址
                     
                     try {
-                        // Step 1: Fetch user card info (doesn't require WBI)
+                        // Step 1: Fetch user card info
                         const cardApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
                         const cardResponse = await fetch(cardApiUrl);
                         if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
