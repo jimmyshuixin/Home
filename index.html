@@ -16,7 +16,8 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <!-- 引入 Phosphor Icons 图标库 -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- WBI签名逻辑已由代理处理，不再需要CryptoJS -->
+    <!-- 引入CryptoJS库，用于WBI签名中的MD5加密 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 
     <style>
         /* --- 全局样式重置和基础设定 --- */
@@ -590,7 +591,7 @@
                 
                 async function fetchBilibiliData() {
                     const userId = '520237303';
-                    const workerUrl = 'api.xvyin.com'; // <-- 替换为您自己的Worker地址
+                    const workerUrl = 'YOUR_WORKER_URL_HERE'; // <-- 替换为您自己的Worker地址
                     
                     try {
                         // Step 1: Fetch user card info (doesn't require WBI)
