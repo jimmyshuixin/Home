@@ -16,8 +16,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <!-- 引入 Phosphor Icons 图标库 -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- 引入CryptoJS库，用于WBI签名中的MD5加密 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <!-- WBI签名逻辑已由代理处理，不再需要CryptoJS -->
 
     <style>
         /* --- 全局样式重置和基础设定 --- */
@@ -594,7 +593,7 @@
                     const workerUrl = 'https://api.xvyin.com/'; // <-- 请确保这是您正确的、以斜杠结尾的Worker地址
                     
                     try {
-                        // Step 1: Fetch user card info
+                        // Step 1: Fetch user card info (doesn't require WBI)
                         const cardApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
                         const cardResponse = await fetch(cardApiUrl);
                         if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
