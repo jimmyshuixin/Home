@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虚宁的数字空间站</title>
+
+    <!-- 引入外部字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- 切换到 Vue.js 的生产版本 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- 引入 Phosphor Icons 图标库 -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- CryptoJS不再需要，因为代理服务器会处理签名 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+    <style>
+        /* --- 全局样式重置和基础设定 --- */
+        :root {
+            --body-bg-color: #121212;
+            --glass-bg: rgba(38, 38, 38, 0.25);
+            --glass-border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(50, 50, 50, 0.2);
+            --text-color: #f0f0f0;
+            --text-color-darker: #b3b3b3;
+            --text-color-white: #ffffff;
+            --accent-color: #61dafb;
+            --accent-color-rgb: 97, 218, 251;
+            --shadow-color: rgba(0, 0, 0, 0.25);
+            --glow-color: rgba(var(--accent-color-rgb), 0.1);
+            --subscribe-btn-bg: #3b82f6;
+            --theme-switcher-bg: rgba(0, 0, 0, 0.3);
+            --repo-card-bg: rgba(255, 255, 255, 0.05);
+            --repo-card-hover-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        html.light-theme {
+            --body-bg-color: #f5f5f7;
+            --glass-bg: rgba(242, 242, 247, 0.3);
+            --glass-border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.3);
+            --text-color: #1d1d1f;
+            --text-color-darker: #6e6e73;
+            --text-color-white: #000000;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --glow-color: rgba(var(--accent-color-rgb), 0.2);
+            --repo-card-bg: rgba(0, 0, 0, 0.05);
+            --repo-card-hover-bg: rgba(0, 0, 0, 0.1);
+        }
+
+        /* 隐藏所有元素的滚动条 */
+        html,
+        body {
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+        }
+
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none;
+            /* WebKit */
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--body-bg-color);
+            transition: background-color 0.4s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-color);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: color 0.4s ease;
+        }
+
+        /* --- 动态背景Canvas --- */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        /* --- 主容器 --- */
+        #app {
+            width: 100%;
+            position: relative;
+        }
+
+        /* --- iOS 风格玻璃效果 --- */
+        .glass-effect {
+            position: relative;
+            background: var(--glass-bg);
+            background-clip: padding-box;
+            border: 1px solid var(--glass-border-color);
+            border-radius: 24px;
+            box-shadow:
+                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                0 8px 32px 0 var(--shadow-color),
+                0 0 15px var(--glow-color);
+            overflow: hidden;
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-effect::before {
+            display: none;
+        }
+
+        /* --- 流星滚动条 --- */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            right: 5px;
+            width: 10px;
+            height: 100vh;
+            z-index: 50;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .scroll-indicator.is-scrolling {
+            opacity: 1;
+        }
+
+        .scroll-star {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            transition: transform 0.1s linear;
+        }
+
+        /* --- 浮动顶部导航栏 --- */
+        .main-header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 999px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .main-header.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .header-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            max-width: 0;
+            opacity: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: max-width 0.4s ease-in-out, opacity 0.2s 0.1s ease-in-out, margin-left 0.4s ease-in-out;
+            margin-left: 0;
+        }
+
+        .main-header.is-expanded .header-nav {
+            max-width: 500px;
+            opacity: 1;
+            margin-left: 12px;
+        }
+
+        .header-nav a {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-color-darker);
+            text-decoration: none;
+            padding: 0 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .header-nav a:hover,
+        .header-nav a.active {
+            color: var(--text-color-white);
+        }
+
+        /* --- 初始全屏欢迎页 --- */
+        .initial-hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .initial-hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 0;
+        }
+        .hero-text-container, .hero-socials {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text-container {
+            font-weight: 800;
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            color: var(--text-color-white);
+            line-height: 1.2;
+        }
+
+        .hero-text-container p {
+            min-height: 1.2em;
+        }
+
+        .typing-cursor-hero {
+            display: inline-block;
+            width: 0.1em;
+            height: 1em;
+            background-color: var(--text-color-white);
+            animation: blink 0.7s infinite;
+        }
+
+        .waving-hand {
+            display: inline-block;
+            animation: wave 2.5s infinite;
+            transform-origin: 70% 70%;
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(0deg); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 30% { transform: rotate(14deg); } 40% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } 60% { transform: rotate(0deg); } 100% { transform: rotate(0deg); }
+        }
+
+        .hero-socials { margin-top: 3rem; display: flex; gap: 1.5rem; }
+        .hero-socials a { display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; border-radius: 50%; color: var(--text-color); transition: all 0.3s ease; }
+        .hero-socials a:hover { transform: translateY(-5px) scale(1.05); color: var(--text-color-white); box-shadow: 0 0 20px var(--accent-color); }
+        .hero-socials svg { width: 28px; height: 28px; }
+
+        /* --- 登录模态框 --- */
+        .login-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .login-modal-overlay.is-visible { opacity: 1; pointer-events: auto; }
+        .login-modal-container { transform: scale(0.95); transition: transform 0.3s ease; }
+        .login-modal-overlay.is-visible .login-modal-container { transform: scale(1); }
+        .home-container { padding: 2rem; text-align: center; max-width: 90vw; width: 400px; }
+        .info-card { padding: 2.5rem; }
+        .admin-login-form h3 { color: var(--text-color-white); font-size: 1.5rem; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-color-darker); }
+        .form-group input { width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border-color); color: var(--text-color); font-size: 1rem; transition: all 0.3s ease; background: var(--input-bg); box-shadow: inset 0px 1px 1px var(--glass-highlight-border); }
+        .form-group input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color), inset 0px 1px 1px var(--glass-highlight-border); }
+        .login-button { width: 100%; padding: 0.8rem 1rem; border: none; background-color: var(--subscribe-btn-bg); color: white; font-size: 1rem; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
+        .login-button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* --- 内容区域 --- */
+        .content-section { padding: 4rem 2rem; max-width: 1000px; margin: 0 auto; }
+        .content-section:first-of-type { padding-top: 8rem; }
+        .content-card { padding: 2rem; margin-bottom: 3rem; box-shadow: none; }
+        .content-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-color-white); margin-bottom: 2rem; }
+
+        /* About Us 组件 */
+        .about-us-card { display: flex; padding: 3rem; gap: 3rem; }
+        .about-sidebar { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .sidebar-line { width: 2px; height: 100%; background-color: var(--accent-color); flex-grow: 1; }
+        .sidebar-text { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--text-color-darker); font-size: 0.9rem; letter-spacing: 0.1em; white-space: nowrap; }
+        .about-main-content { flex-grow: 1; }
+        .about-main-content h2 { font-size: 1.1rem; font-weight: 500; color: var(--text-color-darker); margin-bottom: 1.5rem; }
+        .about-main-content blockquote { position: relative; font-size: 2.5rem; font-weight: 700; line-height: 1.4; margin-left: 2rem; margin-bottom: 3rem; padding-left: 2rem; border-left: 2px solid var(--accent-color); }
+        .about-main-content h3 { font-size: 1.25rem; font-weight: 600; color: var(--text-color-white); margin-bottom: 1rem; }
+        .about-main-content p { font-size: 1rem; line-height: 1.8; color: var(--text-color-darker); margin-bottom: 2rem; }
+        .about-main-content p strong { color: var(--accent-color); font-weight: 500; }
+        .rd-philosophy { border-top: 1px solid var(--glass-border-color); padding-top: 2rem; margin-top: 2rem; }
+
+        /* Bilibili & Github 组件通用样式 */
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;}
+        .card-header .stats { font-size: 0.9rem; color: var(--text-color-darker); display: flex; gap: 1rem;}
+        .card-header .stats strong { color: var(--text-color-white); font-weight: 600;}
+        .card-header a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+
+        /* Bilibili 组件 */
+        .dynamic-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .dynamic-card { text-decoration: none; color: var(--text-color-darker); transition: transform 0.3s ease; display: block; background: var(--repo-card-bg); border-radius: 16px; padding: 1.5rem; }
+        .dynamic-card:hover { transform: translateY(-5px); background: var(--repo-card-hover-bg); }
+        .dynamic-card .video-thumbnail { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem; background-color: rgba(255,255,255,0.05); }
+        .dynamic-card .video-title { font-weight: 500; font-size: 1rem; line-height: 1.4; color: var(--text-color); margin-bottom: 0.5rem; }
+        .dynamic-card .dynamic-content { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
+        .dynamic-card-text-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .dynamic-card-avatar { width: 36px; height: 36px; border-radius: 50%; }
+
+        /* Github 组件 */
+        .github-contributions { width: 100%; border-radius: 12px; margin-bottom: 2rem; }
+        .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+        .repo-card { background: var(--repo-card-bg); padding: 1.5rem; border-radius: 16px; text-decoration: none; color: var(--text-color-darker); transition: background-color 0.3s ease; display: flex; flex-direction: column; }
+        .repo-card:hover { background: var(--repo-card-hover-bg); }
+        .repo-card h3 { color: var(--text-color-white); font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .repo-card p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1; }
+        .repo-stats { display: flex; gap: 1rem; font-size: 0.85rem; align-items: center; }
+        .repo-stats span { display: flex; align-items: center; gap: 0.25rem; }
+        .repo-stats svg { width: 14px; height: 14px; }
+        
+        /* 时间线 */
+        .timeline { position: relative; padding-left: 2rem; border-left: 2px solid var(--accent-color); }
+        .timeline-item { position: relative; margin-bottom: 2rem; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item::before { content: ''; position: absolute; left: -2.4rem; top: 4px; width: 14px; height: 14px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--body-bg-color); }
+        .timeline-date { font-weight: 600; color: var(--text-color-white); }
+        .timeline-desc { margin-top: 0.5rem; color: var(--text-color-darker); }
+
+        /* 动画 */
+        .anim-fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .anim-fade-in-up.is-visible { opacity: 1; transform: translateY(0); }
+
+        /* --- 页脚区域 --- */
+        .footer-section { padding: 4rem 2rem 2rem; text-align: center; color: var(--text-color-darker); border-radius: 24px 24px 0 0; }
+        html.light-theme .footer-section { --glass-bg: rgba(247, 248, 250, 0.7); }
+        .footer-title { font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-color-white); }
+        .footer-subtitle { margin-bottom: 2.5rem; }
+        .icon-links-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-bottom: 2.5rem; }
+        .icon-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-color-darker); text-decoration: none; transition: color 0.3s ease; }
+        .icon-link:hover { color: var(--text-color-white); }
+        .icon-link svg { width: 18px; height: 18px; }
+        .icon-link span { font-size: 0.9rem; }
+        .info-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-bottom: 1.5rem; }
+        .info-links a { color: var(--text-color-darker); text-decoration: none; font-size: 0.85rem; }
+        .info-links a:hover { color: var(--text-color-white); }
+        .copyright-info { border-top: 1px solid var(--glass-border-color); padding-top: 1.5rem; font-size: 0.85rem; position: relative; transition: border-color 0.3s ease; }
+        .theme-switcher { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; gap: 0.5rem; background: var(--theme-switcher-bg); padding: 0.3rem; border-radius: 20px; transition: background-color 0.3s ease; }
+        .theme-switcher button { background: none; border: none; color: var(--text-color-darker); cursor: pointer; padding: 0.3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .theme-switcher button.active { background: var(--subscribe-btn-bg); color: white; }
+        .theme-switcher svg { width: 14px; height: 14px; }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* 响应式设计 */
+        @media (max-width: 900px) {
+            .about-us-card { flex-direction: column; padding: 2rem; gap: 2rem; }
+            .about-sidebar { flex-direction: row; width: 100%; }
+            .sidebar-text { writing-mode: horizontal-tb; transform: none; }
+            .about-main-content blockquote { font-size: 1.8rem; margin-left: 0; padding-left: 1.5rem; }
+        }
+        @media (max-width: 600px) {
+            .main-header { padding: 4px; } .header-nav a { margin: 0; padding: 0 0.75rem; }
+            .home-container { padding: 1rem; } .info-card { padding: 2rem 1.5rem; border-radius: 1rem; }
+            .copyright-info { text-align: left; padding-right: 60px; } .theme-switcher { top: 1.5rem; transform: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="app">
+        <header class="main-header glass-effect" :class="{ 'is-expanded': isHeaderExpanded, 'is-visible': isHeaderVisible }">
+            <img :src="bilibili.face" alt="导航头像" class="header-avatar" @click="toggleLoginModal" onerror="this.onerror=null;this.src='https://placehold.co/44x44/333/fff?text=LM';">
+            <nav class="header-nav">
+                <a @click="scrollToSection('about')" :class="{ active: activeSection === 'about' }">关于</a>
+                <a @click="scrollToSection('bilibili')" :class="{ active: activeSection === 'bilibili' }">B站</a>
+                <a @click="scrollToSection('github')" :class="{ active: activeSection === 'github' }">Github</a>
+                <a @click="scrollToSection('timeline')" :class="{ active: activeSection === 'timeline' }">时光</a>
+                <a @click="scrollToSection('footer')" :class="{ active: activeSection === 'footer' }">更多</a>
+            </nav>
+        </header>
+
+        <div class="login-modal-overlay" :class="{'is-visible': isLoginModalVisible}" @click.self="toggleLoginModal">
+             <div class="login-modal-container">
+                <div class="home-container">
+                    <div class="info-card glass-effect">
+                        <form @submit.prevent="handleLogin" class="admin-login-form">
+                            <h3>管理员登录</h3>
+                            <div class="form-group"> <label for="username">用户名</label> <input type="text" id="username" v-model="username" required> </div>
+                            <div class="form-group"> <label for="password">密码</label> <input type="password" id="password" required> </div>
+                            <button type="submit" class="login-button">登录</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-indicator" :class="{ 'is-scrolling': isScrolling }">
+            <div class="scroll-star" :style="{ transform: `translateY(calc(100vh * ${scrollProgress} - 50%))` }"></div>
+        </div>
+
+        <main class="main-content">
+            <section class="initial-hero-section" id="initial-hero" data-section="hero" :style="{ backgroundImage: `url(${bilibili.spaceBanner})` }">
+                <div class="hero-text-container">
+                    <p>{{ heroLine1 }}<span v-if="heroLine1Active" class="waving-hand">👋</span></p>
+                    <p>{{ heroLine2 }}<span v-if="heroLine2Active" class="typing-cursor-hero"></span></p>
+                    <p>{{ heroLine3 }}<span v-if="heroLine3Active" class="typing-cursor-hero"></span></p>
+                    <p>{{ heroLine4 }}<span v-if="heroLine4Active" class="typing-cursor-hero"></span></p>
+                </div>
+                <div class="hero-socials">
+                    <a :href="bilibili.spaceUrl" target="_blank" title="Bilibili" class="glass-effect"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>Bilibili</title><path d="M13.28 2.25H4.01A1.76 1.76 0 0 0 2.25 4.01v15.98A1.76 1.76 0 0 0 4.01 21.75h15.98a1.76 1.76 0 0 0 1.76-1.76V11.2H13.28V2.25zM11.22 11.19h-2.1v2.1h2.1v-2.1zm0-4.28h-2.1v2.1h2.1V6.91zm4.28 4.28h-2.1v2.1h2.1v-2.1zm0-4.28h-2.1v2.1h2.1V6.91z"/></svg></a>
+                    <a :href="github.spaceUrl" target="_blank" title="GitHub" class="glass-effect"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22v3.29c0 .316.19.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+                    <a href="#" title="About me" class="glass-effect"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" ><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" /></svg></a>
+                    <a href="#" title="Email" class="glass-effect"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg></a>
+                </div>
+            </section>
+
+            <section id="about" class="content-section" data-section="about">
+                 <div class="about-us-card content-card glass-effect anim-fade-in-up">
+                    <div class="about-sidebar"> <div class="sidebar-text">TECH OTAKUS SAVE THE WORLD</div> <div class="sidebar-line"></div> </div>
+                    <div class="about-main-content">
+                        <h2>我们的愿景</h2> <blockquote>「 2030年 , 打造出全球十亿人愿意生活在其中的虚拟世界。」</blockquote>
+                        <h3>关于米哈游</h3> <p>米哈游成立于2011年, 致力于为用户提供美好的、超出预期的产品与内容。米哈游陆续推出了多款高品质人气产品, 包括《崩坏学园2》、《崩坏3》、《未定事件簿》、《原神》、《崩坏：星穹铁道》、《绝区零》, 并围绕原创IP打造了动画、音乐及周边等多元产品。</p>
+                        <p>秉承着“<strong>技术宅拯救世界</strong>”的使命, 米哈游始终致力于技术研发, 探索前沿科技, 在卡通渲染、人工智能、云游戏技术等领域积累了先进的技术能力。</p>
+                        <p>米哈游总部位于中国上海, 并在新加坡、美国、加拿大、日本、韩国等国家和地区进行全球化布局。目前, 公司员工5,000人, 来自世界知名游戏/互联网/科技公司。</p>
+                        <div class="rd-philosophy"> <h3>米哈游的研发理念</h3> <p>Something New | Something Exciting | Something Out of Imagination</p> </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bilibili Section -->
+            <section id="bilibili" class="content-section" data-section="bilibili">
+                <div class="content-card glass-effect anim-fade-in-up">
+                    <div class="card-header">
+                        <div class="stats">
+                            <span>粉丝: <strong>{{ bilibili.fans }}</strong></span>
+                            <span>获赞: <strong>{{ bilibili.likes }}</strong></span>
+                            <span>投稿: <strong>{{ bilibili.archive_count }}</strong></span>
+                        </div>
+                        <a :href="bilibili.spaceUrl" target="_blank">访问主页 &rarr;</a>
+                    </div>
+                    <div class="dynamic-list" v-if="bilibili.dynamics.length">
+                        <a v-for="dynamic in bilibili.dynamics" :key="dynamic.id_str" :href="dynamic.url" target="_blank" class="dynamic-card">
+                            <template v-if="dynamic.type === 'video'">
+                                <img :src="dynamic.pic" :alt="dynamic.title" class="video-thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/320x200/333/fff?text=Cover';">
+                                <h3 class="video-title">{{ dynamic.title }}</h3>
+                            </template>
+                             <template v-else>
+                                 <div class="dynamic-card-text-header">
+                                     <img :src="bilibili.face" class="dynamic-card-avatar" alt="UP Avatar">
+                                     <strong>{{ bilibili.name }}</strong>
+                                 </div>
+                                 <div class="dynamic-content">{{ dynamic.content }}</div>
+                             </template>
+                        </a>
+                    </div>
+                     <p v-else>正在加载B站动态...</p>
+                </div>
+            </section>
+            
+            <!-- Github Section -->
+            <section id="github" class="content-section" data-section="github">
+                <div class="content-card glass-effect anim-fade-in-up">
+                     <div class="card-header">
+                        <h2>我的Github</h2>
+                        <a :href="github.spaceUrl" target="_blank">访问主页 &rarr;</a>
+                    </div>
+                    <img :src="github.contributionsUrl" alt="Github Contributions" class="github-contributions" :style="{ filter: currentTheme === 'dark' ? 'invert(1)' : 'invert(0)' }">
+                    <div class="repo-grid" v-if="github.repos.length">
+                        <a v-for="repo in github.repos" :key="repo.id" :href="repo.html_url" target="_blank" class="repo-card">
+                            <h3>{{ repo.name }}</h3>
+                            <p>{{ repo.description || '暂无描述' }}</p>
+                            <div class="repo-stats">
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c.321.64.321 1.393 0 2.034a.985.985 0 01-1.737 0c.321-.64.321-1.393 0-2.034a.985.985 0 011.737 0zM12 12.5a.5.5 0 01.5.5v1a.5.5 0 01-1 0v-1a.5.5 0 01.5-.5zM10.5 6a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" clip-rule="evenodd" /><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-1.5a6.5 6.5 0 110-13 6.5 6.5 0 010 13z" /></svg> {{ repo.language || 'Text' }}</span>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg> {{ repo.stargazers_count }}</span>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.312 5.312l-1.422 1.422L12 8.156l-1.89-1.89a.75.75 0 00-1.06 1.061l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422a.75.75 0 101.06 1.06L9.89 13.94l1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422a.75.75 0 10-1.06-1.06z" clip-rule="evenodd" /></svg> {{ repo.forks_count }}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <p v-else>正在加载Github仓库...</p>
+                </div>
+            </section>
+
+            <section id="timeline" class="content-section" data-section="timeline">
+                 <div class="content-card glass-effect anim-fade-in-up">
+                    <h2>时光</h2>
+                    <div class="timeline">
+                       <div class="timeline-item" v-for="item in timeline" :key="item.date">
+                            <div class="timeline-date">{{ item.date }}</div>
+                            <p class="timeline-desc">{{ item.event }}</p>
+                       </div>
+                    </div>
+                </div>
+            </section>
+            
+            <footer class="footer-section glass-effect anim-fade-in-up" id="footer" data-section="footer">
+                <h4 class="footer-title">风向标</h4>
+                <p class="footer-subtitle">去到别处看看？</p>
+                <div class="icon-links-bar">
+                    <a v-for="link in footerIconLinks" :key="link.text" :href="link.url" class="icon-link">
+                        <span v-html="link.icon"></span>
+                        <span>{{ link.text }}</span>
+                    </a>
+                </div>
+                <div class="info-links"> <a href="#">关于</a> <a href="#">关于本站</a> <a href="#">关于我</a> <a href="#">关于此项目</a> <a href="#">更多</a> <a href="#">时间线</a> <a href="#">友链</a> <a href="#">监控</a> <a href="#">联系</a> </div>
+                <div class="copyright-info">
+                    <p>&copy; 2020-2025 林陌青川 | RSS | 站点地图 | 订阅 (Stay hungry. Stay foolish)</p>
+                    <p>Powered by Mix Space & Shiro. 鄂ICP备2025110115号-1</p>
+                    <div class="theme-switcher">
+                        <button @click="setTheme('dark')" :class="{ active: currentTheme === 'dark' }" title="深色模式"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
+                        <button @click="setTheme('light')" :class="{ active: currentTheme === 'light' }" title="浅色模式"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg></button>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+
+    <script>
+        // --- 粒子动画逻辑 ---
+        (function() {
+            const canvas = document.getElementById('particle-canvas'); if (!canvas) return; const ctx = canvas.getContext('2d'); let particles = []; let animationFrameId; function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; } update() { const isLightTheme = document.documentElement.classList.contains('light-theme'); if (!isLightTheme) { const centerX = canvas.width / 2; const centerY = canvas.height / 2; const dx = this.x - centerX; const dy = this.y - centerY; const distance = Math.sqrt(dx * dx + dy * dy); if (distance > 1) { const swirlStrength = 0.01; this.speedX += (-dy / distance) * swirlStrength; this.speedY += (dx / distance) * swirlStrength; } this.speedX *= 0.99; this.speedY *= 0.99; } this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; } } draw() { const isLightTheme = document.documentElement.classList.contains('light-theme'); ctx.fillStyle = isLightTheme ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
+            function initParticles() { const particleCount = Math.floor(canvas.width * canvas.height / 15000); particles = []; for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); } }
+            function handleParticles() { const isLightTheme = document.documentElement.classList.contains('light-theme'); const lineBaseColor = isLightTheme ? '0, 0, 0' : '255, 255, 255'; for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); if (isLightTheme) { for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 100) { ctx.beginPath(); ctx.strokeStyle = `rgba(${lineBaseColor}, ${1 - distance / 100})`; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } } }
+            function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); handleParticles(); animationFrameId = requestAnimationFrame(animate); }
+            function startAnimation() { resizeCanvas(); initParticles(); if (animationFrameId) cancelAnimationFrame(animationFrameId); animate(); }
+            window.addEventListener('resize', startAnimation); startAnimation();
+        })();
+
+        // --- Vue.js 应用逻辑 ---
+        const { createApp, ref, onMounted, onUnmounted } = Vue;
+
+        createApp({
+            setup() {
+                const timeline = ref([ { date: '2024-05-20', event: '项目启动，搭建基础页面结构和样式。'}, { date: '2024-05-22', event: '完成了动态粒子背景和玻璃质感UI的设计。'}, { date: '2024-05-25', event: '集成了天气和音乐播放器组件，丰富页面功能。'}, { date: '2024-06-01', event: '重构页面布局，增加多个内容板块并实现导航高亮功能。'}, ]);
+                const footerIconLinks = ref([ { text: 'Bilibili', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6-2.292m0 0v14.25" /></svg>', url: '#bilibili'}, { text: 'Github', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>', url: '#github'}, { text: '度过的时光', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>', url: '#timeline'} ]);
+                
+                const bilibili = ref({
+                    name: '虚宁',
+                    face: 'https://placehold.co/44x44/333/fff?text=LM',
+                    fans: 0,
+                    likes: 0,
+                    archive_count: 0,
+                    spaceUrl: 'https://space.bilibili.com/520237303',
+                    spaceBanner: '',
+                    dynamics: []
+                });
+                const github = ref({
+                    repos: [],
+                    contributionsUrl: 'https://ghchart.rshah.org/jimmyshuixin',
+                    spaceUrl: 'https://github.com/jimmyshuixin'
+                });
+
+                const isHeaderExpanded = ref(false); const isHeaderVisible = ref(false); const isLoginModalVisible = ref(false);
+                const lastScrollY = ref(0); const isScrolling = ref(false); const scrollProgress = ref(0); let scrollTimeout = null;
+                const heroLine1 = ref(''); const heroLine2 = ref(''); const heroLine3 = ref(''); const heroLine4 = ref('');
+                const heroLine1Active = ref(false); const heroLine2Active = ref(false); const heroLine3Active = ref(false); const heroLine4Active = ref(false);
+                const currentTheme = ref('dark'); const username = ref(''); const password = ref('');
+                const activeSection = ref('hero');
+
+                const setTheme = (theme) => { currentTheme.value = theme; if (theme === 'light') { document.documentElement.classList.add('light-theme'); } else { document.documentElement.classList.remove('light-theme'); } localStorage.setItem('user-theme', theme); };
+                function initTheme() { const savedTheme = localStorage.getItem('user-theme'); const currentHour = new Date().getHours(); if (savedTheme) { setTheme(savedTheme); } else { if (currentHour >= 19 || currentHour < 6) { setTheme('dark'); } else { setTheme('light'); } } }
+                const toggleLoginModal = () => { isLoginModalVisible.value = !isLoginModalVisible.value; };
+                const handleScroll = () => { const scrollTop = window.scrollY; const docHeight = document.documentElement.scrollHeight - window.innerHeight; scrollProgress.value = docHeight > 0 ? scrollTop / docHeight : 0; isScrolling.value = true; if (scrollTimeout) clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => { isScrolling.value = false; }, 1500); const currentScrollY = window.scrollY; if (currentScrollY > 100) { isHeaderVisible.value = true; } else { isHeaderVisible.value = false; } if (currentScrollY > lastScrollY.value && currentScrollY > 100) { isHeaderExpanded.value = true; } else { isHeaderExpanded.value = false; } lastScrollY.value = currentScrollY <= 0 ? 0 : currentScrollY; };
+                const handleLogin = () => { if (!username.value || !password.value) { alert('请输入用户名和密码'); return; } console.log('Attempting login with:', { username: username.value, password: password.value }); alert(`登录成功! 用户名: ${username.value}`); toggleLoginModal(); username.value = ''; password.value = ''; };
+                function typeLine(targetRef, text, speed = 120) { return new Promise(resolve => { let index = 0; targetRef.value = ''; const interval = setInterval(() => { if (index < text.length) { targetRef.value += text[index]; index++; } else { clearInterval(interval); resolve(); } }, speed); }); }
+                async function startHeroTypewriter() { const lines = [ { ref: heroLine1, text: "Hi! ", activeRef: heroLine1Active }, { ref: heroLine2, text: "I'm 虚宁", activeRef: heroLine2Active }, { ref: heroLine3, text: "A Developer", activeRef: heroLine3Active }, { ref: heroLine4, text: "For Anything!", activeRef: heroLine4Active }, ]; for (const line of lines) { line.activeRef.value = true; await typeLine(line.ref, line.text); line.activeRef.value = false; if (line.ref === heroLine1) heroLine1Active.value = true; } }
+                function scrollToSection(sectionId) { const section = document.getElementById(sectionId); if (section) { section.scrollIntoView({ behavior: 'smooth' }); } }
+                
+                async function fetchBilibiliData() {
+                    const userId = '520237303';
+                    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                    
+                    try {
+                        // Step 1: Fetch user card info (doesn't require WBI)
+                        const cardApiUrl = `${proxyUrl}${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
+                        const cardResponse = await fetch(cardApiUrl);
+                        if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
+                        const cardData = await cardResponse.json();
+                        if (cardData.code === 0) {
+                            const data = cardData.data;
+                            bilibili.value.name = data.card.name;
+                            bilibili.value.face = data.card.face.replace('http://', 'https://');
+                            bilibili.value.fans = data.card.fans;
+                            bilibili.value.likes = data.like_num;
+                            bilibili.value.archive_count = data.archive_count;
+                            if (data.card.space && data.card.space.l_img) {
+                                bilibili.value.spaceBanner = data.card.space.l_img.replace('http://', 'https://');
+                            }
+                        } else {
+                            throw new Error(`Bilibili API error for card info: ${cardData.message || JSON.stringify(cardData)}`);
+                        }
+
+                        // Step 2: Fetch and process dynamics using WBI signing
+                        // WBI signing implementation
+                        const mixinKeyEncTab = [
+                            46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+                            33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+                            61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
+                            36, 20, 34, 44, 52
+                        ];
+                        const getMixinKey = (orig) => mixinKeyEncTab.map(n => orig[n]).join('').slice(0, 32);
+
+                        const getWbiKey = async () => {
+                             const navApiUrl = `${proxyUrl}${encodeURIComponent('https://api.bilibili.com/x/web-interface/nav')}`;
+                             const response = await fetch(navApiUrl);
+                             if (!response.ok) throw new Error('Failed to fetch WBI keys');
+                             const navData = await response.json();
+                             const imgUrl = navData.data.wbi_img.img_url;
+                             const subUrl = navData.data.wbi_img.sub_url;
+                             return {
+                                 imgKey: getMixinKey(imgUrl.slice(imgUrl.lastIndexOf('/') + 1).split('.')[0]),
+                                 subKey: getMixinKey(subUrl.slice(subUrl.lastIndexOf('/') + 1).split('.')[0])
+                             };
+                        }
+
+                        const wbiSign = (params, imgKey, subKey) => {
+                            const mixinKey = imgKey + subKey;
+                            const currTime = Math.round(Date.now() / 1000);
+                            const newParams = { ...params, wts: currTime };
+                            const query = Object.keys(newParams).sort().map(key => {
+                                // Filter out special characters
+                                const value = newParams[key].toString().replace(/[!'()*]/g, '');
+                                return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
+                            }).join('&');
+                            const wbi_sign = CryptoJS.MD5(query + mixinKey).toString();
+                            return `${query}&w_rid=${wbi_sign}`;
+                        }
+
+                        // Actual fetch logic
+                        const keys = await getWbiKey();
+                        const dynamicParams = {
+                            host_mid: userId,
+                            offset: '',
+                            platform: 'web',
+                        };
+                        const signedQuery = wbiSign(dynamicParams, keys.imgKey, keys.subKey);
+                        const dynamicApiUrl = `https://api.bilibili.com/x/dynamic/wbi/v2/space/all?${signedQuery}`;
+                        
+                        // Using proxy for the final signed request to avoid potential CORS issues
+                        const dynamicResponse = await fetch(`${proxyUrl}${encodeURIComponent(dynamicApiUrl)}`);
+                        if (!dynamicResponse.ok) {
+                            throw new Error(`Network response was not ok for dynamics. Status: ${dynamicResponse.status}`);
+                        }
+                        const dynamicData = await dynamicResponse.json();
+
+                        if (dynamicData.code === 0 && dynamicData.data.items) {
+                            bilibili.value.dynamics = dynamicData.data.items.map(item => {
+                                const cardData = JSON.parse(item.card);
+                                let dynamicItem = {
+                                    id_str: item.id_str,
+                                    type: 'text',
+                                    content: '',
+                                    url: `https://t.bilibili.com/${item.id_str}`
+                                };
+
+                                switch (item.type) {
+                                    case 'DYNAMIC_TYPE_AV':
+                                        dynamicItem.type = 'video';
+                                        dynamicItem.title = cardData.title;
+                                        dynamicItem.pic = cardData.pic.replace('http://', 'https://');
+                                        dynamicItem.bvid = cardData.bvid;
+                                        dynamicItem.url = `https://www.bilibili.com/video/${cardData.bvid}`;
+                                        break;
+                                    case 'DYNAMIC_TYPE_WORD':
+                                        dynamicItem.content = cardData.item.content;
+                                        break;
+                                    case 'DYNAMIC_TYPE_DRAW':
+                                        dynamicItem.content = cardData.item.description;
+                                        break;
+                                    default:
+                                        return null;
+                                }
+                                return dynamicItem;
+                            }).filter(Boolean).slice(0, 6);
+                        } else {
+                            throw new Error(`Bilibili API error for dynamics: ${dynamicData.message || 'Could not fetch dynamics'}`);
+                        }
+
+                    } catch (err) {
+                        console.error("获取B站数据失败", err);
+                    }
+                }
+
+
+                function fetchGithubData() {
+                     fetch('https://api.github.com/users/jimmyshuixin/repos?sort=updated&per_page=6')
+                        .then(res => res.json())
+                        .then(data => { github.value.repos = data; })
+                        .catch(err => console.error("获取Github仓库失败", err));
+                }
+
+                function setupIntersectionObserver() {
+                    const options = { root: null, rootMargin: '0px', threshold: 0.5 };
+                    const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { activeSection.value = entry.target.getAttribute('data-section'); } }); }, options);
+                    document.querySelectorAll('[data-section]').forEach(el => observer.observe(el));
+                    const animObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); animObserver.unobserve(entry.target); } }); }, { threshold: 0.1 });
+                    document.querySelectorAll('.anim-fade-in-up').forEach(el => animObserver.observe(el));
+                }
+
+                onMounted(() => {
+                    startHeroTypewriter();
+                    fetchBilibiliData();
+                    fetchGithubData();
+                    setTimeout(() => { setupIntersectionObserver(); }, 100);
+                    initTheme();
+                    window.addEventListener('scroll', handleScroll);
+                });
+
+                onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
+
+                return {
+                    timeline, bilibili, github, footerIconLinks, currentTheme, setTheme, isHeaderExpanded,
+                    isLoginModalVisible, toggleLoginModal, scrollToSection, username, password, handleLogin,
+                    heroLine1, heroLine2, heroLine3, heroLine4, isHeaderVisible,
+                    heroLine1Active, heroLine2Active, heroLine3Active, heroLine4Active,
+                    isScrolling, scrollProgress, activeSection
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
