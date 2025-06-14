@@ -16,8 +16,7 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <!-- 引入 Phosphor Icons 图标库 -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- CryptoJS不再需要，因为代理服务器会处理签名 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    <!-- WBI签名逻辑已由代理处理，不再需要CryptoJS -->
 
     <style>
         /* --- 全局样式重置和基础设定 --- */
@@ -591,11 +590,12 @@
                 
                 async function fetchBilibiliData() {
                     const userId = '520237303';
-                    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                    // 替换为您的 Cloudflare Worker URL
+                    const workerUrl = 'https://bili-proxy.jimmyai3132.workers.dev/?';
                     
                     try {
                         // Step 1: Fetch user card info (doesn't require WBI)
-                        const cardApiUrl = `${proxyUrl}${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
+                        const cardApiUrl = `${workerUrl}https://api.bilibili.com/x/web-interface/card?mid=${userId}`;
                         const cardResponse = await fetch(cardApiUrl);
                         if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
                         const cardData = await cardResponse.json();
@@ -613,90 +613,25 @@
                             throw new Error(`Bilibili API error for card info: ${cardData.message || JSON.stringify(cardData)}`);
                         }
 
-                        // Step 2: Fetch and process dynamics using WBI signing
-                        // WBI signing implementation
-                        const mixinKeyEncTab = [
-                            46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
-                            33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
-                            61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
-                            36, 20, 34, 44, 52
-                        ];
-                        const getMixinKey = (orig) => mixinKeyEncTab.map(n => orig[n]).join('').slice(0, 32);
-
-                        const getWbiKey = async () => {
-                             const navApiUrl = `${proxyUrl}${encodeURIComponent('https://api.bilibili.com/x/web-interface/nav')}`;
-                             const response = await fetch(navApiUrl);
-                             if (!response.ok) throw new Error('Failed to fetch WBI keys');
-                             const navData = await response.json();
-                             const imgUrl = navData.data.wbi_img.img_url;
-                             const subUrl = navData.data.wbi_img.sub_url;
-                             return {
-                                 imgKey: getMixinKey(imgUrl.slice(imgUrl.lastIndexOf('/') + 1).split('.')[0]),
-                                 subKey: getMixinKey(subUrl.slice(subUrl.lastIndexOf('/') + 1).split('.')[0])
-                             };
+                        // Step 2: Fetch user's video list (more stable than dynamics)
+                        const videoApiUrl = `${workerUrl}https://api.bilibili.com/x/space/arc/search?mid=${userId}&ps=6&tid=0&pn=1&order=pubdate`;
+                        const videoResponse = await fetch(videoApiUrl);
+                        if (!videoResponse.ok) {
+                             throw new Error(`Network response was not ok for videos. Status: ${videoResponse.status}`);
                         }
+                        const videoData = await videoResponse.json();
 
-                        const wbiSign = (params, imgKey, subKey) => {
-                            const mixinKey = imgKey + subKey;
-                            const currTime = Math.round(Date.now() / 1000);
-                            const newParams = { ...params, wts: currTime };
-                            const query = Object.keys(newParams).sort().map(key => {
-                                // Filter out special characters
-                                const value = newParams[key].toString().replace(/[!'()*]/g, '');
-                                return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
-                            }).join('&');
-                            const wbi_sign = CryptoJS.MD5(query + mixinKey).toString();
-                            return `${query}&w_rid=${wbi_sign}`;
-                        }
-
-                        // Actual fetch logic
-                        const keys = await getWbiKey();
-                        const dynamicParams = {
-                            host_mid: userId,
-                            offset: '',
-                            platform: 'web',
-                        };
-                        const signedQuery = wbiSign(dynamicParams, keys.imgKey, keys.subKey);
-                        const dynamicApiUrl = `https://api.bilibili.com/x/dynamic/wbi/v2/space/all?${signedQuery}`;
-                        
-                        // Using proxy for the final signed request to avoid potential CORS issues
-                        const dynamicResponse = await fetch(`${proxyUrl}${encodeURIComponent(dynamicApiUrl)}`);
-                        if (!dynamicResponse.ok) {
-                            throw new Error(`Network response was not ok for dynamics. Status: ${dynamicResponse.status}`);
-                        }
-                        const dynamicData = await dynamicResponse.json();
-
-                        if (dynamicData.code === 0 && dynamicData.data.items) {
-                            bilibili.value.dynamics = dynamicData.data.items.map(item => {
-                                const cardData = JSON.parse(item.card);
-                                let dynamicItem = {
-                                    id_str: item.id_str,
-                                    type: 'text',
-                                    content: '',
-                                    url: `https://t.bilibili.com/${item.id_str}`
-                                };
-
-                                switch (item.type) {
-                                    case 'DYNAMIC_TYPE_AV':
-                                        dynamicItem.type = 'video';
-                                        dynamicItem.title = cardData.title;
-                                        dynamicItem.pic = cardData.pic.replace('http://', 'https://');
-                                        dynamicItem.bvid = cardData.bvid;
-                                        dynamicItem.url = `https://www.bilibili.com/video/${cardData.bvid}`;
-                                        break;
-                                    case 'DYNAMIC_TYPE_WORD':
-                                        dynamicItem.content = cardData.item.content;
-                                        break;
-                                    case 'DYNAMIC_TYPE_DRAW':
-                                        dynamicItem.content = cardData.item.description;
-                                        break;
-                                    default:
-                                        return null;
-                                }
-                                return dynamicItem;
-                            }).filter(Boolean).slice(0, 6);
+                        if (videoData.code === 0 && videoData.data.list.vlist) {
+                            bilibili.value.dynamics = videoData.data.list.vlist.map(video => ({
+                                type: 'video',
+                                id_str: video.bvid,
+                                title: video.title,
+                                pic: video.pic.replace('http://', 'https://'),
+                                bvid: video.bvid,
+                                url: `https://www.bilibili.com/video/${video.bvid}`,
+                            }));
                         } else {
-                            throw new Error(`Bilibili API error for dynamics: ${dynamicData.message || 'Could not fetch dynamics'}`);
+                             throw new Error(`Bilibili API error for videos: ${videoData.message || 'Could not fetch videos'}`);
                         }
 
                     } catch (err) {
