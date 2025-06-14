@@ -590,12 +590,11 @@
                 
                 async function fetchBilibiliData() {
                     const userId = '520237303';
-                    // 替换为您的 Cloudflare Worker URL
-                    const workerUrl = 'https://bili-proxy.jimmyai3132.workers.dev/?';
+                    const workerUrl = 'api.xvyin.com'; // <-- 替换为您自己的Worker地址
                     
                     try {
                         // Step 1: Fetch user card info (doesn't require WBI)
-                        const cardApiUrl = `${workerUrl}https://api.bilibili.com/x/web-interface/card?mid=${userId}`;
+                        const cardApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
                         const cardResponse = await fetch(cardApiUrl);
                         if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
                         const cardData = await cardResponse.json();
@@ -614,7 +613,7 @@
                         }
 
                         // Step 2: Fetch user's video list (more stable than dynamics)
-                        const videoApiUrl = `${workerUrl}https://api.bilibili.com/x/space/arc/search?mid=${userId}&ps=6&tid=0&pn=1&order=pubdate`;
+                        const videoApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/space/arc/search?mid=${userId}&ps=6&tid=0&pn=1&order=pubdate`)}`;
                         const videoResponse = await fetch(videoApiUrl);
                         if (!videoResponse.ok) {
                              throw new Error(`Network response was not ok for videos. Status: ${videoResponse.status}`);
