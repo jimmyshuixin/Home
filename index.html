@@ -2,21 +2,33 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>虚宁的数字空间站</title>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>虚静以宁</title>
+    <!-- FIX: 添加一个默认的 favicon 防止 404 错误 -->
+    <link rel="icon" href="data:image/x-icon;base64,iVBORw0KGgo=">
     <!-- 引入外部字体 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
 
-    <!-- 切换到 Vue.js 的生产版本 -->
+    <!-- APlayer CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
+
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Vue.js Production -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <!-- 引入 Phosphor Icons 图标库 -->
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- WBI签名逻辑已由代理处理，不再需要CryptoJS -->
+
+    <!-- APlayer JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js"></script>
+    <!-- fetch-jsonp for QQ Music -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch-jsonp/1.3.0/fetch-jsonp.min.js"></script>
 
     <style>
         /* --- 全局样式重置和基础设定 --- */
@@ -80,7 +92,8 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, "Helvetica Neue", Arial, sans-serif;
             color: var(--text-color);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
@@ -111,12 +124,11 @@
             background-clip: padding-box;
             border: 1px solid var(--glass-border-color);
             border-radius: 24px;
-            box-shadow:
-                inset 0 0 0 1px rgba(255, 255, 255, 0.15),
-                0 8px 32px 0 var(--shadow-color),
-                0 0 15px var(--glow-color);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+                0 8px 32px 0 var(--shadow-color), 0 0 15px var(--glow-color);
             overflow: hidden;
-            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+            transition: background-color 0.4s ease, border-color 0.4s ease,
+                box-shadow 0.4s ease;
         }
 
         .glass-effect::before {
@@ -166,6 +178,8 @@
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             opacity: 0;
             pointer-events: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .main-header.is-visible {
@@ -190,12 +204,13 @@
             opacity: 0;
             overflow: hidden;
             white-space: nowrap;
-            transition: max-width 0.4s ease-in-out, opacity 0.2s 0.1s ease-in-out, margin-left 0.4s ease-in-out;
+            transition: max-width 0.4s ease-in-out, opacity 0.2s 0.1s ease-in-out,
+                margin-left 0.4s ease-in-out;
             margin-left: 0;
         }
 
         .main-header.is-expanded .header-nav {
-            max-width: 500px;
+            max-width: 600px;
             opacity: 1;
             margin-left: 12px;
         }
@@ -207,6 +222,7 @@
             text-decoration: none;
             padding: 0 1rem;
             transition: color 0.3s ease;
+            cursor: pointer;
         }
 
         .header-nav a:hover,
@@ -216,28 +232,19 @@
 
         /* --- 初始全屏欢迎页 --- */
         .initial-hero-section {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             padding: 2rem;
-            background-size: cover;
-            background-position: center;
             position: relative;
+            transition: padding-bottom 0.5s ease-in-out;
         }
-        .initial-hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 0;
-        }
-        .hero-text-container, .hero-socials {
+
+        .hero-text-container,
+        .hero-bottom-content {
             position: relative;
             z-index: 1;
         }
@@ -268,119 +275,1354 @@
         }
 
         @keyframes wave {
-            0% { transform: rotate(0deg); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 30% { transform: rotate(14deg); } 40% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } 60% { transform: rotate(0deg); } 100% { transform: rotate(0deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            10% {
+                transform: rotate(14deg);
+            }
+
+            20% {
+                transform: rotate(-8deg);
+            }
+
+            30% {
+                transform: rotate(14deg);
+            }
+
+            40% {
+                transform: rotate(-4deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+
+            60% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
         }
 
-        .hero-socials { margin-top: 3rem; display: flex; gap: 1.5rem; }
-        .hero-socials a { display: flex; justify-content: center; align-items: center; width: 60px; height: 60px; border-radius: 50%; color: var(--text-color); transition: all 0.3s ease; }
-        .hero-socials a:hover { transform: translateY(-5px) scale(1.05); color: var(--text-color-white); box-shadow: 0 0 20px var(--accent-color); }
-        .hero-socials svg { width: 28px; height: 28px; }
+        .hero-bottom-content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .hero-bottom-content.visible {
+            opacity: 1;
+        }
+
+        .hero-socials {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .hero-socials a,
+        .play-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .hero-socials a:hover,
+        .play-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            color: var(--text-color-white);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        .hero-socials svg,
+        .play-button i {
+            width: 28px;
+            height: 28px;
+            font-size: 28px;
+        }
+
+        /* --- 音乐播放器 --- */
+        .hero-player-container {
+            margin-top: 0;
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 2rem;
+            min-height: 95px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .player-wrapper {
+            transition: all 0.5s ease-in-out;
+            width: 100%;
+            border-radius: 16px !important;
+            border: 1px solid var(--glass-border-color) !important;
+            padding: 1rem;
+        }
+
+        .play-button,
+        .loading-spinner {
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            position: absolute;
+        }
+
+        .play-button i,
+        .loading-spinner i {
+            margin: 0;
+        }
+
+        #player-hidden {
+            display: none;
+        }
+
+        .custom-player {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .custom-player-cover {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .custom-player-info-wrapper {
+            flex-grow: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .custom-player-info {
+            text-align: left;
+        }
+
+        .custom-player-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color-white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .custom-player-artist {
+            font-size: 0.85rem;
+            color: var(--text-color-darker);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .custom-player-progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .custom-player-progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .custom-player-progress-bar::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--text-color-white);
+            border-radius: 50%;
+        }
+
+        .custom-player-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .custom-player-controls button {
+            background: none;
+            border: none;
+            color: var(--text-color-darker);
+            cursor: pointer;
+            font-size: 1.75rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .custom-player-controls button:hover {
+            color: var(--text-color-white);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border-color);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .volume-control-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .volume-control-wrapper i {
+            font-size: 1.5rem;
+            color: var(--text-color-darker);
+        }
+
+        input[type="range"].volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 80px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        input[type="range"].volume-slider::-webkit-slider-runnable-track {
+            height: 4px;
+            background: linear-gradient(to right,
+                    var(--accent-color) 0%,
+                    var(--accent-color) var(--volume-percent, 70%),
+                    rgba(255, 255, 255, 0.1) var(--volume-percent, 70%),
+                    rgba(255, 255, 255, 0.1) 100%);
+            border-radius: 2px;
+        }
+
+        input[type="range"].volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -4px;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--text-color-white);
+        }
+
+        input[type="range"].volume-slider::-moz-range-track {
+            background-color: rgba(255, 255, 255, 0.1);
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        input[type="range"].volume-slider::-moz-range-progress {
+            background-color: var(--accent-color);
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        input[type="range"].volume-slider::-moz-range-thumb {
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: var(--text-color-white);
+            border: none;
+        }
+
+        /* --- 歌词样式 --- */
+        .custom-lrc-container {
+            height: 60px;
+            margin-top: 1rem;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .aplayer-lrc {
+            padding: 0 !important;
+            margin: 0 !important;
+            text-shadow: none !important;
+            background: none !important;
+            height: 100%;
+        }
+
+        .aplayer-lrc-contents {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s ease-out !important;
+            height: 100%;
+        }
+
+        .aplayer-lrc p {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color-darker);
+            padding: 4px 0;
+            margin: 0;
+            line-height: 1.5;
+            transition: all 0.4s ease-in-out;
+            opacity: 0.5;
+            flex-shrink: 0;
+        }
+
+        .aplayer-lrc p.aplayer-lrc-current {
+            color: var(--text-color-white);
+            font-weight: 700;
+            transform: scale(1.05);
+            opacity: 1;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .aplayer-lrc p:first-child {
+            margin-top: auto;
+        }
+
+        .aplayer-lrc p:last-child {
+            margin-bottom: auto;
+        }
+
+        .playlist-container {
+            max-height: 0;
+            overflow-y: auto;
+            transition: max-height 0.5s ease-in-out;
+            border-top: 1px solid transparent;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .playlist-container.show {
+            max-height: 250px;
+            margin-top: 1rem;
+            padding-top: 0.5rem;
+            border-top-color: var(--glass-border-color);
+        }
+
+        /* 播放列表自定义滚动条 */
+        .playlist-container::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .playlist-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .playlist-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: 10px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .playlist-item:hover {
+            background-color: var(--repo-card-hover-bg);
+        }
+
+        .playlist-item.active {
+            background-color: var(--repo-card-bg);
+        }
+
+        .playlist-item .index {
+            color: var(--text-color-darker);
+            margin-right: 1rem;
+            width: 1.5rem;
+            text-align: right;
+        }
+
+        .playlist-item .info {
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .playlist-item .title {
+            color: var(--text-color);
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .playlist-item .artist {
+            font-size: 0.8rem;
+            color: var(--text-color-darker);
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .player-fade-enter-active,
+        .player-fade-leave-active {
+            transition: all 0.4s ease-in-out;
+        }
+
+        .player-fade-enter-from,
+        .player-fade-leave-to {
+            opacity: 0;
+            transform: scale(0.95);
+        }
 
         /* --- 登录模态框 --- */
-        .login-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 30; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .login-modal-overlay.is-visible { opacity: 1; pointer-events: auto; }
-        .login-modal-container { transform: scale(0.95); transition: transform 0.3s ease; }
-        .login-modal-overlay.is-visible .login-modal-container { transform: scale(1); }
-        .home-container { padding: 2rem; text-align: center; max-width: 90vw; width: 400px; }
-        .info-card { padding: 2.5rem; }
-        .admin-login-form h3 { color: var(--text-color-white); font-size: 1.5rem; margin-bottom: 2rem; }
-        .form-group { margin-bottom: 1.5rem; text-align: left; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-color-darker); }
-        .form-group input { width: 100%; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border-color); color: var(--text-color); font-size: 1rem; transition: all 0.3s ease; background: var(--input-bg); box-shadow: inset 0px 1px 1px var(--glass-highlight-border); }
-        .form-group input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 2px var(--accent-color), inset 0px 1px 1px var(--glass-highlight-border); }
-        .login-button { width: 100%; padding: 0.8rem 1rem; border: none; background-color: var(--subscribe-btn-bg); color: white; font-size: 1rem; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
-        .login-button:hover { opacity: 0.9; transform: translateY(-2px); }
+        .login-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .login-modal-overlay.is-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .login-modal-container {
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .login-modal-overlay.is-visible .login-modal-container {
+            transform: scale(1);
+        }
+
+        .home-container {
+            padding: 2rem;
+            text-align: center;
+            max-width: 90vw;
+            width: 400px;
+        }
+
+        .info-card {
+            padding: 2.5rem;
+        }
+
+        .admin-login-form h3 {
+            color: var(--text-color-white);
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--input-bg);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: none;
+            background-color: var(--subscribe-btn-bg);
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
 
         /* --- 内容区域 --- */
-        .content-section { padding: 4rem 2rem; max-width: 1000px; margin: 0 auto; }
-        .content-section:first-of-type { padding-top: 8rem; }
-        .content-card { padding: 2rem; margin-bottom: 3rem; box-shadow: none; }
-        .content-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-color-white); margin-bottom: 2rem; }
+        .content-section {
+            padding: 4rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .content-section:first-of-type {
+            padding-top: 8rem;
+        }
+
+        .content-card {
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: none;
+        }
+
+        .content-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color-white);
+            margin-bottom: 2rem;
+        }
 
         /* About Us 组件 */
-        .about-us-card { display: flex; padding: 3rem; gap: 3rem; }
-        .about-sidebar { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
-        .sidebar-line { width: 2px; height: 100%; background-color: var(--accent-color); flex-grow: 1; }
-        .sidebar-text { writing-mode: vertical-rl; transform: rotate(180deg); color: var(--text-color-darker); font-size: 0.9rem; letter-spacing: 0.1em; white-space: nowrap; }
-        .about-main-content { flex-grow: 1; }
-        .about-main-content h2 { font-size: 1.1rem; font-weight: 500; color: var(--text-color-darker); margin-bottom: 1.5rem; }
-        .about-main-content blockquote { position: relative; font-size: 2.5rem; font-weight: 700; line-height: 1.4; margin-left: 2rem; margin-bottom: 3rem; padding-left: 2rem; border-left: 2px solid var(--accent-color); }
-        .about-main-content h3 { font-size: 1.25rem; font-weight: 600; color: var(--text-color-white); margin-bottom: 1rem; }
-        .about-main-content p { font-size: 1rem; line-height: 1.8; color: var(--text-color-darker); margin-bottom: 2rem; }
-        .about-main-content p strong { color: var(--accent-color); font-weight: 500; }
-        .rd-philosophy { border-top: 1px solid var(--glass-border-color); padding-top: 2rem; margin-top: 2rem; }
+        .about-us-card {
+            display: flex;
+            padding: 3rem;
+            gap: 3rem;
+        }
 
-        /* Bilibili & Github 组件通用样式 */
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;}
-        .card-header .stats { font-size: 0.9rem; color: var(--text-color-darker); display: flex; gap: 1rem;}
-        .card-header .stats strong { color: var(--text-color-white); font-weight: 600;}
-        .card-header a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+        .about-sidebar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
 
-        /* Bilibili 组件 */
-        .dynamic-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .dynamic-card { text-decoration: none; color: var(--text-color-darker); transition: transform 0.3s ease; display: block; background: var(--repo-card-bg); border-radius: 16px; padding: 1.5rem; }
-        .dynamic-card:hover { transform: translateY(-5px); background: var(--repo-card-hover-bg); }
-        .dynamic-card .video-thumbnail { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 12px; margin-bottom: 0.75rem; background-color: rgba(255,255,255,0.05); }
-        .dynamic-card .video-title { font-weight: 500; font-size: 1rem; line-height: 1.4; color: var(--text-color); margin-bottom: 0.5rem; }
-        .dynamic-card .dynamic-content { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; }
-        .dynamic-card-text-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
-        .dynamic-card-avatar { width: 36px; height: 36px; border-radius: 50%; }
+        .sidebar-line {
+            width: 2px;
+            height: 100%;
+            background-color: var(--accent-color);
+            flex-grow: 1;
+        }
 
-        /* Github 组件 */
-        .github-contributions { width: 100%; border-radius: 12px; margin-bottom: 2rem; }
-        .repo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
-        .repo-card { background: var(--repo-card-bg); padding: 1.5rem; border-radius: 16px; text-decoration: none; color: var(--text-color-darker); transition: background-color 0.3s ease; display: flex; flex-direction: column; }
-        .repo-card:hover { background: var(--repo-card-hover-bg); }
-        .repo-card h3 { color: var(--text-color-white); font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .repo-card p { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex-grow: 1; }
-        .repo-stats { display: flex; gap: 1rem; font-size: 0.85rem; align-items: center; }
-        .repo-stats span { display: flex; align-items: center; gap: 0.25rem; }
-        .repo-stats svg { width: 14px; height: 14px; }
+        .sidebar-text {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            color: var(--text-color-darker);
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+        }
+
+        .about-main-content {
+            flex-grow: 1;
+        }
+
+        .about-main-content h2 {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color-darker);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-main-content blockquote {
+            position: relative;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-left: 2rem;
+            margin-bottom: 3rem;
+            padding-left: 2rem;
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .about-main-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color-white);
+            margin-bottom: 1rem;
+        }
+
+        .about-main-content p {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-color-darker);
+            margin-bottom: 2rem;
+        }
+
+        .about-main-content p strong {
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .rd-philosophy {
+            border-top: 1px solid var(--glass-border-color);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Github & Bookshelf 组件通用样式 */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-header .stats {
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .card-header .stats strong {
+            color: var(--text-color-white);
+            font-weight: 600;
+        }
+
+        .card-header a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .github-contributions {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .repo-grid, .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .repo-card, .book-card {
+            background: var(--repo-card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text-color-darker);
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
         
+        .book-card {
+            align-items: center; /* Center book content */
+            text-align: center;
+        }
+
+        .repo-card:hover, .book-card:hover {
+            background: var(--repo-card-hover-bg);
+            transform: translateY(-5px);
+        }
+
+        .repo-card h3, .book-card h3 {
+            color: var(--text-color-white);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .book-card h3 {
+             margin-top: 1rem; /* Space between cover and title */
+        }
+
+        .repo-card p, .book-card p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        
+        .book-card p {
+            flex-grow: 0; /* Author doesn't need to grow */
+        }
+        
+        .book-cover {
+            width: 100%;
+            max-width: 150px; /* Limit book cover size */
+            height: auto;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .repo-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            align-items: center;
+        }
+
+        .repo-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .repo-stats svg {
+            width: 14px;
+            height: 14px;
+        }
+
         /* 时间线 */
-        .timeline { position: relative; padding-left: 2rem; border-left: 2px solid var(--accent-color); }
-        .timeline-item { position: relative; margin-bottom: 2rem; }
-        .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-item::before { content: ''; position: absolute; left: -2.4rem; top: 4px; width: 14px; height: 14px; background-color: var(--accent-color); border-radius: 50%; border: 2px solid var(--body-bg-color); }
-        .timeline-date { font-weight: 600; color: var(--text-color-white); }
-        .timeline-desc { margin-top: 0.5rem; color: var(--text-color-darker); }
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -2.4rem;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            border: 2px solid var(--body-bg-color);
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--text-color-white);
+        }
+
+        .timeline-desc {
+            margin-top: 0.5rem;
+            color: var(--text-color-darker);
+        }
+
+        /* --- 目标进度组件 --- */
+        .targets-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color-white);
+            margin-bottom: 2rem;
+        }
+
+        .target-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .target-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .target-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .target-name {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .target-progress-text {
+            color: var(--text-color-darker);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: var(--repo-card-bg);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* --- AI 对话组件 --- */
+        .chatbot-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 70vh;
+            max-height: 120vh;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-settings {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 900px) {
+            .chatbot-settings {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .api-key-group {
+            grid-column: 1 / -1;
+            /* Span across all columns */
+        }
+
+        .setting-item label {
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tooltip-icon {
+            color: var(--text-color-darker);
+            font-size: 1rem;
+            cursor: help;
+            margin-left: 0.5rem;
+        }
+
+        .setting-item input[type="password"],
+        .setting-item input[type="range"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .setting-item input[type="password"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .get-api-key-link {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .get-api-key-link:hover {
+            text-decoration: underline;
+        }
+
+        .chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--repo-card-bg);
+            border-radius: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .chat-window::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-window::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb {
+            background-color: var(--accent-color);
+            border-radius: 8px;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+            margin-bottom: 1rem;
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.assistant {
+            align-items: flex-start;
+        }
+
+        .message.system {
+            align-items: center;
+        }
+
+        .system-message-content {
+            font-size: 0.85rem;
+            color: var(--text-color-darker);
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            line-height: 1.6;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message-content> :first-child {
+            margin-top: 0;
+        }
+
+        .message-content> :last-child {
+            margin-bottom: 0;
+        }
+
+        .message.user .message-content {
+            background-color: var(--accent-color);
+            color: #121212;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background-color: var(--repo-card-hover-bg);
+            color: var(--text-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.assistant pre {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        .message.assistant code {
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: var(--text-color-darker);
+            cursor: pointer;
+            padding: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-content:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            color: var(--text-color-white);
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input-area textarea {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border-color);
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            resize: none;
+            height: 50px;
+            transition: all 0.2s;
+        }
+
+        .chat-input-area textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+            height: 80px;
+        }
+
+        .send-button {
+            padding: 0.75rem 1.25rem;
+            border-radius: 16px;
+            border: none;
+            background-color: var(--subscribe-btn-bg);
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .send-button:disabled {
+            background-color: var(--text-color-darker);
+            cursor: not-allowed;
+        }
+
+        .copy-chat-button {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border-color);
+            background: var(--input-bg);
+            color: var(--text-color-darker);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .copy-chat-button:hover {
+            border-color: var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .web-search-toggle {
+            display: flex;
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border-color);
+            background: var(--input-bg);
+            height: 100%;
+        }
+
+        .web-search-toggle label {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .toggle-switch.active {
+            background-color: var(--accent-color);
+        }
+
+        .toggle-knob {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
 
         /* 动画 */
-        .anim-fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .anim-fade-in-up.is-visible { opacity: 1; transform: translateY(0); }
+        .anim-fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .anim-fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* --- 页脚区域 --- */
-        .footer-section { padding: 4rem 2rem 2rem; text-align: center; color: var(--text-color-darker); border-radius: 24px 24px 0 0; }
-        html.light-theme .footer-section { --glass-bg: rgba(247, 248, 250, 0.7); }
-        .footer-title { font-size: 1.5rem; margin-bottom: 1rem; color: var(--text-color-white); }
-        .footer-subtitle { margin-bottom: 2.5rem; }
-        .icon-links-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem 1.5rem; margin-bottom: 2.5rem; }
-        .icon-link { display: flex; align-items: center; gap: 0.5rem; color: var(--text-color-darker); text-decoration: none; transition: color 0.3s ease; }
-        .icon-link:hover { color: var(--text-color-white); }
-        .icon-link svg { width: 18px; height: 18px; }
-        .icon-link span { font-size: 0.9rem; }
-        .info-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-bottom: 1.5rem; }
-        .info-links a { color: var(--text-color-darker); text-decoration: none; font-size: 0.85rem; }
-        .info-links a:hover { color: var(--text-color-white); }
-        .copyright-info { border-top: 1px solid var(--glass-border-color); padding-top: 1.5rem; font-size: 0.85rem; position: relative; transition: border-color 0.3s ease; }
-        .theme-switcher { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; gap: 0.5rem; background: var(--theme-switcher-bg); padding: 0.3rem; border-radius: 20px; transition: background-color 0.3s ease; }
-        .theme-switcher button { background: none; border: none; color: var(--text-color-darker); cursor: pointer; padding: 0.3rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .theme-switcher button.active { background: var(--subscribe-btn-bg); color: white; }
-        .theme-switcher svg { width: 14px; height: 14px; }
+        .footer-section {
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            color: var(--text-color-darker);
+            border-radius: 24px 24px 0 0;
+        }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        html.light-theme .footer-section {
+            --glass-bg: rgba(247, 248, 250, 0.7);
+        }
+
+        .footer-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-color-white);
+        }
+
+        .footer-subtitle {
+            margin-bottom: 2.5rem;
+        }
+
+        .icon-links-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .icon-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-color-darker);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .icon-link:hover {
+            color: var(--text-color-white);
+        }
+
+        .icon-link svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .icon-link span {
+            font-size: 0.9rem;
+        }
+
+        .info-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-links a {
+            color: var(--text-color-darker);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .info-links a:hover {
+            color: var(--text-color-white);
+        }
+
+        .copyright-info {
+            border-top: 1px solid var(--glass-border-color);
+            padding-top: 1.5rem;
+            font-size: 0.85rem;
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+
+        .copyright-info p {
+            margin-bottom: 0.5rem;
+        }
+
+        .copyright-info .site-info-item {
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .theme-switcher {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+            background: var(--theme-switcher-bg);
+            padding: 0.3rem;
+            border-radius: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-switcher button {
+            background: none;
+            border: none;
+            color: var(--text-color-darker);
+            cursor: pointer;
+            padding: 0.3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-switcher button.active {
+            background: var(--subscribe-btn-bg);
+            color: white;
+        }
+
+        .theme-switcher svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
 
         /* 响应式设计 */
         @media (max-width: 900px) {
-            .about-us-card { flex-direction: column; padding: 2rem; gap: 2rem; }
-            .about-sidebar { flex-direction: row; width: 100%; }
-            .sidebar-text { writing-mode: horizontal-tb; transform: none; }
-            .about-main-content blockquote { font-size: 1.8rem; margin-left: 0; padding-left: 1.5rem; }
+            .about-us-card {
+                flex-direction: column;
+                padding: 2rem;
+                gap: 2rem;
+            }
+
+            .about-sidebar {
+                flex-direction: row;
+                width: 100%;
+            }
+
+            .sidebar-text {
+                writing-mode: horizontal-tb;
+                transform: none;
+            }
+
+            .about-main-content blockquote {
+                font-size: 1.8rem;
+                margin-left: 0;
+                padding-left: 1.5rem;
+            }
+            .book-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
         }
+
+        @media (max-width: 768px) {
+            .custom-player-controls .volume-control-wrapper {
+                display: none;
+            }
+        }
+
         @media (max-width: 600px) {
-            .main-header { padding: 4px; } .header-nav a { margin: 0; padding: 0 0.75rem; }
-            .home-container { padding: 1rem; } .info-card { padding: 2rem 1.5rem; border-radius: 1rem; }
-            .copyright-info { text-align: left; padding-right: 60px; } .theme-switcher { top: 1.5rem; transform: none; }
+            .main-header {
+                padding: 4px;
+            }
+
+            .header-nav a {
+                margin: 0;
+                padding: 0 0.75rem;
+            }
+
+            .home-container {
+                padding: 1rem;
+            }
+
+            .info-card {
+                padding: 2rem 1.5rem;
+                border-radius: 1rem;
+            }
+
+            .copyright-info {
+                text-align: left;
+                padding-right: 60px;
+            }
+
+            .theme-switcher {
+                top: 1.5rem;
+                transform: none;
+            }
+
+            .hero-player-container {
+                max-width: calc(100% - 40px);
+            }
+
+            .book-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
         }
     </style>
 </head>
@@ -389,25 +1631,35 @@
     <canvas id="particle-canvas"></canvas>
 
     <div id="app">
-        <header class="main-header glass-effect" :class="{ 'is-expanded': isHeaderExpanded, 'is-visible': isHeaderVisible }">
-            <img :src="bilibili.face" alt="导航头像" class="header-avatar" @click="toggleLoginModal" onerror="this.onerror=null;this.src='https://placehold.co/44x44/333/fff?text=LM';">
+        <header class="main-header glass-effect"
+            :class="{ 'is-expanded': isHeaderExpanded, 'is-visible': isHeaderVisible }">
+            <img src="icon\128.png" alt="导航头像" class="header-avatar"
+                @click="toggleLoginModal" />
             <nav class="header-nav">
                 <a @click="scrollToSection('about')" :class="{ active: activeSection === 'about' }">关于</a>
-                <a @click="scrollToSection('bilibili')" :class="{ active: activeSection === 'bilibili' }">B站</a>
                 <a @click="scrollToSection('github')" :class="{ active: activeSection === 'github' }">Github</a>
                 <a @click="scrollToSection('timeline')" :class="{ active: activeSection === 'timeline' }">时光</a>
+                <a @click="scrollToSection('targets')" :class="{ active: activeSection === 'targets' }">进度</a>
+                <a @click="scrollToSection('bookshelf')" :class="{ active: activeSection === 'bookshelf' }">书架</a>
+                <a @click="scrollToSection('chatbot')" :class="{ active: activeSection === 'chatbot' }">AI</a>
                 <a @click="scrollToSection('footer')" :class="{ active: activeSection === 'footer' }">更多</a>
             </nav>
         </header>
 
         <div class="login-modal-overlay" :class="{'is-visible': isLoginModalVisible}" @click.self="toggleLoginModal">
-             <div class="login-modal-container">
+            <div class="login-modal-container">
                 <div class="home-container">
                     <div class="info-card glass-effect">
                         <form @submit.prevent="handleLogin" class="admin-login-form">
                             <h3>管理员登录</h3>
-                            <div class="form-group"> <label for="username">用户名</label> <input type="text" id="username" v-model="username" required> </div>
-                            <div class="form-group"> <label for="password">密码</label> <input type="password" id="password" required> </div>
+                            <div class="form-group">
+                                <label for="username">用户名</label>
+                                <input type="text" id="username" v-model="username" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="password">密码</label>
+                                <input type="password" id="password" v-model="password" required />
+                            </div>
                             <button type="submit" class="login-button">登录</button>
                         </form>
                     </div>
@@ -420,80 +1672,197 @@
         </div>
 
         <main class="main-content">
-            <section class="initial-hero-section" id="initial-hero" data-section="hero" :style="{ backgroundImage: `url(${bilibili.spaceBanner})` }">
+            <section class="initial-hero-section" id="initial-hero" data-section="hero">
                 <div class="hero-text-container">
-                    <p>{{ heroLine1 }}<span v-if="heroLine1Active" class="waving-hand">👋</span></p>
-                    <p>{{ heroLine2 }}<span v-if="heroLine2Active" class="typing-cursor-hero"></span></p>
-                    <p>{{ heroLine3 }}<span v-if="heroLine3Active" class="typing-cursor-hero"></span></p>
-                    <p>{{ heroLine4 }}<span v-if="heroLine4Active" class="typing-cursor-hero"></span></p>
+                    <p>
+                        {{ heroLine1 }}<span v-if="heroLine1Active" class="waving-hand">👋</span>
+                    </p>
+                    <p>
+                        {{ heroLine2 }}<span v-if="heroLine2Active" class="typing-cursor-hero"></span>
+                    </p>
+                    <p>
+                        {{ heroLine3 }}<span v-if="heroLine3Active" class="typing-cursor-hero"></span>
+                    </p>
+                    <p>
+                        {{ heroLine4 }}<span v-if="heroLine4Active" class="typing-cursor-hero"></span>
+                    </p>
                 </div>
-                <div class="hero-socials">
-                    <a :href="bilibili.spaceUrl" target="_blank" title="Bilibili" class="glass-effect"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>Bilibili</title><path d="M13.28 2.25H4.01A1.76 1.76 0 0 0 2.25 4.01v15.98A1.76 1.76 0 0 0 4.01 21.75h15.98a1.76 1.76 0 0 0 1.76-1.76V11.2H13.28V2.25zM11.22 11.19h-2.1v2.1h2.1v-2.1zm0-4.28h-2.1v2.1h2.1V6.91zm4.28 4.28h-2.1v2.1h2.1v-2.1zm0-4.28h-2.1v2.1h2.1V6.91z"/></svg></a>
-                    <a :href="github.spaceUrl" target="_blank" title="GitHub" class="glass-effect"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22v3.29c0 .316.19.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
-                    <a href="#" title="About me" class="glass-effect"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" ><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd" /></svg></a>
-                    <a href="#" title="Email" class="glass-effect"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg></a>
+                <div class="hero-bottom-content" :class="{ visible: showHeroButtons }">
+                    <div class="hero-socials">
+                        <a :href="github.spaceUrl" target="_blank" title="GitHub" class="glass-effect"><svg role="img"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                <title>GitHub</title>
+                                <path
+                                    d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22v3.29c0 .316.19.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                            </svg></a>
+                        <a href="https://space.bilibili.com/520237303" target="_blank" title="Bilibili"
+                            class="glass-effect"><svg width="24" height="24" viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                <g>
+                                    <path fill="none" d="M0 0h24v24H0z" />
+                                    <path
+                                        d="M18.223 3.086a1.25 1.25 0 0 1 0 1.768L17.08 5.996h1.17A3.75 3.75 0 0 1 22 9.747v7.5a3.75 3.75 0 0 1-3.75 3.75H5.75A3.75 3.75 0 0 1 2 17.247v-7.5a3.75 3.75 0 0 1 3.75-3.75h1.166L5.775 4.855a1.25 1.25 0 1 1 1.767-1.768l2.652 2.652c.079.079.145.165.198.257h3.213c.053-.092.12-.18.199-.258l2.651-2.652a1.25 1.25 0 0 1 1.768 0zm.027 5.42H5.75a1.25 1.25 0 0 0-1.247 1.157l-.003.094v7.5c0 .659.51 1.199 1.157 1.246l.093.004h12.5a1.25 1.25 0 0 0 1.247-1.157l.003-.093v-7.5c0-.69-.56-1.25-1.25-1.25zm-10 2.5c.69 0 1.25.56 1.25 1.25v1.25a1.25 1.25 0 1 1-2.5 0v-1.25c0-.69.56-1.25 1.25-1.25zm7.5 0c.69 0 1.25.56 1.25 1.25v1.25a1.25 1.25 0 1 1-2.5 0v-1.25c0-.69.56-1.25 1.25-1.25z" />
+                                </g>
+                            </svg></a>
+                        <a href="https://wpa.qq.com/msgrd?v=3&uin=1723749425&site=qq&menu=yes" title="QQ:1723749425"
+                            class="glass-effect">
+                            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                                <path
+                                    d="M29.11 26.278c-0.72 0.087-2.804-3.296-2.804-3.296 0 1.959-1.009 4.515-3.191 6.362 1.052 0.325 3.428 1.198 2.863 2.151-0.457 0.772-7.844 0.493-9.977 0.252-2.133 0.24-9.52 0.519-9.977-0.252-0.565-0.953 1.807-1.826 2.861-2.151-2.182-1.846-3.191-4.403-3.191-6.362 0 0-2.083 3.384-2.804 3.296-0.335-0.041-0.776-1.853 0.584-6.231 0.641-2.064 1.375-3.78 2.509-6.611-0.191-7.306 2.828-13.435 10.016-13.435 7.109 0.001 10.197 6.008 10.017 13.435 1.132 2.826 1.869 4.553 2.509 6.611 1.361 4.379 0.92 6.191 0.584 6.231z" />
+                            </svg>
+                        </a>
+                        <a href="mailto:luckyshuixin@qq.com" title="Email:luckyshuixin@qq.com" class="glass-effect"><svg
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg></a>
+                    </div>
+
+                    <div class="hero-player-container">
+                        <transition name="player-fade">
+                            <button v-if="!player.isInitialized && !player.isLoading" @click="startMusicPlayback"
+                                class="play-button glass-effect">
+                                <i class="ph-fill ph-play"></i>
+                            </button>
+                        </transition>
+                        <transition name="player-fade">
+                            <div v-if="player.isLoading" class="loading-spinner"></div>
+                        </transition>
+
+                        <transition name="player-fade">
+                            <div class="player-wrapper glass-effect" v-if="player.isInitialized">
+                                <div id="player" class="custom-player">
+                                    <img :src="player.currentSong.cover" alt="Song Cover" class="custom-player-cover" />
+                                    <div class="custom-player-info-wrapper">
+                                        <div class="custom-player-info">
+                                            <div class="custom-player-title">
+                                                {{ player.currentSong.name }}
+                                            </div>
+                                            <div class="custom-player-artist">
+                                                {{ player.currentSong.artist }}
+                                            </div>
+                                        </div>
+                                        <div class="custom-player-progress-container" @click="seek">
+                                            <div class="custom-player-progress-bar"
+                                                :style="{ width: player.progress + '%' }"></div>
+                                        </div>
+                                    </div>
+                                    <div class="custom-player-controls">
+                                        <div class="volume-control-wrapper">
+                                            <i class="ph-fill"
+                                                :class="player.volume > 0.5 ? 'ph-speaker-high' : player.volume > 0 ? 'ph-speaker-low' : 'ph-speaker-slash'"></i>
+                                            <input type="range" class="volume-slider" min="0" max="1" step="0.01"
+                                                v-model="player.volume" @input="setVolume"
+                                                :style="{'--volume-percent': player.volume * 100 + '%'}" />
+                                        </div>
+                                        <button @click="player.aplayer.skipBack()">
+                                            <i class="ph-fill ph-skip-back"></i>
+                                        </button>
+                                        <button @click="player.aplayer.toggle()">
+                                            <i :class="player.isPlaying ? 'ph-fill ph-pause' : 'ph-fill ph-play'"></i>
+                                        </button>
+                                        <button @click="player.aplayer.skipForward()">
+                                            <i class="ph-fill ph-skip-forward"></i>
+                                        </button>
+                                        <button @click="togglePlaylist">
+                                            <i class="ph-fill ph-list"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div ref="lrcContainer" class="custom-lrc-container"></div>
+
+                                <div class="playlist-container" :class="{ show: player.isPlaylistVisible }">
+                                    <div v-for="(song, index) in player.playlist" :key="song.url" class="playlist-item"
+                                        :class="{ active: player.currentSong.url === song.url }"
+                                        @click="player.aplayer.list.switch(index)">
+                                        <span class="index">{{ index + 1 }}</span>
+                                        <div class="info">
+                                            <div class="title">{{ song.name }}</div>
+                                            <div class="artist">{{ song.artist }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </transition>
+                        <div id="player-hidden"></div>
+                    </div>
                 </div>
             </section>
 
             <section id="about" class="content-section" data-section="about">
-                 <div class="about-us-card content-card glass-effect anim-fade-in-up">
-                    <div class="about-sidebar"> <div class="sidebar-text">TECH OTAKUS SAVE THE WORLD</div> <div class="sidebar-line"></div> </div>
+                <div class="about-us-card content-card glass-effect anim-fade-in-up">
+                    <div class="about-sidebar">
+                        <div class="sidebar-text">MAY YOU ALWAYS SHINE</div>
+                        <div class="sidebar-line"></div>
+                    </div>
                     <div class="about-main-content">
-                        <h2>我们的愿景</h2> <blockquote>「 2030年 , 打造出全球十亿人愿意生活在其中的虚拟世界。」</blockquote>
-                        <h3>关于米哈游</h3> <p>米哈游成立于2011年, 致力于为用户提供美好的、超出预期的产品与内容。米哈游陆续推出了多款高品质人气产品, 包括《崩坏学园2》、《崩坏3》、《未定事件簿》、《原神》、《崩坏：星穹铁道》、《绝区零》, 并围绕原创IP打造了动画、音乐及周边等多元产品。</p>
-                        <p>秉承着“<strong>技术宅拯救世界</strong>”的使命, 米哈游始终致力于技术研发, 探索前沿科技, 在卡通渲染、人工智能、云游戏技术等领域积累了先进的技术能力。</p>
-                        <p>米哈游总部位于中国上海, 并在新加坡、美国、加拿大、日本、韩国等国家和地区进行全球化布局。目前, 公司员工5,000人, 来自世界知名游戏/互联网/科技公司。</p>
-                        <div class="rd-philosophy"> <h3>米哈游的研发理念</h3> <p>Something New | Something Exciting | Something Out of Imagination</p> </div>
+                        <h2>我的愿景</h2>
+                        <blockquote>
+                            「你便是世界上的美好，永远闪耀。」
+                        </blockquote>
+                        <h3>关于我</h3>
+                        <p>
+                            我一直很喜欢动手做出点东西,包括这个个人网站。
+                            从22年就开始着手设计和开发这个网站,花了三年多时间,终于在2025年1月1日上线。
+                            虽然有很多不足之处,也停滞不前了很久。
+                            但真的做出来了,我很开心。
+                        </p>
+                        <p>
+                            我很喜欢一句话“<strong>May you,the beauty of this world,always shine.</strong>”,
+                            来自崩坏3的毕业旅行。
+                            虽然没有那样的旅行，没有那样的经历，但在我自己的路上，我便是世界上的美好，永远闪耀。
+                            这也是我喜欢二次元的原因。
+                        </p>
+                        <h3>我的爱好</h3>
+                        <p>
+                            我喜欢编程、k动画、电子DIY,做喜欢的东西。
+                            喜欢健身，喜欢健康的生活方式。
+                            喜欢竹笛，因为一首曲子。
+                        </p>
+                        <div class="rd-philosophy">
+                            <h3>喜欢</h3>
+                            <p>
+                                凡人修仙传 | 二次元 | Something Exciting | Something Out of
+                                Imagination
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Bilibili Section -->
-            <section id="bilibili" class="content-section" data-section="bilibili">
-                <div class="content-card glass-effect anim-fade-in-up">
-                    <div class="card-header">
-                        <div class="stats">
-                            <span>粉丝: <strong>{{ bilibili.fans }}</strong></span>
-                            <span>获赞: <strong>{{ bilibili.likes }}</strong></span>
-                            <span>投稿: <strong>{{ bilibili.archive_count }}</strong></span>
-                        </div>
-                        <a :href="bilibili.spaceUrl" target="_blank">访问主页 &rarr;</a>
-                    </div>
-                    <div class="dynamic-list" v-if="bilibili.dynamics.length">
-                        <a v-for="dynamic in bilibili.dynamics" :key="dynamic.id_str" :href="dynamic.url" target="_blank" class="dynamic-card">
-                            <template v-if="dynamic.type === 'video'">
-                                <img :src="dynamic.pic" :alt="dynamic.title" class="video-thumbnail" onerror="this.onerror=null;this.src='https://placehold.co/320x200/333/fff?text=Cover';">
-                                <h3 class="video-title">{{ dynamic.title }}</h3>
-                            </template>
-                             <template v-else>
-                                 <div class="dynamic-card-text-header">
-                                     <img :src="bilibili.face" class="dynamic-card-avatar" alt="UP Avatar">
-                                     <strong>{{ bilibili.name }}</strong>
-                                 </div>
-                                 <div class="dynamic-content">{{ dynamic.content }}</div>
-                             </template>
-                        </a>
-                    </div>
-                     <p v-else>正在加载B站动态...</p>
-                </div>
-            </section>
-            
-            <!-- Github Section -->
             <section id="github" class="content-section" data-section="github">
                 <div class="content-card glass-effect anim-fade-in-up">
-                     <div class="card-header">
+                    <div class="card-header">
                         <h2>我的Github</h2>
                         <a :href="github.spaceUrl" target="_blank">访问主页 &rarr;</a>
                     </div>
-                    <img :src="github.contributionsUrl" alt="Github Contributions" class="github-contributions" :style="{ filter: currentTheme === 'dark' ? 'invert(1)' : 'invert(0)' }">
+                    <img :src="github.contributionsUrl" alt="Github Contributions" class="github-contributions"
+                        :style="{ filter: currentTheme === 'dark' ? 'invert(1)' : 'invert(0)' }" />
                     <div class="repo-grid" v-if="github.repos.length">
-                        <a v-for="repo in github.repos" :key="repo.id" :href="repo.html_url" target="_blank" class="repo-card">
+                        <a v-for="repo in github.repos" :key="repo.id" :href="repo.html_url" target="_blank"
+                            class="repo-card">
                             <h3>{{ repo.name }}</h3>
                             <p>{{ repo.description || '暂无描述' }}</p>
                             <div class="repo-stats">
-                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.868 2.884c.321.64.321 1.393 0 2.034a.985.985 0 01-1.737 0c.321-.64.321-1.393 0-2.034a.985.985 0 011.737 0zM12 12.5a.5.5 0 01.5.5v1a.5.5 0 01-1 0v-1a.5.5 0 01.5-.5zM10.5 6a.5.5 0 00-1 0v6a.5.5 0 001 0V6z" clip-rule="evenodd" /><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-1.5a6.5 6.5 0 110-13 6.5 6.5 0 010 13z" /></svg> {{ repo.language || 'Text' }}</span>
-                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg> {{ repo.stargazers_count }}</span>
-                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M15.312 5.312l-1.422 1.422L12 8.156l-1.89-1.89a.75.75 0 00-1.06 1.061l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422a.75.75 0 101.06 1.06L9.89 13.94l1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422a.75.75 0 10-1.06-1.06z" clip-rule="evenodd" /></svg> {{ repo.forks_count }}</span>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10.868 2.884c.321.64.321 1.393 0 2.034a.985.985 0 01-1.737 0c.321-.64.321-1.393 0-2.034a.985.985 0 011.737 0zM12 12.5a.5.5 0 01.5.5v1a.5.5 0 01-1 0v-1a.5.5 0 01.5-.5zM10.5 6a.5.5 0 00-1 0v6a.5.5 0 001 0V6z"
+                                            clip-rule="evenodd" />
+                                        <path
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-1.5a6.5 6.5 0 110-13 6.5 6.5 0 010 13z" />
+                                    </svg>
+                                    {{ repo.language || 'Text' }}</span>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                    </svg>
+                                    {{ repo.stargazers_count }}</span>
+                                <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M15.312 5.312l-1.422 1.422L12 8.156l-1.89-1.89a.75.75 0 00-1.06 1.061l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422-1.89-1.89a.75.75 0 10-1.06 1.06l1.89 1.89-1.422 1.422a.75.75 0 101.06 1.06L9.89 13.94l1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422 1.89 1.89a.75.75 0 101.06-1.06l-1.89-1.89 1.422-1.422a.75.75 0 10-1.06-1.06z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    {{ repo.forks_count }}</span>
                             </div>
                         </a>
                     </div>
@@ -502,17 +1871,116 @@
             </section>
 
             <section id="timeline" class="content-section" data-section="timeline">
-                 <div class="content-card glass-effect anim-fade-in-up">
+                <div class="content-card glass-effect anim-fade-in-up">
                     <h2>时光</h2>
                     <div class="timeline">
-                       <div class="timeline-item" v-for="item in timeline" :key="item.date">
+                        <div class="timeline-item" v-for="item in timeline" :key="item.date">
                             <div class="timeline-date">{{ item.date }}</div>
                             <p class="timeline-desc">{{ item.event }}</p>
-                       </div>
+                        </div>
                     </div>
                 </div>
             </section>
-            
+
+            <section id="targets" class="content-section" data-section="targets">
+                <div class="content-card glass-effect anim-fade-in-up targets-card">
+                    <h2>目标进度</h2>
+                    <div class="target-list">
+                        <div v-for="target in targets" :key="target.name" class="target-item">
+                            <div class="target-info">
+                                <span class="target-name">{{ target.name }}</span>
+                                <span class="target-progress-text">{{ target.current }} / {{ target.total }}</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar"
+                                    :style="{ width: (target.current / target.total) * 100 + '%' }"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bookshelf" class="content-section" data-section="bookshelf">
+                <div class="content-card glass-effect anim-fade-in-up">
+                    <h2>我的笔记（随便点一个查看更多）</h2>
+                    <div class="book-grid">
+                        <a v-for="book in bookshelf" :key="book.title" :href="book.url" target="_blank" class="book-card">
+                            <img :src="book.coverUrl" :alt="book.title" class="book-cover" @error="handleImgError" />
+                            <h3>{{ book.title }}</h3>
+                            <p>{{ book.author }}</p>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section id="chatbot" class="content-section" data-section="chatbot">
+                <div class="content-card glass-effect anim-fade-in-up chatbot-card">
+                    <h2>AI 对话 (开发测试中)</h2>
+                    <div class="chatbot-settings">
+                        <div class="setting-item api-key-group">
+                            <label for="apiKey">
+                                <span>API Key</span>
+                                <a href="https://platform.deepseek.com/api_keys" target="_blank"
+                                    class="get-api-key-link">获取密钥</a>
+                            </label>
+                            <input id="apiKey" type="password" v-model="chatbot.apiKey"
+                                placeholder="输入你的 DeepSeek API Key" />
+                        </div>
+                        <div class="setting-item">
+                            <label for="temperature">
+                                <span>温度: {{ chatbot.temperature }}</span>
+                                <i class="ph ph-info tooltip-icon" title="较低的值会使输出更具确定性，较高的值会更具创造性和随机性。">
+                                </i>
+                            </label>
+                            <input id="temperature" type="range" v-model="chatbot.temperature" min="0" max="2"
+                                step="0.1" />
+                        </div>
+                        <div class="setting-item web-search-toggle">
+                            <label for="webSearch">网页搜索</label>
+                            <div class="toggle-switch" :class="{ active: chatbot.webSearchEnabled }"
+                                @click="chatbot.webSearchEnabled = !chatbot.webSearchEnabled">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <button @click="copyFullChat($event)" class="copy-chat-button">
+                                <i class="ph ph-copy-simple"></i>
+                                <span>复制对话</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chat-window" ref="chatWindow">
+                        <div v-for="(message, index) in chatbot.messages" :key="index" class="message"
+                            :class="message.role">
+                            <div v-if="message.role !== 'system'" class="message-content">
+                                <div v-if="chatbot.isLoading && index === chatbot.messages.length - 1 && !message.content"
+                                    style="display: flex; align-items: center; justify-content: center; height: 1.6em;">
+                                    <span class="typing-cursor-hero"
+                                        style="height: 1.2em; background-color: var(--text-color);"></span>
+                                </div>
+                                <div v-else v-html="renderMarkdown(message.content)"></div>
+                            </div>
+                            <button v-if="message.role === 'assistant' && message.content"
+                                @click="copyToClipboard(message.content)" class="copy-button" title="复制">
+                                <i class="ph ph-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div v-if="chatbot.status" class="chat-status">
+                        <i class="ph ph-spinner-gap animate-spin"></i>
+                        <span>{{ chatbot.status }}</span>
+                    </div>
+
+                    <form @submit.prevent="sendMessage" class="chat-input-area">
+                        <textarea v-model="chatbot.currentMessage" @keydown.enter.exact.prevent="sendMessage"
+                            placeholder="输入消息..."></textarea>
+                        <button type="submit" class="send-button"
+                            :disabled="chatbot.isLoading || !chatbot.apiKey">发送</button>
+                    </form>
+                </div>
+            </section>
+
             <footer class="footer-section glass-effect anim-fade-in-up" id="footer" data-section="footer">
                 <h4 class="footer-title">风向标</h4>
                 <p class="footer-subtitle">去到别处看看？</p>
@@ -522,158 +1990,825 @@
                         <span>{{ link.text }}</span>
                     </a>
                 </div>
-                <div class="info-links"> <a href="#">关于</a> <a href="#">关于本站</a> <a href="#">关于我</a> <a href="#">关于此项目</a> <a href="#">更多</a> <a href="#">时间线</a> <a href="#">友链</a> <a href="#">监控</a> <a href="#">联系</a> </div>
+                <div class="info-links">
+                    <a href="https://www.bilibili.com/video/BV1Kj411g7Lu">May you,the beauty of this world,always
+                        shine.</a>
+                </div>
                 <div class="copyright-info">
-                    <p>&copy; 2020-2025 林陌青川 | RSS | 站点地图 | 订阅 (Stay hungry. Stay foolish)</p>
-                    <p>Powered by Mix Space & Shiro. 鄂ICP备2025110115号-1</p>
+                    <p>
+                        Copyright&copy;2022-2025 虚宁
+                        <span class="site-info-item" v-if="siteUptime">| 站点已运行 {{ siteUptime }}</span>
+                        <span class="site-info-item" v-if="icp">|
+                            <a href="https://beian.miit.gov.cn/" target="_blank">{{ icp }}</a></span>
+                    </p>
                     <div class="theme-switcher">
-                        <button @click="setTheme('dark')" :class="{ active: currentTheme === 'dark' }" title="深色模式"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
-                        <button @click="setTheme('light')" :class="{ active: currentTheme === 'light' }" title="浅色模式"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z" clip-rule="evenodd"></path></svg></button>
+                        <button @click="setTheme('dark')" :class="{ active: currentTheme === 'dark' }" title="深色模式">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                            </svg>
+                        </button>
+                        <button @click="setTheme('light')" :class="{ active: currentTheme === 'light' }" title="浅色模式">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zM3 11a1 1 0 100-2H2a1 1 0 100 2h1z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </footer>
         </main>
     </div>
 
-
     <script>
         // --- 粒子动画逻辑 ---
-        (function() {
-            const canvas = document.getElementById('particle-canvas'); if (!canvas) return; const ctx = canvas.getContext('2d'); let particles = []; let animationFrameId; function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-            class Particle { constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; } update() { const isLightTheme = document.documentElement.classList.contains('light-theme'); if (!isLightTheme) { const centerX = canvas.width / 2; const centerY = canvas.height / 2; const dx = this.x - centerX; const dy = this.y - centerY; const distance = Math.sqrt(dx * dx + dy * dy); if (distance > 1) { const swirlStrength = 0.01; this.speedX += (-dy / distance) * swirlStrength; this.speedY += (dx / distance) * swirlStrength; } this.speedX *= 0.99; this.speedY *= 0.99; } this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; } } draw() { const isLightTheme = document.documentElement.classList.contains('light-theme'); ctx.fillStyle = isLightTheme ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.4)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } }
-            function initParticles() { const particleCount = Math.floor(canvas.width * canvas.height / 15000); particles = []; for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); } }
-            function handleParticles() { const isLightTheme = document.documentElement.classList.contains('light-theme'); const lineBaseColor = isLightTheme ? '0, 0, 0' : '255, 255, 255'; for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); if (isLightTheme) { for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 100) { ctx.beginPath(); ctx.strokeStyle = `rgba(${lineBaseColor}, ${1 - distance / 100})`; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } } }
-            function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); handleParticles(); animationFrameId = requestAnimationFrame(animate); }
-            function startAnimation() { resizeCanvas(); initParticles(); if (animationFrameId) cancelAnimationFrame(animationFrameId); animate(); }
-            window.addEventListener('resize', startAnimation); startAnimation();
+        (function () {
+            const canvas = document.getElementById("particle-canvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            let particles = [];
+            let animationFrameId;
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 1 - 0.5;
+                    this.speedY = Math.random() * 1 - 0.5;
+                }
+                update() {
+                    const isLightTheme =
+                        document.documentElement.classList.contains("light-theme");
+                    if (!isLightTheme) {
+                        const centerX = canvas.width / 2;
+                        const centerY = canvas.height / 2;
+                        const dx = this.x - centerX;
+                        const dy = this.y - centerY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance > 1) {
+                            const swirlStrength = 0.01;
+                            this.speedX += (-dy / distance) * swirlStrength;
+                            this.speedY += (dx / distance) * swirlStrength;
+                        }
+                        this.speedX *= 0.99;
+                        this.speedY *= 0.99;
+                    }
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (
+                        this.x < 0 ||
+                        this.x > canvas.width ||
+                        this.y < 0 ||
+                        this.y > canvas.height
+                    ) {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.speedX = Math.random() * 1 - 0.5;
+                        this.speedY = Math.random() * 1 - 0.5;
+                    }
+                }
+                draw() {
+                    const isLightTheme =
+                        document.documentElement.classList.contains("light-theme");
+                    ctx.fillStyle = isLightTheme
+                        ? "rgba(0, 0, 0, 0.4)"
+                        : "rgba(255, 255, 255, 0.4)";
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            function initParticles() {
+                const particleCount = Math.floor(
+                    (canvas.width * canvas.height) / 15000
+                );
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            function handleParticles() {
+                const isLightTheme =
+                    document.documentElement.classList.contains("light-theme");
+                const lineBaseColor = isLightTheme ? "0, 0, 0" : "255, 255, 255";
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    if (isLightTheme) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 100) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = `rgba(${lineBaseColor}, ${1 - distance / 100
+                                    })`;
+                                ctx.lineWidth = 0.5;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+            }
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                handleParticles();
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            function startAnimation() {
+                resizeCanvas();
+                initParticles();
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                animate();
+            }
+            window.addEventListener("resize", startAnimation);
+            startAnimation();
         })();
 
         // --- Vue.js 应用逻辑 ---
-        const { createApp, ref, onMounted, onUnmounted } = Vue;
+        const { createApp, ref, onMounted, onUnmounted, nextTick, watch } = Vue;
 
         createApp({
             setup() {
-                const timeline = ref([ { date: '2024-05-20', event: '项目启动，搭建基础页面结构和样式。'}, { date: '2024-05-22', event: '完成了动态粒子背景和玻璃质感UI的设计。'}, { date: '2024-05-25', event: '集成了天气和音乐播放器组件，丰富页面功能。'}, { date: '2024-06-01', event: '重构页面布局，增加多个内容板块并实现导航高亮功能。'}, ]);
-                const footerIconLinks = ref([ { text: 'Bilibili', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6-2.292m0 0v14.25" /></svg>', url: '#bilibili'}, { text: 'Github', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>', url: '#github'}, { text: '度过的时光', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>', url: '#timeline'} ]);
-                
-                const bilibili = ref({
-                    name: '虚宁',
-                    face: 'https://placehold.co/44x44/333/fff?text=LM',
-                    fans: 0,
-                    likes: 0,
-                    archive_count: 0,
-                    spaceUrl: 'https://space.bilibili.com/520237303',
-                    spaceBanner: '',
-                    dynamics: []
+                // --- 配置信息 ---
+                const VITE_SITE_START = "2024-01-01";
+                const VITE_SITE_ICP = "渝ICP备2025053763号-1";
+                const VITE_SONG_API = "https://api.injahow.cn/meting/";
+                const VITE_SONG_SERVER = "tencent";
+                const VITE_SONG_TYPE = "playlist";
+                const VITE_SONG_ID = "9518431060";
+
+                const timeline = ref([
+                    { date: "2022-05-20", event: "项目启动，学习前端知识" },
+                    {
+                        date: "2023-07-22",
+                        event: "学会用网页放烟花，但没人看。",
+                    },
+                    {
+                        date: "2024-05-25",
+                        event: "学习后端知识，开始搭建网站后端。",
+                    },
+                    {
+                        date: "2025-03-01",
+                        event: "开始搭建初代网站，使用 Vue.js 和其他现代前端技术。",
+                    },
+                    {
+                        date: "2025-04-03",
+                        event: "网站上线，正式发布。",
+                    },
+                    {
+                        date: "2025-05-01",
+                        event: "网站进行第一次大规模更新，增加了更多功能和内容。",
+                    },
+                    {
+                        date: "2025-06-15",
+                        event: "网站进行第二次大规模更新，优化了用户体验和界面设计。",
+                    },
+                ]);
+
+                const targets = ref([
+                    { name: "搭建个人网站：前端基本完成，后端开发中", current: 60, total: 100 },
+                    { name: "做动画：会二创了，深入学习中", current: 25, total: 100 },
+                    { name: "健身：第三年，八块腹肌已成，增肌减脂中", current: 60, total: 100 },
+                    { name: "学竹笛：现在吹得太难听了，道阻且长", current: 10, total: 100 },
+                ]);
+
+                const bookshelf = ref([
+                    {
+                        title: "放射化学",
+                        author: "虚宁",
+                        coverUrl: "icon/放射化学.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    {
+                        title: "辐射环境监测",
+                        author: "虚宁",
+                        coverUrl: "icon/辐射环境检测.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    {
+                        title: "辐射探测",
+                        author: "虚宁",
+                        coverUrl: "icon/辐射探测.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    {
+                        title: "模拟电路与数字电路",
+                        author: "虚宁",
+                        coverUrl: "icon/模拟电路与数字电路.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    {
+                        title: "原子核物理",
+                        author: "虚宁",
+                        coverUrl: "icon/原子核物理.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    {
+                        title: "核燃料",
+                        author: "虚宁",
+                        coverUrl: "icon/核燃料.png",
+                        url: "https://kdocs.cn/join/g2ouzur?f=101"
+                    },
+                    
+                ]);
+
+                const chatbot = ref({
+                    apiKey: '',
+                    temperature: 0.7,
+                    webSearchEnabled: true,
+                    status: '',
+                    messages: [
+                        { role: 'assistant', content: '你好！我是 DeepSeek，有什么可以帮助你的吗？请先在上方输入你的 API Key。' }
+                    ],
+                    currentMessage: '',
+                    isLoading: false,
                 });
+
+                const chatWindow = ref(null);
+
+                const handleImgError = (event) => {
+                    event.target.src = 'https://placehold.co/300x450/1a1a1a/ffffff?text=图片加载失败';
+                };
+
+                const footerIconLinks = ref([
+                    {
+                        text: "Blog",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>',
+                        url: "https://blog.xvyin.com",
+                    },
+                    {
+                        text: "看烟花",
+                        icon: '<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="1190.000000pt" height="1280.000000pt" viewBox="0 0 1190.000000 1280.000000" preserveAspectRatio="xMidYMid meet"><g transform="translate(0.000000,1280.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none"><path d="M6522 12711 c-488 -368 -825 -811 -986 -1298 -32 -96 -13 -89 -193 -65 l-121 17 -182 220 c-101 121 -185 219 -188 218 -2 -1 -60 -117 -127 -259 l-122 -257 -264 -105 c-145 -58 -266 -107 -269 -109 -5 -4 22 -30 270 -266 l144 -137 18 -252 c9 -139 17 -270 17 -291 l1 -39 46 27 c25 15 50 23 54 19 4 -5 19 -41 33 -80 14 -40 77 -199 140 -355 139 -343 194 -495 237 -655 29 -107 35 -121 52 -116 25 6 31 24 54 152 28 158 26 457 -5 600 -41 194 -130 392 -237 532 l-43 57 62 34 c132 74 98 72 331 12 114 -29 209 -55 211 -57 2 -2 20 -87 40 -188 61 -306 123 -517 168 -568 8 -10 31 -57 52 -107 39 -97 177 -387 181 -383 1 2 -4 55 -11 118 -30 266 -40 466 -40 840 1 439 17 658 75 1005 109 640 351 1260 678 1733 35 50 59 92 53 92 -6 0 -64 -40 -129 -89z"/><path d="M7293 12162 l-111 -116 -159 -10 c-87 -5 -159 -10 -161 -11 -1 -1 32 -67 74 -145 l77 -143 -40 -159 c-23 -87 -38 -158 -34 -158 4 0 68 11 142 24 74 14 143 26 155 28 13 2 73 -30 157 -84 110 -70 137 -83 141 -70 2 9 13 82 23 162 l18 144 128 106 128 105 -148 71 -148 71 -60 151 c-33 84 -62 151 -65 151 -3 -1 -55 -54 -117 -117z"/><path d="M1375 11221 l-60 -38 -75 8 c-41 4 -206 11 -367 15 l-292 7 -11 -28 c-6 -15 -9 -29 -8 -29 2 -1 28 -8 58 -15 83 -20 433 -121 438 -126 19 -19 -38 -15 -244 14 -129 19 -236 32 -239 30 -2 -3 25 -103 61 -223 35 -120 64 -224 64 -231 0 -6 -47 -106 -103 -221 l-104 -209 116 -6 c64 -4 170 -7 236 -8 l120 -1 176 -169 175 -169 80 225 79 224 125 66 c69 36 165 87 214 113 l89 48 -191 147 c-164 127 -191 151 -195 178 -2 18 -4 33 -2 35 8 9 444 -185 605 -271 462 -244 789 -485 1156 -851 263 -264 328 -341 934 -1106 92 -115 146 -177 148 -166 6 27 -28 283 -53 411 -186 929 -783 1626 -1722 2009 -298 122 -656 217 -1022 270 -100 15 -111 22 -111 74 0 17 -3 32 -7 32 -5 0 -35 -17 -68 -39z"/><path d="M8569 10720 c-416 -75 -789 -231 -1081 -451 -244 -184 -396 -338 -778 -789 -63 -74 -170 -197 -238 -272 l-123 -138 35 -16 35 -17 93 53 c51 29 206 123 343 208 138 86 320 199 407 253 589 365 986 526 1428 579 124 14 371 -5 568 -46 813 -167 1617 -704 2070 -1381 30 -46 59 -83 64 -83 5 0 18 5 28 10 17 9 13 20 -57 141 -606 1057 -1239 1649 -1993 1867 -291 85 -608 117 -801 82z"/><path d="M6730 10531 c-136 -48 -190 -80 -271 -161 -75 -75 -118 -154 -149 -275 -27 -107 -42 -305 -33 -440 9 -153 20 -151 136 30 136 211 245 391 287 475 81 161 161 383 144 400 -5 4 -56 -9 -114 -29z"/><path d="M9734 9533 c-114 -136 -208 -249 -209 -251 -1 -1 -148 -21 -326 -44 -178 -22 -325 -42 -327 -44 -2 -1 61 -106 141 -232 l144 -230 -301 -5 c-466 -7 -785 -61 -1152 -192 -452 -163 -870 -460 -1116 -794 l-29 -41 203 99 c404 197 757 307 1183 367 154 21 591 30 752 15 166 -16 406 -50 415 -59 4 -4 1 -35 -6 -69 -8 -36 -10 -63 -4 -63 5 0 73 16 151 36 163 42 149 43 404 -27 665 -183 1129 -438 1513 -835 250 -257 428 -518 614 -897 89 -180 93 -186 106 -162 17 31 8 314 -14 457 -115 740 -614 1396 -1383 1818 -95 52 -133 78 -133 91 0 10 96 109 235 240 129 122 235 225 235 228 0 3 -136 61 -302 127 l-302 122 -137 292 c-76 161 -140 295 -143 297 -2 2 -97 -107 -212 -244z"/><path d="M2262 9388 c-107 -10 -113 -11 -110 -31 2 -18 63 -49 334 -172 359 -164 525 -248 708 -358 126 -77 334 -228 440 -321 35 -32 67 -53 70 -48 13 22 -143 378 -217 492 -154 241 -305 356 -547 420 -75 20 -114 23 -325 25 -132 2 -291 -1 -353 -7z"/><path d="M7525 9286 c-115 -30 -288 -106 -374 -164 -321 -219 -498 -415 -604 -672 -38 -90 -109 -320 -100 -320 3 0 60 55 127 123 242 245 408 358 836 571 347 172 515 236 641 244 59 3 84 0 113 -13 32 -15 39 -16 47 -4 5 8 9 17 9 20 0 9 -204 141 -268 173 -75 38 -193 66 -271 66 -36 -1 -106 -12 -156 -24z"/><path d="M2405 8313 c-568 -47 -1153 -246 -1720 -585 -158 -95 -345 -218 -330 -218 6 0 39 9 75 20 778 241 1402 373 2095 442 201 20 845 17 1065 -6 173 -17 513 -62 538 -71 14 -5 62 14 62 25 0 8 -124 67 -293 139 -301 129 -663 221 -982 251 -101 9 -415 11 -510 3z"/><path d="M3293 7699 c-62 -12 -197 -78 -280 -138 -67 -47 -486 -441 -478 -449 2 -2 63 26 137 62 279 137 722 257 1131 307 95 11 376 7 442 -6 l30 -7 -25 21 c-88 72 -354 175 -529 205 -101 17 -353 20 -428 5z"/><path d="M8426 7543 c-4 -10 -41 -108 -83 -218 -41 -109 -78 -205 -82 -213 -5 -9 -22 7 -58 55 -177 235 -423 368 -708 380 -195 9 -354 -26 -540 -118 -113 -56 -159 -88 -147 -106 4 -7 63 -16 152 -23 430 -33 761 -115 1055 -263 l100 -50 -179 -89 c-98 -49 -175 -93 -170 -97 9 -8 406 -323 413 -327 1 -2 22 -122 44 -268 23 -146 45 -266 49 -266 5 0 107 66 227 146 l220 146 253 -41 c139 -23 260 -41 269 -41 13 0 3 46 -57 259 l-72 260 119 233 c66 128 121 237 122 243 1 6 -100 14 -267 21 l-268 12 -193 192 c-160 159 -193 189 -199 173z"/><path d="M824 7203 c-47 -93 -112 -217 -144 -278 l-57 -109 -291 -106 -290 -106 218 -225 218 -225 10 -303 c6 -167 13 -305 16 -308 2 -3 127 58 278 135 l273 140 294 -84 c161 -47 296 -82 299 -79 3 3 -15 141 -41 306 l-46 301 175 259 c97 142 173 259 170 259 -7 0 -557 90 -587 96 -18 3 -46 31 -90 87 -35 45 -120 155 -190 245 l-128 162 -87 -167z"/><path d="M4320 7134 c-807 -83 -1501 -358 -2047 -811 -119 -99 -354 -337 -447 -453 -90 -113 -241 -341 -308 -465 -224 -412 -343 -823 -379 -1305 -6 -85 -12 -156 -13 -157 -1 -1 -68 1 -149 5 -81 4 -147 5 -147 2 0 -3 63 -160 140 -349 77 -189 140 -350 140 -357 0 -7 -57 -163 -126 -346 -69 -183 -128 -341 -131 -350 -7 -24 -4 -23 414 7 l342 25 258 -207 c142 -114 277 -222 299 -240 l42 -33 93 373 93 373 318 208 c175 115 316 211 314 215 -3 4 -148 96 -324 205 l-319 198 -98 362 c-54 198 -101 364 -104 368 -3 4 -136 -103 -296 -238 l-290 -244 -160 6 c-88 3 -170 7 -182 10 -20 4 -11 23 119 257 538 967 878 1443 1307 1831 420 380 922 692 1616 1006 131 59 185 92 185 112 0 4 -6 7 -12 7 -7 -1 -74 -8 -148 -15z"/><path d="M6725 7028 c570 -467 1006 -1239 1213 -2148 33 -141 113 -582 108 -587 -2 -2 -34 81 -71 184 -37 104 -74 204 -82 223 l-14 34 -187 -186 -187 -187 -123 -3 c-67 -2 -122 -3 -122 -2 0 0 18 48 40 107 214 568 154 1112 -179 1614 -102 153 -210 281 -358 423 -107 104 -328 289 -354 299 -6 1 19 -33 54 -76 515 -639 695 -1558 496 -2538 -29 -141 -94 -395 -119 -459 -6 -16 -9 -31 -6 -33 6 -6 172 217 231 310 27 42 52 74 56 70 3 -5 28 -50 54 -102 l48 -93 -70 -247 c-47 -166 -66 -247 -58 -249 6 -1 114 13 240 33 125 19 237 35 249 35 12 0 112 -61 223 -135 112 -74 208 -136 214 -137 8 -2 25 80 53 251 23 142 46 256 52 258 7 2 14 -17 18 -49 101 -817 167 -1606 197 -2368 14 -362 22 -386 65 -188 127 582 178 1060 178 1653 -1 422 -21 762 -69 1135 -9 71 -11 118 -6 123 6 6 5 14 -3 22 -7 7 -18 57 -25 111 -35 275 -124 756 -182 989 -203 808 -574 1364 -1149 1719 -130 81 -424 226 -457 226 -4 0 10 -15 32 -32z"/><path d="M4710 6643 c-179 -13 -381 -68 -540 -148 -114 -57 -159 -92 -217 -170 -125 -166 -173 -349 -204 -762 -11 -160 -8 -206 12 -186 5 5 76 138 158 294 218 420 260 477 460 631 217 168 405 280 494 295 31 5 37 10 37 29 0 23 -2 24 -77 22 -43 -1 -98 -3 -123 -5z"/><path d="M5410 6424 c-387 -284 -616 -734 -681 -1344 -16 -152 -16 -520 0 -693 7 -76 11 -140 9 -142 -2 -3 -23 9 -47 26 -23 17 -43 30 -45 28 -1 -2 -22 -112 -45 -244 -23 -132 -44 -247 -47 -255 -2 -8 -96 -84 -209 -169 -113 -85 -203 -156 -200 -160 3 -3 105 -60 227 -126 l222 -120 23 -65 c12 -36 51 -147 86 -247 l62 -182 187 178 186 178 158 6 c88 4 205 7 262 7 56 0 102 3 102 6 0 3 -50 110 -110 236 l-111 230 76 246 c41 135 73 247 71 249 -3 3 -409 -48 -486 -61 -14 -3 -35 3 -48 12 l-22 17 30 240 c91 744 192 1284 361 1944 33 129 58 239 56 244 -1 5 -32 -13 -67 -39z"/><path d="M5997 6452 c-15 -16 -19 -65 -28 -328 -17 -458 -3 -787 42 -1003 l11 -54 45 69 c201 308 242 618 127 964 -34 102 -160 370 -174 370 -4 0 -14 -8 -23 -18z"/><path d="M7835 1059 c-170 -36 -226 -64 -240 -121 -14 -53 67 -108 205 -139 69 -16 349 -16 410 0 120 30 166 52 197 91 17 21 16 52 -2 76 -13 17 -14 17 -15 2 0 -23 -36 -24 -44 -2 -3 9 -6 27 -6 41 0 15 -3 24 -6 21 -3 -4 -20 -2 -37 4 -109 34 -360 49 -462 27z"/></g></svg>',
+                        url: "https://fireworks.xvyin.com/",
+                    }
+                ]);
+
                 const github = ref({
                     repos: [],
-                    contributionsUrl: 'https://ghchart.rshah.org/jimmyshuixin',
-                    spaceUrl: 'https://github.com/jimmyshuixin'
+                    contributionsUrl: "https://ghchart.rshah.org/jimmyshuixin",
+                    spaceUrl: "https://github.com/jimmyshuixin",
                 });
 
-                const isHeaderExpanded = ref(false); const isHeaderVisible = ref(false); const isLoginModalVisible = ref(false);
-                const lastScrollY = ref(0); const isScrolling = ref(false); const scrollProgress = ref(0); let scrollTimeout = null;
-                const heroLine1 = ref(''); const heroLine2 = ref(''); const heroLine3 = ref(''); const heroLine4 = ref('');
-                const heroLine1Active = ref(false); const heroLine2Active = ref(false); const heroLine3Active = ref(false); const heroLine4Active = ref(false);
-                const currentTheme = ref('dark'); const username = ref(''); const password = ref('');
-                const activeSection = ref('hero');
+                const siteUptime = ref("");
+                const icp = ref(VITE_SITE_ICP);
 
-                const setTheme = (theme) => { currentTheme.value = theme; if (theme === 'light') { document.documentElement.classList.add('light-theme'); } else { document.documentElement.classList.remove('light-theme'); } localStorage.setItem('user-theme', theme); };
-                function initTheme() { const savedTheme = localStorage.getItem('user-theme'); const currentHour = new Date().getHours(); if (savedTheme) { setTheme(savedTheme); } else { if (currentHour >= 19 || currentHour < 6) { setTheme('dark'); } else { setTheme('light'); } } }
-                const toggleLoginModal = () => { isLoginModalVisible.value = !isLoginModalVisible.value; };
-                const handleScroll = () => { const scrollTop = window.scrollY; const docHeight = document.documentElement.scrollHeight - window.innerHeight; scrollProgress.value = docHeight > 0 ? scrollTop / docHeight : 0; isScrolling.value = true; if (scrollTimeout) clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => { isScrolling.value = false; }, 1500); const currentScrollY = window.scrollY; if (currentScrollY > 100) { isHeaderVisible.value = true; } else { isHeaderVisible.value = false; } if (currentScrollY > lastScrollY.value && currentScrollY > 100) { isHeaderExpanded.value = true; } else { isHeaderExpanded.value = false; } lastScrollY.value = currentScrollY <= 0 ? 0 : currentScrollY; };
-                const handleLogin = () => { if (!username.value || !password.value) { alert('请输入用户名和密码'); return; } console.log('Attempting login with:', { username: username.value, password: password.value }); alert(`登录成功! 用户名: ${username.value}`); toggleLoginModal(); username.value = ''; password.value = ''; };
-                function typeLine(targetRef, text, speed = 120) { return new Promise(resolve => { let index = 0; targetRef.value = ''; const interval = setInterval(() => { if (index < text.length) { targetRef.value += text[index]; index++; } else { clearInterval(interval); resolve(); } }, speed); }); }
-                async function startHeroTypewriter() { const lines = [ { ref: heroLine1, text: "Hi! ", activeRef: heroLine1Active }, { ref: heroLine2, text: "I'm 虚宁", activeRef: heroLine2Active }, { ref: heroLine3, text: "A Developer", activeRef: heroLine3Active }, { ref: heroLine4, text: "For Anything!", activeRef: heroLine4Active }, ]; for (const line of lines) { line.activeRef.value = true; await typeLine(line.ref, line.text); line.activeRef.value = false; if (line.ref === heroLine1) heroLine1Active.value = true; } }
-                function scrollToSection(sectionId) { const section = document.getElementById(sectionId); if (section) { section.scrollIntoView({ behavior: 'smooth' }); } }
-                
-                async function fetchBilibiliData() {
-                    const userId = '520237303';
-                    const workerUrl = 'https://api.xvyin.com/'; // <-- 请确保这是您正确的、以斜杠结尾的Worker地址
-                    
-                    try {
-                        // Step 1: Fetch user card info
-                        const cardApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/web-interface/card?mid=${userId}`)}`;
-                        const cardResponse = await fetch(cardApiUrl);
-                        if (!cardResponse.ok) throw new Error(`Network response was not ok for card info. Status: ${cardResponse.status}`);
-                        const cardData = await cardResponse.json();
-                        if (cardData.code === 0) {
-                            const data = cardData.data;
-                            bilibili.value.name = data.card.name;
-                            bilibili.value.face = data.card.face.replace('http://', 'https://');
-                            bilibili.value.fans = data.card.fans;
-                            bilibili.value.likes = data.like_num;
-                            bilibili.value.archive_count = data.archive_count;
-                            if (data.card.space && data.card.space.l_img) {
-                                bilibili.value.spaceBanner = data.card.space.l_img.replace('http://', 'https://');
+                const player = ref({
+                    aplayer: null,
+                    playlist: [],
+                    isInitialized: false,
+                    isLoading: false,
+                    isPlaying: false,
+                    isPlaylistVisible: false,
+                    currentSong: {},
+                    progress: 0,
+                    volume: 0.7,
+                });
+                const showHeroButtons = ref(false);
+
+                const lrcContainer = ref(null);
+
+                const isHeaderExpanded = ref(false);
+                const isHeaderVisible = ref(false);
+                const isLoginModalVisible = ref(false);
+                const lastScrollY = ref(0);
+                const isScrolling = ref(false);
+                const scrollProgress = ref(0);
+                let scrollTimeout = null;
+                const heroLine1 = ref("");
+                const heroLine2 = ref("");
+                const heroLine3 = ref("");
+                const heroLine4 = ref("");
+                const heroLine1Active = ref(false);
+                const heroLine2Active = ref(false);
+                const heroLine3Active = ref(false);
+                const heroLine4Active = ref(false);
+                const currentTheme = ref("dark");
+                const username = ref("");
+                const password = ref("");
+                const activeSection = ref("hero");
+
+                const setTheme = (theme) => {
+                    currentTheme.value = theme;
+                    if (theme === "light") {
+                        document.documentElement.classList.add("light-theme");
+                    } else {
+                        document.documentElement.classList.remove("light-theme");
+                    }
+                    localStorage.setItem("user-theme", theme);
+                };
+                function initTheme() {
+                    const savedTheme = localStorage.getItem("user-theme");
+                    const currentHour = new Date().getHours();
+                    if (savedTheme) {
+                        setTheme(savedTheme);
+                    } else {
+                        if (currentHour >= 19 || currentHour < 6) {
+                            setTheme("dark");
+                        } else {
+                            setTheme("light");
+                        }
+                    }
+                }
+                const toggleLoginModal = () => {
+                    isLoginModalVisible.value = !isLoginModalVisible.value;
+                };
+                const handleScroll = () => {
+                    const scrollTop = window.scrollY;
+                    const docHeight =
+                        document.documentElement.scrollHeight - window.innerHeight;
+                    scrollProgress.value = docHeight > 0 ? scrollTop / docHeight : 0;
+                    isScrolling.value = true;
+                    if (scrollTimeout) clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        isScrolling.value = false;
+                    }, 1500);
+                    const currentScrollY = window.scrollY;
+                    if (currentScrollY > 100) {
+                        isHeaderVisible.value = true;
+                    } else {
+                        isHeaderVisible.value = false;
+                    }
+                    if (currentScrollY > lastScrollY.value && currentScrollY > 100) {
+                        isHeaderExpanded.value = true;
+                    } else {
+                        isHeaderExpanded.value = false;
+                    }
+                    lastScrollY.value = currentScrollY <= 0 ? 0 : currentScrollY;
+                };
+                const handleLogin = () => {
+                    if (!username.value || !password.value) {
+                        alert("请输入用户名和密码");
+                        return;
+                    }
+                    console.log("Attempting login with:", {
+                        username: username.value,
+                        password: password.value,
+                    });
+                    alert(`登录成功! 用户名: ${username.value}`);
+                    toggleLoginModal();
+                    username.value = "123456";
+                    password.value = "123456";
+                };
+                function typeLine(targetRef, text, speed = 120) {
+                    return new Promise((resolve) => {
+                        let index = 0;
+                        targetRef.value = "";
+                        const interval = setInterval(() => {
+                            if (index < text.length) {
+                                targetRef.value += text[index];
+                                index++;
+                            } else {
+                                clearInterval(interval);
+                                resolve();
                             }
-                        } else {
-                            throw new Error(`Bilibili API error for card info: ${cardData.message || JSON.stringify(cardData)}`);
-                        }
-
-                        // Step 2: Fetch user's video list (more stable than dynamics)
-                        const videoApiUrl = `${workerUrl}?url=${encodeURIComponent(`https://api.bilibili.com/x/space/arc/search?mid=${userId}&ps=6&tid=0&pn=1&order=pubdate`)}`;
-                        const videoResponse = await fetch(videoApiUrl);
-                        if (!videoResponse.ok) {
-                             throw new Error(`Network response was not ok for videos. Status: ${videoResponse.status}`);
-                        }
-                        const videoData = await videoResponse.json();
-
-                        if (videoData.code === 0 && videoData.data.list.vlist) {
-                            bilibili.value.dynamics = videoData.data.list.vlist.map(video => ({
-                                type: 'video',
-                                id_str: video.bvid,
-                                title: video.title,
-                                pic: video.pic.replace('http://', 'https://'),
-                                bvid: video.bvid,
-                                url: `https://www.bilibili.com/video/${video.bvid}`,
-                            }));
-                        } else {
-                             throw new Error(`Bilibili API error for videos: ${videoData.message || 'Could not fetch videos'}`);
-                        }
-
-                    } catch (err) {
-                        console.error("获取B站数据失败", err);
+                        }, speed);
+                    });
+                }
+                async function startHeroTypewriter() {
+                    const lines = [
+                        { ref: heroLine1, text: "Hi! ", activeRef: heroLine1Active },
+                        { ref: heroLine2, text: "I'm 虚宁", activeRef: heroLine2Active },
+                        {
+                            ref: heroLine3,
+                            text: "A Developer",
+                            activeRef: heroLine3Active,
+                        },
+                        {
+                            ref: heroLine4,
+                            text: "For Anything!",
+                            activeRef: heroLine4Active,
+                        },
+                    ];
+                    for (const line of lines) {
+                        line.activeRef.value = true;
+                        await typeLine(line.ref, line.text);
+                        line.activeRef.value = false;
+                        if (line.ref === heroLine1) heroLine1Active.value = true;
+                    }
+                    showHeroButtons.value = true;
+                }
+                function scrollToSection(sectionId) {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        section.scrollIntoView({ behavior: "smooth" });
                     }
                 }
 
+                const calculateSiteUptime = () => {
+                    if (!VITE_SITE_START) return;
+                    const startDate = new Date(VITE_SITE_START);
+                    const now = new Date();
+                    const diffTime = Math.abs(now - startDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    siteUptime.value = `${diffDays} 天`;
+                };
+
+                const startMusicPlayback = async () => {
+                    if (player.value.isInitialized) {
+                        player.value.aplayer.toggle();
+                        return;
+                    }
+                    if (player.value.isLoading || !VITE_SONG_ID || !VITE_SONG_API)
+                        return;
+
+                    player.value.isLoading = true;
+
+                    const corsProxy = "https://corsproxy.io/?";
+                    const apiUrl = `${VITE_SONG_API}?server=${VITE_SONG_SERVER}&type=${VITE_SONG_TYPE}&id=${VITE_SONG_ID}`;
+                    const requestUrl = `${corsProxy}${encodeURIComponent(apiUrl)}`;
+
+                    try {
+                        const response = await fetch(requestUrl);
+                        if (!response.ok) {
+                            throw new Error(`API 请求失败，状态码: ${response.status}`);
+                        }
+                        const data = await response.json();
+
+                        let audioList;
+                        if (data.length > 0 && data[0].url.startsWith("@")) {
+                            const [handle, jsonpCallback, jsonpCallbackFunction, url] =
+                                data[0].url.split("@").slice(1);
+                            const jsonpUrl = `${corsProxy}${encodeURIComponent(url)}`;
+                            const jsonpData = await fetchJsonp(jsonpUrl).then((res) =>
+                                res.json()
+                            );
+                            const domain = (
+                                jsonpData.req_0.data.sip.find(
+                                    (i) => !i.startsWith("http://ws")
+                                ) || jsonpData.req_0.data.sip[0]
+                            ).replace("http://", "https://");
+                            audioList = data.map((v, i) => ({
+                                name: v.name || v.title,
+                                artist: v.artist || v.author,
+                                url: domain + jsonpData.req_0.data.midurlinfo[i].purl,
+                                cover: v.cover || v.pic,
+                                lrc: v.lrc,
+                            }));
+                        } else {
+                            audioList = data.map((v) => ({
+                                name: v.name || v.title,
+                                artist: v.artist || v.author,
+                                url: v.url,
+                                cover: v.cover || v.pic,
+                                lrc: v.lrc,
+                            }));
+                        }
+
+                        player.value.playlist = audioList;
+
+                        await nextTick();
+
+                        const ap = new APlayer({
+                            container: document.getElementById("player-hidden"),
+                            audio: audioList,
+                            lrcType: 3, // 启用歌词
+                        });
+
+                        player.value.aplayer = ap;
+                        player.value.aplayer.volume(player.value.volume, true);
+
+                        player.value.isInitialized = true;
+                        player.value.isLoading = false;
+
+                        const moveLrcElement = () => {
+                            nextTick(() => {
+                                const lrcElement = document.querySelector(
+                                    "#player-hidden .aplayer-lrc"
+                                );
+                                if (lrcElement && lrcContainer.value) {
+                                    lrcContainer.value.innerHTML = "";
+                                    lrcContainer.value.appendChild(lrcElement);
+                                }
+                            });
+                        };
+
+                        ap.on("play", () => {
+                            player.value.isPlaying = true;
+                        });
+                        ap.on("pause", () => {
+                            player.value.isPlaying = false;
+                        });
+
+                        ap.on("timeupdate", () => {
+                            player.value.progress = ap.audio.duration
+                                ? (ap.audio.currentTime / ap.audio.duration) * 100
+                                : 0;
+
+                            if (lrcContainer.value) {
+                                const lrcContents = lrcContainer.value.querySelector(
+                                    ".aplayer-lrc-contents"
+                                );
+                                const currentLrc = lrcContainer.value.querySelector(
+                                    ".aplayer-lrc-current"
+                                );
+
+                                if (lrcContents && currentLrc) {
+                                    const offset = currentLrc.offsetTop;
+                                    lrcContents.style.transform = `translateY(-${offset}px)`;
+                                }
+                            }
+                        });
+
+                        ap.on("listswitch", (data) => {
+                            player.value.currentSong = audioList[data.index];
+                            moveLrcElement();
+                        });
+
+                        player.value.currentSong = audioList[ap.list.index];
+                        moveLrcElement();
+                        ap.play();
+                    } catch (error) {
+                        console.error("初始化音乐播放器失败:", error);
+                        player.value.isLoading = false;
+                        player.value.isInitialized = false;
+                        alert("音乐播放器加载失败，请检查网络或稍后再试。");
+                    }
+                };
+
+                const seek = (event) => {
+                    if (!player.value.aplayer) return;
+                    const progressContainer = event.currentTarget;
+                    const clickX =
+                        event.clientX - progressContainer.getBoundingClientRect().left;
+                    const percentage = clickX / progressContainer.offsetWidth;
+                    const newTime = player.value.aplayer.audio.duration * percentage;
+                    player.value.aplayer.seek(newTime);
+                };
+
+                const setVolume = (event) => {
+                    if (!player.value.aplayer) return;
+                    const volume = parseFloat(event.target.value);
+                    player.value.volume = volume;
+                    player.value.aplayer.volume(volume, true);
+                    const slider = event.target;
+                    slider.style.setProperty("--volume-percent", `${volume * 100}%`);
+                };
+
+                const togglePlaylist = () => {
+                    player.value.isPlaylistVisible = !player.value.isPlaylistVisible;
+                };
+
+                const sendMessage = async () => {
+                    const messageText = chatbot.value.currentMessage.trim();
+                    if (!messageText || chatbot.value.isLoading || !chatbot.value.apiKey) return;
+
+                    chatbot.value.isLoading = true;
+                    chatbot.value.status = '正在准备请求...';
+                    chatbot.value.messages.push({ role: 'user', content: messageText });
+                    chatbot.value.currentMessage = '';
+                    await nextTick();
+
+                    const systemPrompt = {
+                        role: 'system',
+                        content: '你是一个乐于助人的人工智能助手。当你使用搜索工具时，你必须在回答的末尾以清晰的列表形式，列出你参考的所有网页链接。'
+                    };
+                    const apiMessages = [systemPrompt, ...chatbot.value.messages.filter(msg => msg.role !== 'system')];
+
+                    const tools = chatbot.value.webSearchEnabled ? [{
+                        type: "function",
+                        function: {
+                            name: "bing_search",
+                            description: "当用户查询实时信息、近期事件或需要外部知识时，使用必应搜索。",
+                            parameters: {
+                                type: "object",
+                                properties: { "query": { "type": "string", "description": "搜索关键词" } },
+                                required: ["query"]
+                            }
+                        }
+                    }] : undefined;
+
+                    try {
+                        const response = await fetch("https://api.deepseek.com/chat/completions", {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${chatbot.value.apiKey}` },
+                            body: JSON.stringify({
+                                model: "deepseek-chat",
+                                messages: apiMessages,
+                                stream: false, // Use non-stream for simplicity with tool calls
+                                temperature: parseFloat(chatbot.value.temperature),
+                                tools: tools,
+                                tool_choice: tools ? "auto" : undefined,
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error?.message || 'API request failed');
+                        }
+
+                        const data = await response.json();
+                        let message = data.choices[0].message;
+
+                        if (message.tool_calls && message.tool_calls.length > 0) {
+                            const toolCall = message.tool_calls[0];
+                            const searchArgs = JSON.parse(toolCall.function.arguments);
+                            chatbot.value.status = `正在搜索: "${searchArgs.query}"`;
+
+                            // This part will not work in the browser, it's a placeholder
+                            // for how the backend would execute the tool.
+                            // In a real application, the backend would perform the search.
+                            // Here, we simulate it.
+                            chatbot.value.messages.push({ role: 'assistant', content: `*我将搜索: ${searchArgs.query}*` });
+                            chatbot.value.status = '获取搜索结果后，我将为您总结。';
+
+                            // In a real implementation, you would make another API call here
+                            // with the tool result. Since we can't do that from the client,
+                            // we'll stop here and display a message.
+                            chatbot.value.messages.push({ role: 'assistant', content: `**模拟搜索**: 已为查询 "${searchArgs.query}" 调用搜索工具。在实际应用中，这里会显示搜索结果。` });
+
+                        } else {
+                            chatbot.value.status = '正在生成答案...';
+                            chatbot.value.messages.push(message);
+                        }
+
+                    } catch (error) {
+                        chatbot.value.messages.push({ role: 'assistant', content: `**错误:** ${error.message}` });
+                    } finally {
+                        chatbot.value.isLoading = false;
+                        chatbot.value.status = '';
+                    }
+                };
+
+                const copyFullChat = (event) => {
+                    const chatHistory = chatbot.value.messages
+                        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+                        .map(msg => `${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}:\n${msg.content}`)
+                        .join('\n\n');
+
+                    if (!chatHistory) return;
+
+                    const textarea = document.createElement('textarea');
+                    textarea.value = chatHistory;
+                    textarea.style.position = 'fixed'; // Prevent scrolling to bottom
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        const button = event.currentTarget;
+                        if (successful) {
+                            const originalText = button.innerHTML;
+                            button.innerHTML = '<span>已复制!</span>';
+                            setTimeout(() => {
+                                button.innerHTML = originalText;
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy chat:', err);
+                    }
+                    document.body.removeChild(textarea);
+                };
+
+                const renderMarkdown = (content) => {
+                    if (window.marked) {
+                        return window.marked.parse(content || '', { gfm: true, breaks: true, sanitize: true });
+                    }
+                    return (content || '').replace(/\n/g, '<br>');
+                };
+
+                const copyToClipboard = (text) => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.left = '-9999px';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                    } catch (err) {
+                        console.error('Failed to copy text:', err);
+                    }
+                    document.body.removeChild(textarea);
+                };
+
+                watch(() => chatbot.value.messages, () => {
+                    nextTick(() => {
+                        if (chatWindow.value) {
+                            chatWindow.value.scrollTop = chatWindow.value.scrollHeight;
+                        }
+                    });
+                }, { deep: true });
+
+                watch(() => chatbot.value.apiKey, (newKey) => {
+                    localStorage.setItem('deepseek_api_key', newKey);
+                });
+
 
                 function fetchGithubData() {
-                     fetch('https://api.github.com/users/jimmyshuixin/repos?sort=updated&per_page=6')
-                        .then(res => res.json())
-                        .then(data => { github.value.repos = data; })
-                        .catch(err => console.error("获取Github仓库失败", err));
+                    fetch(
+                        "https://api.github.com/users/jimmyshuixin/repos?sort=updated&per_page=6"
+                    )
+                        .then((res) => res.json())
+                        .then((data) => {
+                            github.value.repos = data;
+                        })
+                        .catch((err) => console.error("获取Github仓库失败", err));
                 }
 
                 function setupIntersectionObserver() {
-                    const options = { root: null, rootMargin: '0px', threshold: 0.5 };
-                    const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { activeSection.value = entry.target.getAttribute('data-section'); } }); }, options);
-                    document.querySelectorAll('[data-section]').forEach(el => observer.observe(el));
-                    const animObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('is-visible'); animObserver.unobserve(entry.target); } }); }, { threshold: 0.1 });
-                    document.querySelectorAll('.anim-fade-in-up').forEach(el => animObserver.observe(el));
+                    const options = { root: null, rootMargin: "0px", threshold: 0.5 };
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                activeSection.value =
+                                    entry.target.getAttribute("data-section");
+                            }
+                        });
+                    }, options);
+                    document
+                        .querySelectorAll("[data-section]")
+                        .forEach((el) => observer.observe(el));
+                    const animObserver = new IntersectionObserver(
+                        (entries) => {
+                            entries.forEach((entry) => {
+                                if (entry.isIntersecting) {
+                                    entry.target.classList.add("is-visible");
+                                    animObserver.unobserve(entry.target);
+                                }
+                            });
+                        },
+                        { threshold: 0.1 }
+                    );
+                    document
+                        .querySelectorAll(".anim-fade-in-up")
+                        .forEach((el) => animObserver.observe(el));
                 }
 
                 onMounted(() => {
                     startHeroTypewriter();
-                    fetchBilibiliData();
                     fetchGithubData();
-                    setTimeout(() => { setupIntersectionObserver(); }, 100);
+                    calculateSiteUptime();
+
+                    const savedApiKey = localStorage.getItem('deepseek_api_key');
+                    if (savedApiKey) {
+                        chatbot.value.apiKey = savedApiKey;
+                    }
+
+                    setTimeout(() => {
+                        setupIntersectionObserver();
+                    }, 100);
                     initTheme();
-                    window.addEventListener('scroll', handleScroll);
+                    window.addEventListener("scroll", handleScroll);
                 });
 
-                onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
+                onUnmounted(() => {
+                    window.removeEventListener("scroll", handleScroll);
+                    if (player.value.aplayer) player.value.aplayer.destroy();
+                });
 
                 return {
-                    timeline, bilibili, github, footerIconLinks, currentTheme, setTheme, isHeaderExpanded,
-                    isLoginModalVisible, toggleLoginModal, scrollToSection, username, password, handleLogin,
-                    heroLine1, heroLine2, heroLine3, heroLine4, isHeaderVisible,
-                    heroLine1Active, heroLine2Active, heroLine3Active, heroLine4Active,
-                    isScrolling, scrollProgress, activeSection
+                    timeline,
+                    targets,
+                    bookshelf,
+                    chatbot,
+                    chatWindow,
+                    sendMessage,
+                    renderMarkdown,
+                    copyToClipboard,
+                    copyFullChat,
+                    handleImgError,
+                    github,
+                    footerIconLinks,
+                    currentTheme,
+                    setTheme,
+                    isHeaderExpanded,
+                    isLoginModalVisible,
+                    toggleLoginModal,
+                    scrollToSection,
+                    username,
+                    password,
+                    handleLogin,
+                    heroLine1,
+                    heroLine2,
+                    heroLine3,
+                    heroLine4,
+                    isHeaderVisible,
+                    heroLine1Active,
+                    heroLine2Active,
+                    heroLine3Active,
+                    heroLine4Active,
+                    isScrolling,
+                    scrollProgress,
+                    activeSection,
+                    siteUptime,
+                    icp,
+                    player,
+                    startMusicPlayback,
+                    seek,
+                    setVolume,
+                    togglePlaylist,
+                    showHeroButtons,
+                    lrcContainer,
                 };
-            }
-        }).mount('#app');
+            },
+        }).mount("#app");
     </script>
 </body>
 
