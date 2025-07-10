@@ -2696,10 +2696,21 @@
                 };
                 function initTheme() {
                     const savedTheme = localStorage.getItem("user-theme");
-                    const currentHour = new Date().getHours();
+
+                    // --- FIX: Get current hour in Beijing Time (UTC+8) ---
+                    // 获取当前时间
+                    const now = new Date();
+                    // 获取当前 UTC 时间（毫秒）
+                    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+                    // 创建北京时间 (UTC+8) 的 Date 对象
+                    const beijingTime = new Date(utcTime + (3600000 * 8));
+                    const currentHour = beijingTime.getHours();
+                    // --- END FIX ---
+
                     if (savedTheme) {
                         setTheme(savedTheme);
                     } else {
+                        // 北京时间晚上 7 点 (19:00) 到早上 6 点 (06:00) 切换为深色模式
                         if (currentHour >= 19 || currentHour < 6) {
                             setTheme("dark");
                         } else {
