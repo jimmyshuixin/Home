@@ -3519,11 +3519,11 @@
         // --- Vue.js 应用逻辑 ---
         const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
         
-        // --- API服务 ---
+       // --- API服务 ---
         const apiService = {
             async getMusicPlaylist(songId) {
-                // 使用CORS代理来绕过浏览器的跨域安全限制
-                const corsProxy = "https://corsproxy.io/?";
+                // 参考稳定版文件，使用此CORS代理
+                const corsProxy = "https://api.allorigins.win/raw?url=";
 
                 const { VITE_SONG_API, VITE_SONG_SERVER, VITE_SONG_TYPE } = {
                     VITE_SONG_API: "https://api.injahow.cn/meting/", VITE_SONG_SERVER: "tencent",
@@ -3535,68 +3535,67 @@
                 const cleanApiUrl = VITE_SONG_API.endsWith('/') ? VITE_SONG_API.slice(0, -1) : VITE_SONG_API;
                 const apiUrl = `${cleanApiUrl}?server=${VITE_SONG_SERVER}&type=${VITE_SONG_TYPE}&id=${songId}`;
                 
-                // 将代理服务器地址拼接到实际API地址前面
-                const proxiedApiUrl = `${corsProxy}${encodeURIComponent(apiUrl)}`;
+                const requestUrl = `${corsProxy}${encodeURIComponent(apiUrl)}`;
                 
-                const response = await fetch(proxiedApiUrl);
+                const response = await fetch(requestUrl);
                 if (!response.ok) throw new Error(`API请求失败: ${response.status}`);
                 const data = await response.json();
 
-                // 修正: 确保 data 是一个非空数组再继续
                 if (!Array.isArray(data) || data.length === 0) {
-                    console.error("收到的API响应不是一个有效的播放列表:", data);
+                    console.error("API响应无效或播放列表为空:", data);
                     throw new Error("播放列表为空或加载失败。");
                 }
                 
-                // 检查是否需要通过 jsonp 解析真实 URL
+                let audioList;
                 if (typeof data[0].url === 'string' && data[0].url.startsWith("@")) {
                     const [, , jsonpCallbackFunction, url] = data[0].url.split("@");
-                    
-                    // 直接调用 fetchJsonp，不使用代理，并增加超时处理
-                    const jsonpData = await fetchJsonp(url, { jsonpCallbackFunction, timeout: 10000 })
+                    const jsonpProxyUrl = `${corsProxy}${encodeURIComponent(url)}`;
+
+                    const jsonpData = await fetchJsonp(jsonpProxyUrl, { jsonpCallbackFunction })
                         .then(res => res.json())
                         .catch(err => {
                              console.error("JSONP request failed:", err);
-                             throw new Error("解析歌曲链接超时或失败。");
+                             throw new Error("解析歌曲链接失败。");
                         });
-                    
-                    // 检查解析结果是否有效
-                    if (!jsonpData.req_0 || !jsonpData.req_0.data || !jsonpData.req_0.data.midurlinfo) {
-                        throw new Error("无法解析歌曲链接。");
-                    }
 
+                    if (!jsonpData.req_0 || !jsonpData.req_0.data || !jsonpData.req_0.data.midurlinfo) {
+                        throw new Error("无法从JSONP响应中解析歌曲链接。");
+                    }
+                    
                     const domain = (jsonpData.req_0.data.sip.find(i => !i.startsWith("http://ws")) || jsonpData.req_0.data.sip[0]).replace("http://", "https://");
                     
-                    // 映射并过滤掉无效歌曲
-                    const playableSongs = data
-                        .map((songInfo, index) => {
-                            const mediaInfo = jsonpData.req_0.data.midurlinfo[index];
-                            // 确保歌曲信息和 p-url 都存在
-                            if (mediaInfo && mediaInfo.purl) {
-                                return {
-                                    name: songInfo.name || songInfo.title,
-                                    artist: songInfo.artist || songInfo.author,
-                                    url: domain + mediaInfo.purl,
-                                    cover: songInfo.cover || songInfo.pic,
-                                    lrc: songInfo.lrc,
-                                };
-                            }
-                            return null; // 无效歌曲返回 null
-                        })
-                        .filter(Boolean); // 过滤掉所有 null
+                    audioList = data.map((v, i) => {
+                        const mediaInfo = jsonpData.req_0.data.midurlinfo[i];
+                        if (mediaInfo && mediaInfo.purl) {
+                            return {
+                                name: v.name || v.title,
+                                artist: v.artist || v.author,
+                                url: domain + mediaInfo.purl,
+                                cover: v.cover || v.pic,
+                                lrc: v.lrc,
+                            };
+                        }
+                        return null;
+                    }).filter(Boolean); // 过滤掉无效歌曲
 
-                    // 如果过滤后列表为空，则抛出更具体的错误
-                    if (playableSongs.length === 0) {
+                    if (audioList.length === 0) {
                         throw new Error("歌单中的歌曲均因版权或地区限制无法播放。");
                     }
-                    
-                    return playableSongs;
+                } else {
+                    audioList = data.map(v => ({
+                        name: v.name || v.title,
+                        artist: v.artist || v.author,
+                        url: v.url,
+                        cover: v.cover || v.pic,
+                        lrc: v.lrc,
+                    })).filter(song => song.url); // 确保URL存在
                 }
 
-                // 对于不需要额外解析的歌单，也进行一次过滤以防万一
-                return data.map(v => ({
-                    name: v.name || v.title, artist: v.artist || v.author, url: v.url, cover: v.cover || v.pic, lrc: v.lrc,
-                })).filter(song => song.url);
+                if (audioList.length === 0) {
+                    throw new Error("未能加载任何可播放的歌曲。");
+                }
+
+                return audioList;
             },
             async getGithubRepos() {
                 // Github API正确配置了CORS，所以不需要代理
@@ -3605,6 +3604,7 @@
                 return response.json();
             }
         };
+
         // --- 静态数据模块 ---
         const useStaticData = () => {
             const resumeData = ref({
@@ -4175,13 +4175,12 @@
                 const targetsWithProgress = ref([]);
                 
                 // 歌单管理
-                const currentSongId = ref("9518431060");
+                const currentSongId = ref("9206816111");
                 const newSongIdInput = ref("");
                 const newSongNameInput = ref("");
                 const presetSonglists = ref([
                     { id: "9206816111", name: "「 BGM 」净尘拂人心" },
                     { id: "8886500589", name: "『纯音乐』美到窒息的旋律" },
-                    { id: "9215562671", name: "『纯音乐』人间忽晚，山河已秋" },
                 ]);
                 const customSonglists = ref([]);
                 
