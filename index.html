@@ -1697,7 +1697,7 @@
             padding: 1rem;
             border-radius: 12px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .blog-post-item:not(:last-child) {
             margin-bottom: 0.5rem;
@@ -1719,6 +1719,7 @@
         }
         .blog-post-item:hover:not(.active) {
             background-color: var(--repo-card-hover-bg);
+            transform: translateX(5px) scale(1.02);
         }
         
         .blog-main {
@@ -1769,6 +1770,56 @@
             margin: 1.5em 0;
         }
         .blog-post-body code { font-family: 'Courier New', Courier, monospace; }
+
+        /* --- 文章内容切换动画 --- */
+        .post-fade-enter-active,
+        .post-fade-leave-active {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .post-fade-enter-from,
+        .post-fade-leave-to {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        /* --- 文章列表项切换动画 --- */
+        .list-fade-enter-active,
+        .list-fade-leave-active,
+        .list-fade-move {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .list-fade-enter-from,
+        .list-fade-leave-to {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .list-fade-leave-active {
+            position: absolute;
+            width: calc(100% - 2rem); /* 减去父元素的 padding */
+        }
+
+        /* --- 博客面板入场动画 --- */
+        .panel-fade-enter-active .blog-sidebar {
+            animation: slide-up-fade-in 0.6s 0.3s backwards;
+        }
+
+        .panel-fade-enter-active .blog-main {
+            animation: slide-up-fade-in 0.6s 0.4s backwards;
+        }
+
+        @keyframes slide-up-fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* 时间线 */
         .timeline {
@@ -2364,191 +2415,102 @@
             transform: translateY(10px);
         }
         
-        /* --- 兴趣星系组件 --- */
-        .interest-galaxy-container {
-            position: relative;
-            width: 100%;
-            height: 600px;
-            margin: 2rem auto 0;
-            transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .interest-galaxy-container.detail-view-active {
-            transform: translateX(-15%);
-        }
-
-        .galaxy-lines {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .interest-galaxy:not(.detail-view-active) .galaxy-lines {
-            opacity: 0.3;
-        }
-
-        .galaxy-lines path {
-            stroke: var(--accent-color);
-            stroke-width: 1.5px;
-            fill: none;
-            stroke-dasharray: 4 4;
-            transition: d 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .interest-galaxy {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .interest-node {
-            position: absolute;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        /* --- 兴趣手风琴组件 --- */
+        .interest-accordion {
             display: flex;
             flex-direction: column;
+            gap: 1rem;
+        }
+
+        .accordion-item {
+            background: var(--repo-card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid transparent;
+            transition: all 0.3s ease-in-out;
+            transform: 0.3s ease;
+            box-shadow: 0.3s ease;
+        }
+
+        .accordion-item:has(.is-open) {
+            border-color: var(--glass-border-color);
+        }
+
+        .accordion-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            background-color: var(--repo-card-bg);
-            border: 2px solid transparent;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            animation: float 6s ease-in-out infinite, pulse 4s ease-in-out infinite;
-            z-index: 2;
-        }
-
-        .interest-node.is-center {
-            width: 140px;
-            height: 140px;
-            z-index: 3;
-            border-color: rgba(var(--accent-color-rgb), 0.3);
-        }
-        
-        .interest-node:hover {
-            transform: translate(-50%, -50%) scale(1.15) !important;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 30px var(--glow-color);
-            z-index: 5 !important;
-            animation-play-state: paused;
-        }
-
-        @keyframes float {
-            0% { transform: translate(-50%, -50%) translateY(0px); }
-            50% { transform: translate(-50%, -50%) translateY(-15px); }
-            100% { transform: translate(-50%, -50%) translateY(0px); }
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 15px var(--shadow-color), 0 0 20px var(--glow-color); }
-            50% { box-shadow: 0 0 25px var(--shadow-color), 0 0 35px rgba(var(--accent-color-rgb), 0.4); }
-            100% { box-shadow: 0 0 15px var(--shadow-color), 0 0 20px var(--glow-color); }
-        }
-
-        .interest-node i {
-            font-size: 2.5rem;
-            color: var(--accent-color);
-            transition: all 0.3s ease;
-        }
-
-        .interest-node.is-center i {
-            font-size: 3rem;
-        }
-
-        .interest-node-title {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-color-white);
-            margin-top: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .interest-node:hover i {
-             transform: translateY(-5px);
-        }
-        
-        .interest-node:hover .interest-node-title {
-             transform: translateY(5px);
-        }
-
-        .interest-detail-card {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.9);
-            width: 90%;
-            max-width: 500px;
-            height: auto;
-            max-height: 90%;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            border-radius: 20px;
-        }
-        
-        .interest-detail-image {
             width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .interest-detail-content {
-            padding: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
             text-align: left;
+            color: var(--text-color-white);
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
-        .interest-detail-content h3 {
-            text-align: left;
-            margin-bottom: 1rem;
+        .accordion-header .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .interest-detail-content p {
+        .accordion-header .header-content i {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .accordion-item:has(.is-open) .accordion-header .header-content i {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .chevron-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .chevron-icon.is-rotated {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .accordion-content.is-open {
+            max-height: 500px; /* 确保这个高度足够容纳内容 */
+        }
+
+        .accordion-content-inner {
+            padding: 0 1.5rem 1.5rem;
             color: var(--text-color-darker);
             line-height: 1.7;
-        }
-
-        .close-interest-detail-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--glass-border-color);
-            color: var(--text-color-white);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .close-interest-detail-btn:hover {
-            transform: scale(1.1);
-            background-color: var(--accent-color);
-            color: #121212;
-        }
-
-        .interest-detail-fade-enter-active,
-        .interest-detail-fade-leave-active {
-            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-        .interest-detail-fade-enter-from,
-        .interest-detail-fade-leave-to {
             opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9);
+            transform: translateY(-10px);
+            transition: opacity 1s ease-out 0.15s, transform 1s ease-out 0.15s;
+        }
+
+        .accordion-content.is-open .accordion-content-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .interest-detail-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1rem;
         }
 
         /* 动画 (只保留页脚的) */
@@ -3166,21 +3128,25 @@
                                             </button>
                                         </div>
                                         <div class="blog-post-list-container">
-                                            <div v-for="post in filteredBlogPosts" :key="post.id" 
-                                                 @click="activePostId = post.id"
-                                                 class="blog-post-item"
-                                                 :class="{ active: post.id === activePostId }">
-                                                <h4>{{ post.title }}</h4>
-                                                <p>{{ post.date }}</p>
-                                            </div>
+                                            <transition-group name="list-fade" tag="div">
+                                                <div v-for="post in filteredBlogPosts" :key="post.id" 
+                                                    @click="activePostId = post.id"
+                                                    class="blog-post-item"
+                                                    :class="{ active: post.id === activePostId }">
+                                                    <h4>{{ post.title }}</h4>
+                                                    <p>{{ post.date }}</p>
+                                                </div>
+                                            </transition-group>
                                         </div>
                                     </div>
                                     <div class="blog-main">
-                                        <div v-if="activePost" class="blog-post-content">
-                                            <h2>{{ activePost.title }}</h2>
-                                            <p class="blog-post-meta">发布于 {{ activePost.date }} | 分类: {{ activePost.category }}</p>
-                                            <div class="blog-post-body" v-html="renderMarkdown(activePost.content)"></div>
-                                        </div>
+                                        <transition name="post-fade" mode="out-in">
+                                            <div v-if="activePost" class="blog-post-content" :key="activePost.id">
+                                                <h2>{{ activePost.title }}</h2>
+                                                <p class="blog-post-meta">发布于 {{ activePost.date }} | 分类: {{ activePost.category }}</p>
+                                                <div class="blog-post-body" v-html="renderMarkdown(activePost.content)"></div>
+                                            </div>
+                                        </transition>
                                     </div>
                                 </div>
                             </div>
@@ -3222,31 +3188,24 @@
                             <div class="content-card glass-effect">
                                 <button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button>
                                 <h2>兴趣星系</h2>
-                                <div class="interest-galaxy-container" :class="{ 'detail-view-active': selectedInterest }">
-                                    <transition name="interest-detail-fade">
-                                        <div v-if="selectedInterest" class="interest-detail-card glass-effect">
-                                            <img :src="selectedInterest.image" :alt="selectedInterest.title" class="interest-detail-image" @error="handleImgError" />
-                                            <div class="interest-detail-content">
-                                                <h3>{{ selectedInterest.title }}</h3>
-                                                <p>{{ selectedInterest.content }}</p>
-                                            </div>
-                                            <button @click="selectedInterest = null" class="close-interest-detail-btn" aria-label="返回兴趣星系" title="返回"><i class="ph ph-arrow-arc-left"></i></button>
-                                        </div>
-                                    </transition>
-                                     <div class="interest-galaxy">
-                                        <svg class="galaxy-lines">
-                                            <path v-for="line in galaxyLines" :key="line.id" :d="line.d"></path>
-                                        </svg>
-                                        <div
-                                            v-for="(interest, index) in interests"
-                                            :key="interest.id"
-                                            class="interest-node"
-                                            :class="{ 'is-center': interest.isCenter }"
-                                            :style="getInterestNodeStyle(interest)"
-                                            @click="selectedInterest = interest"
+                                <div class="interest-accordion">
+                                    <div v-for="interest in interests" :key="interest.id" class="accordion-item">
+                                        <button 
+                                            class="accordion-header" 
+                                            @click="toggleInterest(interest.id)" 
+                                            :aria-expanded="openInterestId === interest.id"
                                         >
-                                            <i :class="interest.icon"></i>
-                                            <span class="interest-node-title">{{ interest.title }}</span>
+                                            <div class="header-content">
+                                                <i :class="interest.icon"></i>
+                                                <span>{{ interest.title }}</span>
+                                            </div>
+                                            <i class="ph ph-caret-down chevron-icon" :class="{ 'is-rotated': openInterestId === interest.id }"></i>
+                                        </button>
+                                        <div class="accordion-content" :class="{ 'is-open': openInterestId === interest.id }">
+                                            <div class="accordion-content-inner">
+                                                <img :src="interest.image" :alt="interest.title" class="interest-detail-image" @error="handleImgError" />
+                                                <p>{{ interest.content }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -4194,9 +4153,17 @@
                 const isLoggingIn = ref(false);
                 const activeSection = ref("hero");
                 const activeJourneyPanel = ref(null);
-                const selectedInterest = ref(null);
                 const growthPanelRef = ref(null);
                 const targetsWithProgress = ref([]);
+                const openInterestId = ref(interests.value.length > 0 ? interests.value[0].id : null); // 默认展开第一项
+
+                const toggleInterest = (id) => {
+                    if (openInterestId.value === id) {
+                        openInterestId.value = null; // 如果点击的是已展开项，则关闭
+                    } else {
+                        openInterestId.value = id; // 否则，展开点击的项
+                    }
+                };
                 
                 // 歌单管理
                 const currentSongId = ref("9206816111");
@@ -4233,57 +4200,7 @@
                 const handleResize = () => windowWidth.value = window.innerWidth;
 
                 // --- 兴趣星系 ---
-                const orbitingNodes = computed(() => interests.value.filter(i => !i.isCenter));
-                const galaxyLines = computed(() => {
-                    if (selectedInterest.value) return [];
-                    const centerPos = { x: 50, y: 50 }; // in %
-                    return orbitingNodes.value.map((node, index) => {
-                        const angle = (index / orbitingNodes.value.length) * 2 * Math.PI - (Math.PI / 2);
-                        const radius = 38; // in %
-                        const x = centerPos.x + radius * Math.cos(angle);
-                        const y = centerPos.y + radius * Math.sin(angle);
-                        return {
-                            id: node.id,
-                            d: `M ${centerPos.x}% ${centerPos.y}% L ${x}% ${y}%`
-                        };
-                    });
-                });
 
-                const getInterestNodeStyle = (interest) => {
-                    const style = { animationDelay: `${Math.random()*5}s`, animationDuration: `${Math.random()*4+6}s`};
-                    
-                    if (selectedInterest.value) {
-                         const allNodes = interests.value;
-                         const selectedIdx = allNodes.findIndex(i => i.id === selectedInterest.value.id);
-                         const currentIdx = allNodes.findIndex(i => i.id === interest.id);
-                         
-                         style.left = '85%';
-                         style.top = `${15 + currentIdx * 18}%`;
-                         style.transform = `translate(-50%, -50%) scale(0.6)`;
-                         style.opacity = '0.4';
-                         style.animation = 'none';
-
-                         if (interest.id === selectedInterest.value.id) {
-                            style.opacity = '0';
-                            style.transform = `translate(-50%, -50%) scale(0)`;
-                         }
-                    } else {
-                        if (interest.isCenter) {
-                            style.left = '50%';
-                            style.top = '50%';
-                            style.transform = 'translate(-50%, -50%)';
-                        } else {
-                            const orbitIndex = orbitingNodes.value.findIndex(n => n.id === interest.id);
-                            const totalOrbiting = orbitingNodes.value.length;
-                            const angle = (orbitIndex / totalOrbiting) * 2 * Math.PI - (Math.PI / 2);
-                            const radius = 38; 
-                            style.left = `${50 + radius * Math.cos(angle)}%`;
-                            style.top = `${50 + radius * Math.sin(angle)}%`;
-                            style.transform = 'translate(-50%, -50%)';
-                        }
-                    }
-                    return style;
-                };
 
                 // --- 动效逻辑 ---
                 const useAnimatedCounter = (targetValueRef) => {
@@ -4641,7 +4558,7 @@
                     // State
                     currentTheme, isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded,
                     isLoginModalVisible, username, password, loginStatus, isLoggingIn,
-                    activeSection, activeJourneyPanel, selectedInterest,
+                    activeSection, activeJourneyPanel, 
                     activePostId, activePost, activeCategory, blogCategories, filteredBlogPosts,
                     visibleNavLinks,
                     // Hero
@@ -4653,7 +4570,7 @@
                     // Chatbot
                     chatbot, chatWindow, dropdownRef, chatHistories, activeChatId, activeChat, isHistoryDropdownOpen,
                     // Interests
-                    galaxyLines,
+                    openInterestId, toggleInterest,
                     // Growth
                     growthPanelRef, targetsWithProgress,
                     // Methods
@@ -4662,7 +4579,7 @@
                     switchSonglist, addAndSwitchSonglist, removeCustomSonglist,
                     sendMessage, createNewChat, deleteActiveChat, selectChat,
                     onBeforeEnter, onEnter, openJourneyPanel, closeJourneyPanel, handleNavClick,
-                    getInterestNodeStyle, handleImgError, renderMarkdown, copyToClipboard, toggleLoop, toggleShuffle, cyclePlaybackRate
+                    handleImgError, renderMarkdown, copyToClipboard, toggleLoop, toggleShuffle, cyclePlaybackRate
                 };
             },
         }).mount("#app");
