@@ -3639,22 +3639,46 @@
          */
         const useTheme = () => {
             const currentTheme = ref("dark");
+            let themeCheckInterval = null; // 用于存储定时器ID
+
+            // 仅根据当前时间设置主题的函数
+            const autoSetThemeByTime = () => {
+                // 获取用户本地时间的小时 (中国时区会正确获取)
+                const currentHour = new Date().getHours();
+                const newTheme = (currentHour >= 6 && currentHour < 18) ? 'light' : 'dark';
+                
+                // 只有当需要切换时才执行操作，避免不必要的DOM更新
+                if (newTheme !== currentTheme.value) {
+                    currentTheme.value = newTheme;
+                    document.documentElement.classList.toggle("light-theme", newTheme === "light");
+                }
+            };
+            
+            // 手动设置主题的函数，供页脚按钮调用（效果仅在本次会话生效）
             const setTheme = (theme) => {
                 currentTheme.value = theme;
                 document.documentElement.classList.toggle("light-theme", theme === "light");
-                localStorage.setItem("user-theme", theme);
             };
+
+            // 初始化主题并启动定时检查
             const initTheme = () => {
-                const savedTheme = localStorage.getItem("user-theme");
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (savedTheme) {
-                    setTheme(savedTheme);
-                } else {
-                    setTheme(prefersDark ? 'dark' : 'light');
-                }
+                autoSetThemeByTime(); // 页面加载时立即设置一次
+                
+                // 清理旧的定时器以防万一
+                if (themeCheckInterval) clearInterval(themeCheckInterval);
+                
+                // 每分钟检查一次时间，实现自动切换
+                themeCheckInterval = setInterval(autoSetThemeByTime, 60000); 
             };
+
+            // 在组件卸载时清理定时器，防止内存泄漏
+            onUnmounted(() => {
+                if (themeCheckInterval) clearInterval(themeCheckInterval);
+            });
+
             return { currentTheme, setTheme, initTheme };
         };
+
 
         /**
          * @description 管理页面滚动相关状态和事件
