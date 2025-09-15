@@ -1,0 +1,38 @@
+[
+  {
+    "id": 5,
+    "title": "代码宇宙",
+    "icon": "ph-fill ph-code",
+    "image": "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2070&auto=format&fit=crop",
+    "content": "将Web开发作为我的核心星球。我享受探索前端技术，用代码和设计将想法变为现实，构建连接信息与人的桥梁。这样的现代框架来构建交互式界面。它让开发过程充满乐趣和高效。",
+    "isCenter": true
+  },
+  {
+    "id": 1,
+    "title": "动画新星",
+    "icon": "ph-fill ph-film-strip",
+    "image": "https://images.unsplash.com/photo-1620673435193-a1293228965f?q=80&w=1974&auto=format&fit=crop",
+    "content": "我对动画充满热情，喜欢通过 Blender 和其他工具创造出生动的角色和故事。这是一个充满创造力和技术挑战的领域。"
+  },
+  {
+    "id": 2,
+    "title": "电子脉冲",
+    "icon": "ph-fill ph-cpu",
+    "image": "https://images.unsplash.com/photo-1555529699-6df35b449b29?q=80&w=2070&auto=format&fit=crop",
+    "content": "从焊接电路板到编写微控制器代码，我享受将电子元件组合在一起，创造出实用或有趣的小工具的过程。"
+  },
+  {
+    "id": 3,
+    "title": "力量星座",
+    "icon": "ph-fill ph-barbell",
+    "image": "https://images.unsplash.com/photo-1549060279-7e168fcee0c2?q=80&w=2070&auto=format&fit=crop",
+    "content": "保持身体健康是我生活的重要组成部分。定期的力量训练和有氧运动不仅能塑造体型，还能让我保持精力充沛。"
+  },
+  {
+    "id": 4,
+    "title": "旋律星云",
+    "icon": "ph-fill ph-music-notes",
+    "image": "https://images.unsplash.com/photo-1621215102663-5bd84d1a2936?q=80&w=2070&auto=format&fit=crop",
+    "content": "竹笛清脆悠扬的声音深深吸引着我。虽然仍在学习阶段，但我享受在练习中找到内心平静的每一刻。"
+  }
+]
