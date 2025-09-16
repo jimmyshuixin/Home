@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>虚静以宁 (优化版)</title>
+    <title>虚静以宁 (实时刷新完整版)</title>
     <link rel="icon" href="./content/icon/32.png">
 
     <!-- Preconnect to CDNs for faster DNS resolution -->
@@ -22,17 +22,6 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-
-    <script>
-        // 立即设置主题以避免加载动画出现FOUC (无样式内容闪烁)
-        (function() {
-            const isLightTheme = new Date().getHours() >= 6 && new Date().getHours() < 18;
-            if (isLightTheme) {
-                document.documentElement.classList.add('light-theme');
-            }
-        })();
-    </script>
-
     <style>
         /* --- CSS 结构说明 ---
          * 为了提高可维护性，样式表按以下顺序组织：
@@ -3641,155 +3630,47 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" defer></script>
     
-    <!-- PERFORMANCE OPTIMIZATION: Updated Firebase to modern modular SDK (v9+) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-        // --- 粒子动画逻辑 ---
-        (function () {
-            const canvas = document.getElementById("particle-canvas");
-            if (!canvas) return;
-            const ctx = canvas.getContext("2d");
-            let particles = [];
-            let animationFrameId;
-
-            // PERFORMANCE OPTIMIZATION: Pause animation when tab is not visible
-            let isTabVisible = true;
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) {
-                    isTabVisible = false;
-                    if (animationFrameId) {
-                        cancelAnimationFrame(animationFrameId);
-                        animationFrameId = null;
-                    }
-                } else {
-                    isTabVisible = true;
-                    if (!animationFrameId) {
-                        animate();
-                    }
-                }
-            });
-
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+    <script>
+        // --- 立即执行函数，用于初始化主题和粒子动画 ---
+        (function() {
+            // 立即设置主题以避免加载动画出现FOUC
+            const isLightTheme = new Date().getHours() >= 6 && new Date().getHours() < 18;
+            if (isLightTheme) {
+                document.documentElement.classList.add('light-theme');
             }
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * 2 + 1;
-                    this.speedX = Math.random() * 1 - 0.5;
-                    this.speedY = Math.random() * 1 - 0.5;
-                }
-                update() {
-                    const isLightTheme =
-                        document.documentElement.classList.contains("light-theme");
-                    if (!isLightTheme) {
-                        const centerX = canvas.width / 2;
-                        const centerY = canvas.height / 2;
-                        const dx = this.x - centerX;
-                        const dy = this.y - centerY;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-                        if (distance > 1) {
-                            const swirlStrength = 0.01;
-                            this.speedX += (-dy / distance) * swirlStrength;
-                            this.speedY += (dx / distance) * swirlStrength;
-                        }
-                        this.speedX *= 0.99;
-                        this.speedY *= 0.99;
-                    }
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (
-                        this.x < 0 ||
-                        this.x > canvas.width ||
-                        this.y < 0 ||
-                        this.y > canvas.height
-                    ) {
-                        this.x = Math.random() * canvas.width;
-                        this.y = Math.random() * canvas.height;
-                        this.speedX = Math.random() * 1 - 0.5;
-                        this.speedY = Math.random() * 1 - 0.5;
-                    }
-                }
-                draw() {
-                    const isLightTheme = document.documentElement.classList.contains("light-theme");
-                    ctx.fillStyle = isLightTheme
-                        ? "rgba(0, 0, 0, 0.4)"
-                        : "rgba(255, 255, 255, 0.4)";
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            function initParticles() {
-                const particleCount = Math.floor(
-                    (canvas.width * canvas.height) / 15000
-                );
-                particles = [];
-                for (let i = 0; i < particleCount; i++) {
-                    particles.push(new Particle());
-                }
-            }
-            function handleParticles() {
-                const isLightTheme =
-                    document.documentElement.classList.contains("light-theme");
-                const lineBaseColor = isLightTheme ? "0, 0, 0" : "255, 255, 255";
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-                    if (isLightTheme) {
-                        for (let j = i + 1; j < particles.length; j++) {
-                            const dx = particles[i].x - particles[j].x;
-                            const dy = particles[i].y - particles[j].y;
-                            const distance = Math.sqrt(dx * dx + dy * dy);
-                            if (distance < 100) {
-                                ctx.beginPath();
-                                ctx.strokeStyle = `rgba(${lineBaseColor}, ${1 - distance / 100
-                                    })`;
-                                ctx.lineWidth = 0.5;
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                                ctx.stroke();
-                            }
-                        }
-                    }
-                }
-            }
-            function animate() {
-                if (!isTabVisible) return;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                handleParticles();
-                animationFrameId = requestAnimationFrame(animate);
-            }
-            function startAnimation() {
-                resizeCanvas();
-                initParticles();
-                if (animationFrameId) {
-                    cancelAnimationFrame(animationFrameId);
-                }
-                animate();
-            }
-            window.addEventListener("resize", startAnimation);
-            startAnimation();
         })();
 
-        // --- Vue.js 应用逻辑 ---
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 粒子动画逻辑 ---
+            (function () {
+                const canvas = document.getElementById("particle-canvas");
+                if (!canvas) return;
+                const ctx = canvas.getContext("2d");
+                let particles = [];
+                let animationFrameId;
+                let isTabVisible = true;
+                document.addEventListener('visibilitychange', () => { isTabVisible = !document.hidden; if(isTabVisible && !animationFrameId) animate(); });
+                function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+                class Particle {
+                    constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; }
+                    update() { const isLightTheme = document.documentElement.classList.contains("light-theme"); if (!isLightTheme) { const centerX = canvas.width / 2; const centerY = canvas.height / 2; const dx = this.x - centerX; const dy = this.y - centerY; const distance = Math.sqrt(dx * dx + dy * dy); if (distance > 1) { const swirlStrength = 0.01; this.speedX += (-dy / distance) * swirlStrength; this.speedY += (dx / distance) * swirlStrength; } this.speedX *= 0.99; this.speedY *= 0.99; } this.x += this.speedX; this.y += this.speedY; if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) { Object.assign(this, new Particle()); } }
+                    draw() { ctx.fillStyle = document.documentElement.classList.contains("light-theme") ? "rgba(0, 0, 0, 0.4)" : "rgba(255, 255, 255, 0.4)"; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+                }
+                function initParticles() { const particleCount = Math.floor((canvas.width * canvas.height) / 15000); particles = Array.from({ length: particleCount }, () => new Particle()); }
+                function handleParticles() { const isLightTheme = document.documentElement.classList.contains("light-theme"); const lineBaseColor = isLightTheme ? "0, 0, 0" : "255, 255, 255"; for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); if (isLightTheme) { for (let j = i + 1; j < particles.length; j++) { const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y; const distance = Math.sqrt(dx * dx + dy * dy); if (distance < 100) { ctx.beginPath(); ctx.strokeStyle = `rgba(${lineBaseColor}, ${1 - distance / 100})`; ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke(); } } } } }
+                function animate() { if (!isTabVisible) { animationFrameId = null; return; } ctx.clearRect(0, 0, canvas.width, canvas.height); handleParticles(); animationFrameId = requestAnimationFrame(animate); }
+                function startAnimation() { resizeCanvas(); initParticles(); if (animationFrameId) cancelAnimationFrame(animationFrameId); animate(); }
+                window.addEventListener("resize", startAnimation);
+                startAnimation();
+            })();
+            
+            // --- Vue.js 应用逻辑 ---
             const loader = document.getElementById('loader-wrapper');
             const appElement = document.getElementById('app');
-
-            if (appElement) {
-                appElement.style.visibility = 'hidden';
-            }
+            if (appElement) appElement.style.visibility = 'hidden';
 
             window.onload = () => {
-                if (loader) {
-                    loader.classList.add('is-hidden');
-                }
+                if (loader) loader.classList.add('is-hidden');
                 if (appElement) {
                     setTimeout(() => {
                         if (loader) loader.style.display = 'none';
@@ -3805,16 +3686,10 @@
 
             const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
             
+            // --- 全局配置 ---
             const config = {
-                firebaseConfig : {
-                    apiKey: "AIzaSyAmXoNo4dx5XuCccI97fBpuC_GcAoefE0A",
-                    authDomain: "home-60305.firebaseapp.com",
-                    projectId: "home-60305",
-                    storageBucket: "home-60305.firebasestorage.app",
-                    messagingSenderId: "936980156368",
-                    appId: "1:936980156368:web:66a3476936a2fb882d33d5",
-                    measurementId: "G-HZTPBPVVJ2"
-                },
+                 // !!! 重要：请将这里替换为您部署的 Cloudflare Worker URL !!!
+                guestbookApiUrl: "https://firebase.xvyin.com/messages",
                 siteStartDate: "2024-03-02",
                 icpNumber: "渝ICP备2025053763号-1",
                 github: {
@@ -3839,7 +3714,7 @@
                 }
             };
 
-            const apiService = {
+             const apiService = {
                 async getMusicPlaylist(songId) {
                     const { music } = config;
                      if (!songId) throw new Error("必须提供歌单ID。");
@@ -3907,7 +3782,8 @@
                     }
                 }
             };
-
+            
+            // --- Vue Composition API Hooks ---
             const useTheme = () => {
                 const currentTheme = ref("dark");
                 let themeCheckInterval = null;
@@ -3982,109 +3858,6 @@
                 return { player, lrcContainer, switchPlaylist, seek, setVolume, togglePlaylist: () => player.value.isPlaylistVisible = !player.value.isPlaylistVisible, toggleSonglistSwitcher: () => player.value.isSongSwitcherVisible = !player.value.isSongSwitcherVisible, toggleLoop, loopModeIcon, loopModeTooltip, toggleShuffle, cyclePlaybackRate };
             };
 
-            const useGuestbook = () => {
-                const guestbook = ref({ isReady: false, error: null, isSubmitting: false, newName: '', newMessage: '', messages: [], isExpanded: false, status: { message: '', type: '' } });
-                const activeDanmaku = ref([]);
-                let db, danmakuQueue = [], danmakuInterval = null;
-
-                const stopDanmakuStream = () => {
-                    if (danmakuInterval) {
-                        clearInterval(danmakuInterval);
-                        danmakuInterval = null;
-                    }
-                };
-                
-                const startDanmakuStream = () => {
-                    stopDanmakuStream(); 
-                    // PERFORMANCE OPTIMIZATION: Increased interval and limited concurrent danmaku
-                    danmakuInterval = setInterval(() => {
-                        if (danmakuQueue.length === 0 || activeDanmaku.value.length > 10) return;
-                        const msg = danmakuQueue.shift(); danmakuQueue.push(msg);
-                        const duration = Math.random() * 8 + 12; // 12-20s
-                        const danmaku = {
-                            id: Date.now() + Math.random(), name: msg.name, message: msg.message,
-                            style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` }
-                        };
-                        activeDanmaku.value.push(danmaku);
-                        setTimeout(() => { activeDanmaku.value.shift(); }, duration * 1000);
-                    }, 3000); // Changed from 2000ms to 3000ms
-                };
-                
-                const handleVisibilityChange = () => {
-                    if (document.hidden) {
-                        stopDanmakuStream();
-                    } else {
-                        startDanmakuStream();
-                    }
-                };
-
-                const init = () => {
-                    try {
-                        const app = initializeApp(config.firebaseConfig);
-                        db = getFirestore(app);
-                        const auth = getAuth(app);
-                        
-                        signInAnonymously(auth).catch(e => {
-                            console.error("匿名登录失败:", e);
-                            guestbook.value.error = "无法连接留言服务";
-                        });
-
-                        onAuthStateChanged(auth, user => {
-                            if (user) {
-                                guestbook.value.isReady = true;
-                                listenForMessages();
-                                if (!document.hidden) {
-                                    startDanmakuStream();
-                                }
-                                document.addEventListener('visibilitychange', handleVisibilityChange);
-                            }
-                        });
-                    } catch (e) {
-                        console.error("Firebase 初始化失败:", e);
-                        guestbook.value.error = "留言服务加载失败。";
-                    }
-                };
-                const listenForMessages = () => {
-                    const messagesCollection = collection(db, "guestbook");
-                    const q = query(messagesCollection, orderBy("timestamp", "desc"), limit(50));
-                    
-                    onSnapshot(q, 
-                        (snapshot) => {
-                            const freshMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                            guestbook.value.messages = freshMessages;
-                            danmakuQueue = [...freshMessages].reverse();
-                        },
-                        (err) => {
-                            console.error("监听留言失败:", err);
-                            guestbook.value.error = "无法加载留言。";
-                        }
-                    );
-                };
-
-                const submitMessage = async () => {
-                    if (!guestbook.value.isReady || guestbook.value.isSubmitting) return;
-                    const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim();
-                    if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; }
-                    guestbook.value.isSubmitting = true; guestbook.value.status = { message: '', type: '' };
-                    try {
-                        const messagesCollection = collection(db, "guestbook");
-                        await addDoc(messagesCollection, { 
-                            name, 
-                            message, 
-                            timestamp: serverTimestamp() 
-                        });
-                        guestbook.value.newName = ''; guestbook.value.newMessage = ''; guestbook.value.status = { message: '发射成功！', type: 'success' };
-                        setTimeout(() => { guestbook.value.isExpanded = false; guestbook.value.status = { message: '', type: '' }; }, 1000);
-                    } catch (e) { console.error("提交留言失败:", e); guestbook.value.status = { message: '发射失败，请稍后再试。', type: 'error' };
-                    } finally { guestbook.value.isSubmitting = false; }
-                };
-                onUnmounted(() => { 
-                    stopDanmakuStream();
-                    document.removeEventListener('visibilitychange', handleVisibilityChange);
-                });
-                return { guestbook, activeDanmaku, init, submitMessage };
-            };
-            
             const useChatbot = (utils) => {
                 const chatbot = ref({ apiKey: '', temperature: 1.3, use_deep_thinking: false, status: '', currentMessage: '', isLoading: false });
                 const chatHistories = ref([]), activeChatId = ref(null), isHistoryDropdownOpen = ref(false), dropdownRef = ref(null), chatWindow = ref(null);
@@ -4139,10 +3912,120 @@
                 };
                 return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, loadAllData };
             };
+            
+            // --- 弹幕/留言板逻辑 (已优化) ---
+            const useGuestbook = () => {
+                const guestbook = ref({
+                    isReady: false, error: null, isSubmitting: false, newName: '', newMessage: '',
+                    messages: [], isExpanded: false, status: { message: '', type: '' }
+                });
+                const activeDanmaku = ref([]);
+                let danmakuQueue = [], danmakuInterval = null, pollInterval = null;
 
+                const fetchMessages = async () => {
+                    try {
+                        const response = await fetch(config.guestbookApiUrl);
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || `代理服务器响应错误: ${response.status}`);
+                        }
+                        const freshMessages = await response.json();
+                        guestbook.value.messages = freshMessages;
+                        danmakuQueue = [...freshMessages].reverse();
+                        guestbook.value.isReady = true;
+                    } catch (err) {
+                        console.error("获取弹幕失败:", err);
+                        guestbook.value.error = err.message || "无法加载弹幕。";
+                    }
+                };
+                
+                const submitMessage = async () => {
+                    if (guestbook.value.isSubmitting) return;
+                    const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim();
+                    if (!name || !message) {
+                        guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' };
+                        return;
+                    }
+                    guestbook.value.isSubmitting = true;
+                    guestbook.value.status = { message: '', type: '' };
+
+                    try {
+                        const response = await fetch(config.guestbookApiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name, message })
+                        });
+
+                        if (!response.ok) {
+                             const errorData = await response.json();
+                            throw new Error(errorData.error || `代理服务器提交错误: ${response.status}`);
+                        }
+                        
+                        const latestMessages = await response.json();
+                        guestbook.value.messages = latestMessages;
+                        danmakuQueue = [...latestMessages].reverse();
+                        console.log("弹幕列表已通过提交响应即时更新！");
+
+                        guestbook.value.newName = '';
+                        guestbook.value.newMessage = '';
+                        guestbook.value.status = { message: '发射成功！', type: 'success' };
+                        setTimeout(() => {
+                            guestbook.value.isExpanded = false;
+                            guestbook.value.status = { message: '', type: '' };
+                        }, 1500);
+
+                    } catch (e) {
+                        console.error("提交弹幕失败:", e);
+                        guestbook.value.status = { message: e.message || '发射失败，请稍后再试。', type: 'error' };
+                    } finally {
+                        guestbook.value.isSubmitting = false;
+                    }
+                };
+
+                const startDanmakuStream = () => {
+                    stopDanmakuStream(); 
+                    danmakuInterval = setInterval(() => {
+                        if (danmakuQueue.length === 0 || activeDanmaku.value.length > 10) return;
+                        const msg = danmakuQueue.shift(); danmakuQueue.push(msg);
+                        const duration = Math.random() * 8 + 12;
+                        const danmaku = {
+                            id: Date.now() + Math.random(), name: msg.name, message: msg.message,
+                            style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` }
+                        };
+                        activeDanmaku.value.push(danmaku);
+                        setTimeout(() => { activeDanmaku.value.shift(); }, duration * 1000);
+                    }, 3000);
+                };
+                const stopDanmakuStream = () => { if (danmakuInterval) clearInterval(danmakuInterval); danmakuInterval = null; };
+                const handleVisibilityChange = () => { document.hidden ? stopDanmakuStream() : startDanmakuStream(); };
+
+                const init = async () => {
+                    await fetchMessages();
+                    startDanmakuStream();
+                    document.addEventListener('visibilitychange', handleVisibilityChange);
+                    if (pollInterval) clearInterval(pollInterval);
+                    pollInterval = setInterval(fetchMessages, 60000); // 每60秒轮询一次以同步其他用户的弹幕
+                };
+                onUnmounted(() => {
+                    stopDanmakuStream();
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    if (pollInterval) clearInterval(pollInterval);
+                });
+                return { guestbook, activeDanmaku, init, submitMessage };
+            };
+
+            // --- Vue App 主逻辑 ---
             createApp({
                 setup() {
-                    const utils = { renderMarkdown(content) { if (!window.marked) return (content || '').replace(/\n/g, '<br>'); const mathPlaceholders = []; let i = 0; const text = (content || '').replace(/(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\(.*?\\\))/g, (match) => { const p = `<!--MATH_${i++}-->`; mathPlaceholders.push(match); return p; }); let html = window.marked.parse(text, { gfm: true, breaks: true }); return html.replace(/<!--MATH_(\d+)-->/g, (m, idx) => mathPlaceholders[parseInt(idx)]); }, triggerMathRendering(selector) { nextTick(() => { if (window.renderMathInElement) { const el = document.querySelector(selector); if (el) try { window.renderMathInElement(el, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\[', right: '\\]', display: true }], throwOnError: false }); } catch (e) { console.error("KaTeX渲染错误", e); } } }); }, handleImgError(event) { event.target.src = 'https://placehold.co/400x600/1a1a1a/ffffff?text=Image+Failed'; } };
+                    const utils = { 
+                        renderMarkdown(content) { if (!window.marked) return (content || '').replace(/\n/g, '<br>'); const mathPlaceholders = []; let i = 0; const text = (content || '').replace(/(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\(.*?\\\))/g, (match) => { const p = `<!--MATH_${i++}-->`; mathPlaceholders.push(match); return p; }); let html = window.marked.parse(text, { gfm: true, breaks: true }); return html.replace(/<!--MATH_(\d+)-->/g, (m, idx) => mathPlaceholders[parseInt(idx)]); }, 
+                        triggerMathRendering(selector) { nextTick(() => { if (window.renderMathInElement) { const el = document.querySelector(selector); if (el) try { window.renderMathInElement(el, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\[', right: '\\]', display: true }], throwOnError: false }); } catch (e) { console.error("KaTeX渲染错误", e); } } }); }, 
+                        handleImgError(event) { event.target.src = 'https://placehold.co/400x600/1a1a1a/ffffff?text=Image+Failed'; } 
+                    };
+
+                    const { guestbook, activeDanmaku, init: initGuestbook, submitMessage: submitGuestbookMessage } = useGuestbook();
+                    const toggleGuestbookExpanded = () => { guestbook.value.isExpanded = !guestbook.value.isExpanded; };
+                    
                     const { currentTheme, setTheme, initTheme } = useTheme();
                     const { isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, handleScroll } = useScroll();
                     const hero = useHeroTypewriter();
@@ -4150,8 +4033,6 @@
                     const chatbot = useChatbot(utils);
                     const data = useDataService(utils);
                     const isLoginModalVisible = ref(false);
-                    const { guestbook, activeDanmaku, init: initGuestbook, submitMessage: submitGuestbookMessage } = useGuestbook();
-                    const toggleGuestbookExpanded = () => { guestbook.value.isExpanded = !guestbook.value.isExpanded; };
 
                     const github = ref({ repos: [], contributionsUrl: config.github.contributionsUrl, spaceUrl: config.github.spaceUrl, error: null }), siteUptime = ref(""), icp = ref(config.icpNumber), username = ref(""), password = ref(""), loginStatus = ref({ message: '', type: '' }), isLoggingIn = ref(false), activeSection = ref("hero"), activeJourneyPanel = ref(null), openInterestId = ref(null), activePostId = ref(null), activeCategory = ref('全部分类'), lastFocusedElement = ref(null), activePanelRef = ref(null);
                     const activePost = computed(() => data.blogPosts.value.find(p => p.id === activePostId.value));
@@ -4183,7 +4064,6 @@
                             }, 400);
                         });
                     };
-
                     const closeJourneyPanel = () => {
                         document.getElementById('interactive-journey')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         activeJourneyPanel.value = null;
@@ -4192,7 +4072,6 @@
                              lastFocusedElement.value.focus();
                         }
                     };
-
                     const handleNavClick = (id) => { if (id === 'hub' || id === 'footer') { closeJourneyPanel(); document.getElementById(id === 'hub' ? 'interactive-journey' : 'footer')?.scrollIntoView({ behavior: 'smooth' }); } else { openJourneyPanel(id); } };
                     const currentSongId = ref("9206816111"), newSongIdInput = ref(""), newSongNameInput = ref("");
                     const presetSonglists = ref([{ id: "9206816111", name: "「 BGM 」净尘拂人心" }, { id: "8886500589", name: "『纯音乐』美到窒息的旋律" }]);
@@ -4202,7 +4081,6 @@
                     const removeCustomSonglist = (id) => { customSonglists.value = customSonglists.value.filter(l => l.id !== id); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); };
                     const loadCustomSonglists = () => { const saved = localStorage.getItem('custom_songlists_v2'); if (saved) customSonglists.value = JSON.parse(saved); };
                     const animatedTargetValues = ref({});
-
                     const useAnimatedCounter = (targetValue, onUpdate) => {
                         let frameId;
                         const animate = (start, end, startTime, duration) => {
@@ -4224,7 +4102,6 @@
                         onUnmounted(() => cancelAnimationFrame(frameId));
                         return { startAnimation };
                     };
-
                     const triggerGrowthAnimations = (panel) => {
                         if (!panel) return;
                         panel.querySelector('.timeline')?.classList.add('is-visible');
@@ -4242,7 +4119,6 @@
                             startAnimation({ duration: 1000, delay: 300 });
                         });
                     };
-
                     const resetGrowthAnimations = (panel) => {
                         if (!panel) return;
                         panel.querySelector('.timeline')?.classList.remove('is-visible');
@@ -4256,17 +4132,7 @@
                         animatedTargetValues.value = {};
                     };
                     
-                    // PERFORMANCE OPTIMIZATION: Throttling the scroll handler
-                    const throttle = (func, limit) => {
-                        let inThrottle;
-                        return function(...args) {
-                            if (!inThrottle) {
-                                func.apply(this, args);
-                                inThrottle = true;
-                                setTimeout(() => inThrottle = false, limit);
-                            }
-                        };
-                    };
+                    const throttle = (func, limit) => { let inThrottle; return function(...args) { if (!inThrottle) { func.apply(this, args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } }; };
                     const throttledScrollHandler = throttle(handleScroll, 100);
 
                     watch(activePanelRef, (newPanelEl) => {
@@ -4277,7 +4143,6 @@
                             }, 50);
                         }
                     });
-                    
                     watch(activePostId, async (newId) => {
                         if (newId === null) return; const post = data.blogPosts.value.find(p => p.id === newId);
                         if (post && !post.content) { post.content = await dataLoaderService.fetchMarkdown(post.filePath); }
@@ -4285,9 +4150,13 @@
                     });
                     
                     onMounted(async () => {
-                        initTheme(); hero.start(); loadCustomSonglists(); initGuestbook();
+                        initTheme(); 
+                        hero.start(); 
+                        loadCustomSonglists(); 
+                        initGuestbook();
                         siteUptime.value = `${Math.ceil(Math.abs(new Date() - new Date(config.siteStartDate)) / 864e5)} 天`;
-                        chatbot.loadChats(); await data.loadAllData();
+                        chatbot.loadChats(); 
+                        await data.loadAllData();
                         if (data.blogPosts.value.length > 0) activePostId.value = data.blogPosts.value[0].id;
                         if (data.interests.value.length > 0) openInterestId.value = data.interests.value[0].id;
                         try { github.value.repos = await apiService.getGithubRepos(); } catch (e) { console.error(e); github.value.error = e.message; }
@@ -4297,12 +4166,12 @@
                         document.querySelectorAll(".anim-fade-in-up").forEach(el => animObserver.observe(el));
                         document.addEventListener('click', chatbot.handleClickOutside);
                         window.addEventListener('resize', () => windowWidth.value = window.innerWidth); 
-                        window.addEventListener("scroll", throttledScrollHandler); // Use throttled handler
+                        window.addEventListener("scroll", throttledScrollHandler);
                         const savedApiKey = localStorage.getItem('deepseek_api_key'); if (savedApiKey) chatbot.chatbot.value.apiKey = savedApiKey;
                     });
 
                     onUnmounted(() => { 
-                        window.removeEventListener("scroll", throttledScrollHandler); // Clean up throttled handler
+                        window.removeEventListener("scroll", throttledScrollHandler);
                         window.removeEventListener('resize', () => windowWidth.value = window.innerWidth); 
                         document.removeEventListener('click', chatbot.handleClickOutside); 
                         if (music.player.value.aplayer) music.player.value.aplayer.destroy(); 
@@ -4322,5 +4191,4 @@
     </script>
 </body>
 </html>
-
 
