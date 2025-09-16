@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>虚静以宁</title>
+    <title>虚静以宁 (优化版)</title>
     <link rel="icon" href="./content/icon/32.png">
 
+    <!-- Preconnect to CDNs for faster DNS resolution -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
@@ -14,12 +15,23 @@
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="preconnect" href="https://www.gstatic.com" />
 
-
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+    <script>
+        // 立即设置主题以避免加载动画出现FOUC (无样式内容闪烁)
+        (function() {
+            const isLightTheme = new Date().getHours() >= 6 && new Date().getHours() < 18;
+            if (isLightTheme) {
+                document.documentElement.classList.add('light-theme');
+            }
+        })();
+    </script>
 
     <style>
         /* --- CSS 结构说明 ---
@@ -37,6 +49,8 @@
         :root {
             --body-bg-color: #121212;
             --glass-bg: rgba(38, 38, 38, 0.25);
+            /* PERFORMANCE OPTIMIZATION: Added a more opaque background for the optimized glass effect */
+            --glass-bg-optimized: rgba(38, 38, 38, 0.65);
             --glass-border-color: rgba(255, 255, 255, 0.1);
             --input-bg: rgba(50, 50, 50, 0.2);
             --text-color: #f0f0f0;
@@ -57,6 +71,8 @@
         html.light-theme {
             --body-bg-color: #f5f5f7;
             --glass-bg: rgba(242, 242, 247, 0.3);
+            /* PERFORMANCE OPTIMIZATION: Added a more opaque background for the optimized glass effect */
+            --glass-bg-optimized: rgba(242, 242, 247, 0.7);
             --glass-border-color: rgba(0, 0, 0, 0.1);
             --input-bg: rgba(255, 255, 255, 0.3);
             --text-color: #1d1d1f;
@@ -110,10 +126,10 @@
 
         /* --- 3. 通用工具类 与 页面加载动画 --- */
 
-        /* 风格玻璃效果 */
+        /* 风格玻璃效果 (已优化) */
         .glass-effect {
             position: relative;
-            background: var(--glass-bg);
+            background: var(--glass-bg-optimized);
             background-clip: padding-box;
             border: 1px solid var(--glass-border-color);
             border-radius: 24px;
@@ -122,8 +138,9 @@
             overflow: hidden;
             transition: background 0.4s ease, border-color 0.4s ease,
                 box-shadow 0.4s ease;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            /* --- PERFORMANCE OPTIMIZATION: backdrop-filter is GPU intensive and can cause lag. It has been replaced with a semi-transparent background. --- */
+            /* backdrop-filter: blur(10px); */
+            /* -webkit-backdrop-filter: blur(10px); */
         }
 
         .glass-effect::before {
@@ -2909,7 +2926,7 @@
 </head>
 
 <body>
-    <!-- 新增: 页面加载动画 -->
+    <!-- 页面加载动画 -->
     <div id="loader-wrapper">
         <div class="loader-container">
             <div class="loader-core"></div>
@@ -3615,6 +3632,7 @@
         </footer>
     </div>
 
+    <!-- External Libraries -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
     <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
@@ -3623,12 +3641,12 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" defer></script>
     
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js" defer></script>
+    <!-- PERFORMANCE OPTIMIZATION: Updated Firebase to modern modular SDK (v9+) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-
-    <script>
         // --- 粒子动画逻辑 ---
         (function () {
             const canvas = document.getElementById("particle-canvas");
@@ -3636,6 +3654,24 @@
             const ctx = canvas.getContext("2d");
             let particles = [];
             let animationFrameId;
+
+            // PERFORMANCE OPTIMIZATION: Pause animation when tab is not visible
+            let isTabVisible = true;
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    isTabVisible = false;
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                } else {
+                    isTabVisible = true;
+                    if (!animationFrameId) {
+                        animate();
+                    }
+                }
+            });
+
             function resizeCanvas() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -3680,8 +3716,7 @@
                     }
                 }
                 draw() {
-                    const isLightTheme =
-                        document.documentElement.classList.contains("light-theme");
+                    const isLightTheme = document.documentElement.classList.contains("light-theme");
                     ctx.fillStyle = isLightTheme
                         ? "rgba(0, 0, 0, 0.4)"
                         : "rgba(255, 255, 255, 0.4)";
@@ -3725,6 +3760,7 @@
                 }
             }
             function animate() {
+                if (!isTabVisible) return;
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 handleParticles();
                 animationFrameId = requestAnimationFrame(animate);
@@ -3732,7 +3768,9 @@
             function startAnimation() {
                 resizeCanvas();
                 initParticles();
-                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                if (animationFrameId) {
+                    cancelAnimationFrame(animationFrameId);
+                }
                 animate();
             }
             window.addEventListener("resize", startAnimation);
@@ -3741,11 +3779,9 @@
 
         // --- Vue.js 应用逻辑 ---
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 新增: 页面加载逻辑 ---
             const loader = document.getElementById('loader-wrapper');
             const appElement = document.getElementById('app');
 
-            // 默认隐藏app，防止内容闪烁
             if (appElement) {
                 appElement.style.visibility = 'hidden';
             }
@@ -3755,14 +3791,12 @@
                     loader.classList.add('is-hidden');
                 }
                 if (appElement) {
-                    // 等待加载动画淡出后再显示内容
                     setTimeout(() => {
                         if (loader) loader.style.display = 'none';
                         appElement.style.visibility = 'visible';
-                    }, 800); // 必须与CSS中的transition持续时间匹配
+                    }, 800);
                 }
             };
-            // --- 页面加载逻辑结束 ---
 
             if (!window.Vue) {
                 console.error("Vue.js未能加载。应用无法启动。");
@@ -3773,13 +3807,13 @@
             
             const config = {
                 firebaseConfig : {
-                apiKey: "AIzaSyAmXoNo4dx5XuCccI97fBpuC_GcAoefE0A",
-                authDomain: "home-60305.firebaseapp.com",
-                projectId: "home-60305",
-                storageBucket: "home-60305.firebasestorage.app",
-                messagingSenderId: "936980156368",
-                appId: "1:936980156368:web:66a3476936a2fb882d33d5",
-                measurementId: "G-HZTPBPVVJ2"
+                    apiKey: "AIzaSyAmXoNo4dx5XuCccI97fBpuC_GcAoefE0A",
+                    authDomain: "home-60305.firebaseapp.com",
+                    projectId: "home-60305",
+                    storageBucket: "home-60305.firebasestorage.app",
+                    messagingSenderId: "936980156368",
+                    appId: "1:936980156368:web:66a3476936a2fb882d33d5",
+                    measurementId: "G-HZTPBPVVJ2"
                 },
                 siteStartDate: "2024-03-02",
                 icpNumber: "渝ICP备2025053763号-1",
@@ -3962,8 +3996,9 @@
                 
                 const startDanmakuStream = () => {
                     stopDanmakuStream(); 
+                    // PERFORMANCE OPTIMIZATION: Increased interval and limited concurrent danmaku
                     danmakuInterval = setInterval(() => {
-                        if (danmakuQueue.length === 0 || activeDanmaku.value.length > 15) return;
+                        if (danmakuQueue.length === 0 || activeDanmaku.value.length > 10) return;
                         const msg = danmakuQueue.shift(); danmakuQueue.push(msg);
                         const duration = Math.random() * 8 + 12; // 12-20s
                         const danmaku = {
@@ -3972,7 +4007,7 @@
                         };
                         activeDanmaku.value.push(danmaku);
                         setTimeout(() => { activeDanmaku.value.shift(); }, duration * 1000);
-                    }, 2000);
+                    }, 3000); // Changed from 2000ms to 3000ms
                 };
                 
                 const handleVisibilityChange = () => {
@@ -3984,32 +4019,45 @@
                 };
 
                 const init = () => {
-                     const checkFirebase = () => {
-                        if (window.firebase && window.firebase.app) {
-                            try {
-                                if (!firebase.apps.length) firebase.initializeApp(config.firebaseConfig);
-                                db = firebase.firestore(); const auth = firebase.auth();
-                                auth.signInAnonymously().catch(e => { console.error("匿名登录失败:", e); guestbook.value.error = "无法连接留言服务"; });
-                                auth.onAuthStateChanged(user => { 
-                                    if (user) { 
-                                        guestbook.value.isReady = true; 
-                                        listenForMessages(); 
-                                        
-                                        if (!document.hidden) {
-                                            startDanmakuStream(); 
-                                        }
-                                        document.addEventListener('visibilitychange', handleVisibilityChange);
-                                    } 
-                                });
-                            } catch (e) { console.error("Firebase 初始化失败:", e); guestbook.value.error = "留言服务加载失败。"; }
-                        } else { setTimeout(checkFirebase, 100); }
-                    };
-                    checkFirebase();
+                    try {
+                        const app = initializeApp(config.firebaseConfig);
+                        db = getFirestore(app);
+                        const auth = getAuth(app);
+                        
+                        signInAnonymously(auth).catch(e => {
+                            console.error("匿名登录失败:", e);
+                            guestbook.value.error = "无法连接留言服务";
+                        });
+
+                        onAuthStateChanged(auth, user => {
+                            if (user) {
+                                guestbook.value.isReady = true;
+                                listenForMessages();
+                                if (!document.hidden) {
+                                    startDanmakuStream();
+                                }
+                                document.addEventListener('visibilitychange', handleVisibilityChange);
+                            }
+                        });
+                    } catch (e) {
+                        console.error("Firebase 初始化失败:", e);
+                        guestbook.value.error = "留言服务加载失败。";
+                    }
                 };
                 const listenForMessages = () => {
-                    db.collection("guestbook").orderBy("timestamp", "desc").limit(50).onSnapshot(
-                        snapshot => { const freshMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); guestbook.value.messages = freshMessages; danmakuQueue = [...freshMessages].reverse(); },
-                        err => { console.error("监听留言失败:", err); guestbook.value.error = "无法加载留言。"; }
+                    const messagesCollection = collection(db, "guestbook");
+                    const q = query(messagesCollection, orderBy("timestamp", "desc"), limit(50));
+                    
+                    onSnapshot(q, 
+                        (snapshot) => {
+                            const freshMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                            guestbook.value.messages = freshMessages;
+                            danmakuQueue = [...freshMessages].reverse();
+                        },
+                        (err) => {
+                            console.error("监听留言失败:", err);
+                            guestbook.value.error = "无法加载留言。";
+                        }
                     );
                 };
 
@@ -4019,7 +4067,12 @@
                     if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; }
                     guestbook.value.isSubmitting = true; guestbook.value.status = { message: '', type: '' };
                     try {
-                        await db.collection("guestbook").add({ name, message, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                        const messagesCollection = collection(db, "guestbook");
+                        await addDoc(messagesCollection, { 
+                            name, 
+                            message, 
+                            timestamp: serverTimestamp() 
+                        });
                         guestbook.value.newName = ''; guestbook.value.newMessage = ''; guestbook.value.status = { message: '发射成功！', type: 'success' };
                         setTimeout(() => { guestbook.value.isExpanded = false; guestbook.value.status = { message: '', type: '' }; }, 1000);
                     } catch (e) { console.error("提交留言失败:", e); guestbook.value.status = { message: '发射失败，请稍后再试。', type: 'error' };
@@ -4203,6 +4256,19 @@
                         animatedTargetValues.value = {};
                     };
                     
+                    // PERFORMANCE OPTIMIZATION: Throttling the scroll handler
+                    const throttle = (func, limit) => {
+                        let inThrottle;
+                        return function(...args) {
+                            if (!inThrottle) {
+                                func.apply(this, args);
+                                inThrottle = true;
+                                setTimeout(() => inThrottle = false, limit);
+                            }
+                        };
+                    };
+                    const throttledScrollHandler = throttle(handleScroll, 100);
+
                     watch(activePanelRef, (newPanelEl) => {
                         if (newPanelEl && activeJourneyPanel.value === 'growth') {
                             resetGrowthAnimations(newPanelEl);
@@ -4230,11 +4296,17 @@
                         const animObserver = new IntersectionObserver((entries, obs) => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-visible"); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
                         document.querySelectorAll(".anim-fade-in-up").forEach(el => animObserver.observe(el));
                         document.addEventListener('click', chatbot.handleClickOutside);
-                        window.addEventListener('resize', () => windowWidth.value = window.innerWidth); window.addEventListener("scroll", handleScroll);
+                        window.addEventListener('resize', () => windowWidth.value = window.innerWidth); 
+                        window.addEventListener("scroll", throttledScrollHandler); // Use throttled handler
                         const savedApiKey = localStorage.getItem('deepseek_api_key'); if (savedApiKey) chatbot.chatbot.value.apiKey = savedApiKey;
                     });
 
-                    onUnmounted(() => { window.removeEventListener("scroll", handleScroll); window.removeEventListener('resize', () => windowWidth.value = window.innerWidth); document.removeEventListener('click', chatbot.handleClickOutside); if (music.player.value.aplayer) music.player.value.aplayer.destroy(); });
+                    onUnmounted(() => { 
+                        window.removeEventListener("scroll", throttledScrollHandler); // Clean up throttled handler
+                        window.removeEventListener('resize', () => windowWidth.value = window.innerWidth); 
+                        document.removeEventListener('click', chatbot.handleClickOutside); 
+                        if (music.player.value.aplayer) music.player.value.aplayer.destroy(); 
+                    });
                     
                     return { ...utils, ...hero, ...data, ...chatbot, ...music,
                         guestbook, activeDanmaku, submitGuestbookMessage, toggleGuestbookExpanded,
@@ -4249,5 +4321,6 @@
         });
     </script>
 </body>
-
 </html>
+
+
