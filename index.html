@@ -1610,7 +1610,8 @@
                     interests: './content/interests.json',
                     growth: './content/growth.json',
                     bookshelf: './content/bookshelf.json',
-                    footerLinks: './content/footer-links.json'
+                    footerLinks: './content/footer-links.json',
+                    localMusic: './content/music/music.json',
                 }
             };
 
@@ -1688,11 +1689,23 @@
             const useMusicPlayer = () => {
                 const player = ref({ aplayer: null, playlist: [], isInitialized: false, isLoading: false, isPlaying: false, isPlaylistVisible: false, isSongSwitcherVisible: false, currentSong: {}, progress: 0, volume: 0.7, error: null, loopMode: 'all', isShuffle: false, playbackRate: 1.0 });
                 const lrcContainer = ref(null), originalPlaylist = ref([]);
-                const switchPlaylist = async (songId) => {
+                const switchPlaylist = async (playlistSource) => {
                     if (player.value.isLoading) return;
                     player.value.isLoading = true; player.value.error = null;
                     try {
-                        const audioList = await apiService.getMusicPlaylist(songId);
+                        let audioList;
+                        if (typeof playlistSource === 'string') {
+                            // It's a song ID, fetch from API
+                            audioList = await apiService.getMusicPlaylist(playlistSource);
+                        } else if (Array.isArray(playlistSource)) {
+                            // It's a local playlist array
+                            audioList = playlistSource;
+                        } else {
+                            throw new Error("无效的播放列表源。");
+                        }
+
+                        if (!Array.isArray(audioList) || audioList.length === 0) { console.error("API响应无效或播放列表为空:", audioList); throw new Error("播放列表为空或加载失败。"); }
+
                         originalPlaylist.value = [...audioList]; player.value.isShuffle = false;
                         if (!player.value.aplayer) {
                             await nextTick();
@@ -1762,18 +1775,19 @@
             
             // `useDataService` Hook: 统一加载所有静态内容数据
             const useDataService = (utils) => {
-                const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]);
+                const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]), localMusicPlaylist = ref([]);
                 const loadAllData = async () => {
-                    const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks] = await Promise.all([
+                    const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks, localMusic] = await Promise.all([
                         dataLoaderService.fetchMarkdown(config.contentPaths.about), dataLoaderService.fetchJSON(config.contentPaths.resume), dataLoaderService.fetchJSON(config.contentPaths.interests), dataLoaderService.fetchJSON(config.contentPaths.growth),
-                        dataLoaderService.fetchJSON(config.contentPaths.bookshelf), dataLoaderService.fetchJSON(config.contentPaths.blogManifest), dataLoaderService.fetchJSON(config.contentPaths.footerLinks),
+                        dataLoaderService.fetchJSON(config.contentPaths.bookshelf), dataLoaderService.fetchJSON(config.contentPaths.blogManifest), dataLoaderService.fetchJSON(config.contentPaths.footerLinks), dataLoaderService.fetchJSON(config.contentPaths.localMusic)
                     ]);
                     aboutContent.value = utils.renderMarkdown(aboutMd || ""); resumeData.value = resume || { name: "数据加载失败" };
                     if (interestsData) interests.value = interestsData.map(item => ({ ...item, content: utils.renderMarkdown(item.content), image: item.image.startsWith('http') ? item.image : `https://placehold.co/800x400/1a1a1a/ffffff?text=${encodeURIComponent(item.title)}` }));
                     if (growth) { timeline.value = growth.timeline; targets.value = growth.targets; }
                     bookshelf.value = books || []; blogPosts.value = blogManifest || []; footerIconLinks.value = footerLinks || [];
+                    localMusicPlaylist.value = localMusic || [];
                 };
-                return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, loadAllData };
+                return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, localMusicPlaylist, loadAllData };
             };
             
             // `useGuestbook` Hook: 封装留言板/弹幕功能 (已优化)
@@ -1944,10 +1958,26 @@
                     const openJourneyPanel = (panelId) => { if (activeJourneyPanel.value === panelId) return; lastFocusedElement.value = document.activeElement; activeJourneyPanel.value = panelId; activeSection.value = panelId; nextTick(() => { const el = document.getElementById('interactive-journey'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 80, behavior: "smooth" }); setTimeout(() => { const newPanel = activePanelRef.value; if(newPanel) { const focusable = newPanel.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if(focusable) focusable.focus(); else newPanel.focus(); } }, 400); }); };
                     const closeJourneyPanel = () => { document.getElementById('interactive-journey')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); activeJourneyPanel.value = null; activeSection.value = 'hub'; if (lastFocusedElement.value) { lastFocusedElement.value.focus(); } };
                     const handleNavClick = (id) => { if (id === 'hub' || id === 'footer') { closeJourneyPanel(); document.getElementById(id === 'hub' ? 'interactive-journey' : 'footer')?.scrollIntoView({ behavior: 'smooth' }); } else { openJourneyPanel(id); } };
-                    const currentSongId = ref("9206816111"), newSongIdInput = ref(""), newSongNameInput = ref("");
-                    const presetSonglists = ref([{ id: "9206816111", name: "「 BGM 」净尘拂人心" }, { id: "8886500589", name: "『纯音乐』美到窒息的旋律" }]);
+                    const currentSongId = ref("local"), newSongIdInput = ref(""), newSongNameInput = ref("");
+                    const presetSonglists = ref([
+                        { id: "local", name: "「 Animenz 」钢琴曲" }, 
+                        { id: "9206816111", name: "「 BGM 」净尘拂人心" }, 
+                        { id: "8886500589", name: "『纯音乐』美到窒息的旋律" }
+                    ]);
                     const customSonglists = ref([]);
-                    const switchSonglist = async (id) => { if (music.player.value.isLoading || !id || (id === currentSongId.value && music.player.value.isInitialized)) return; currentSongId.value = id; await music.switchPlaylist(id); };
+                    const switchSonglist = async (id) => {
+                        if (music.player.value.isLoading || !id) return;
+                        // Prevent re-clicking the same active online playlist
+                        if (id !== 'local' && id === currentSongId.value && music.player.value.isInitialized) return;
+
+                        currentSongId.value = id;
+                        if (id === 'local') {
+                            // music.switchPlaylist will handle empty list error
+                            await music.switchPlaylist(data.localMusicPlaylist.value);
+                        } else {
+                            await music.switchPlaylist(id);
+                        }
+                    };
                     const addAndSwitchSonglist = () => { const newId = newSongIdInput.value.trim(); if (!newId || !/^\d+$/.test(newId)) { alert("请输入纯数字的歌单ID。"); return; } const newName = newSongNameInput.value.trim() || `歌单 ${newId}`; if (!customSonglists.value.some(l => l.id === newId)) { customSonglists.value.unshift({ id: newId, name: newName }); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); } newSongIdInput.value = ""; newSongNameInput.value = ""; switchSonglist(newId); };
                     const removeCustomSonglist = (id) => { customSonglists.value = customSonglists.value.filter(l => l.id !== id); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); };
                     const loadCustomSonglists = () => { const saved = localStorage.getItem('custom_songlists_v2'); if (saved) customSonglists.value = JSON.parse(saved); };
@@ -2011,3 +2041,4 @@
     </script>
 </body>
 </html>
+
