@@ -1399,7 +1399,14 @@
                                 </div>
                                 <div class="songlist-switcher" :class="{ show: player.isSongSwitcherVisible }">
                                     <h4>预设歌单</h4>
-                                    <ul class="songlist-presets"><li v-for="list in presetSonglists" :key="list.id" @click="switchSonglist(list.id)" :class="{active: list.id === currentSongId}"><span>{{ list.name }}</span></li></ul>
+                                    <ul class="songlist-presets">
+                                        <li v-for="list in presetSonglists" 
+                                            :key="list.id" 
+                                            @click="switchSonglist(list.id)" 
+                                            :class="{ active: list.id === currentSongId || (list.id === 'local_folder_picker' && currentSongId === 'local_folder') }">
+                                            <span>{{ list.name }}</span>
+                                        </li>
+                                    </ul>
                                     <h5 v-if="customSonglists.length > 0">我的歌单</h5>
                                     <ul class="songlist-custom" v-if="customSonglists.length > 0"><li v-for="list in customSonglists" :key="list.id" @click="switchSonglist(list.id)" :class="{active: list.id === currentSongId}"><span>{{ list.name }}</span><button @click.stop="removeCustomSonglist(list.id)" class="remove-btn" title="删除这个歌单"><i class="ph ph-x"></i></button></li></ul>
                                     <div class="songlist-input-group">
@@ -1611,7 +1618,7 @@
                     growth: './content/growth.json',
                     bookshelf: './content/bookshelf.json',
                     footerLinks: './content/footer-links.json',
-                    localMusic: './content/music/music.json',
+                    localPlaylistsManifest: './content/music/local_playlists.json',
                 }
             };
 
@@ -1775,19 +1782,27 @@
             
             // `useDataService` Hook: 统一加载所有静态内容数据
             const useDataService = (utils) => {
-                const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]), localMusicPlaylist = ref([]);
+                const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]), localPlaylistsManifest = ref([]);
+                const loadedLocalPlaylists = ref({}); // Cache for loaded playlists
+
                 const loadAllData = async () => {
-                    const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks, localMusic] = await Promise.all([
-                        dataLoaderService.fetchMarkdown(config.contentPaths.about), dataLoaderService.fetchJSON(config.contentPaths.resume), dataLoaderService.fetchJSON(config.contentPaths.interests), dataLoaderService.fetchJSON(config.contentPaths.growth),
-                        dataLoaderService.fetchJSON(config.contentPaths.bookshelf), dataLoaderService.fetchJSON(config.contentPaths.blogManifest), dataLoaderService.fetchJSON(config.contentPaths.footerLinks), dataLoaderService.fetchJSON(config.contentPaths.localMusic)
+                    const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks, localManifest] = await Promise.all([
+                        dataLoaderService.fetchMarkdown(config.contentPaths.about), 
+                        dataLoaderService.fetchJSON(config.contentPaths.resume), 
+                        dataLoaderService.fetchJSON(config.contentPaths.interests), 
+                        dataLoaderService.fetchJSON(config.contentPaths.growth),
+                        dataLoaderService.fetchJSON(config.contentPaths.bookshelf), 
+                        dataLoaderService.fetchJSON(config.contentPaths.blogManifest), 
+                        dataLoaderService.fetchJSON(config.contentPaths.footerLinks),
+                        dataLoaderService.fetchJSON(config.contentPaths.localPlaylistsManifest) // Fetch the manifest
                     ]);
                     aboutContent.value = utils.renderMarkdown(aboutMd || ""); resumeData.value = resume || { name: "数据加载失败" };
                     if (interestsData) interests.value = interestsData.map(item => ({ ...item, content: utils.renderMarkdown(item.content), image: item.image.startsWith('http') ? item.image : `https://placehold.co/800x400/1a1a1a/ffffff?text=${encodeURIComponent(item.title)}` }));
                     if (growth) { timeline.value = growth.timeline; targets.value = growth.targets; }
                     bookshelf.value = books || []; blogPosts.value = blogManifest || []; footerIconLinks.value = footerLinks || [];
-                    localMusicPlaylist.value = localMusic || [];
+                    localPlaylistsManifest.value = localManifest || [];
                 };
-                return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, localMusicPlaylist, loadAllData };
+                return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, localPlaylistsManifest, loadedLocalPlaylists, loadAllData };
             };
             
             // `useGuestbook` Hook: 封装留言板/弹幕功能 (已优化)
@@ -1958,26 +1973,87 @@
                     const openJourneyPanel = (panelId) => { if (activeJourneyPanel.value === panelId) return; lastFocusedElement.value = document.activeElement; activeJourneyPanel.value = panelId; activeSection.value = panelId; nextTick(() => { const el = document.getElementById('interactive-journey'); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 80, behavior: "smooth" }); setTimeout(() => { const newPanel = activePanelRef.value; if(newPanel) { const focusable = newPanel.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'); if(focusable) focusable.focus(); else newPanel.focus(); } }, 400); }); };
                     const closeJourneyPanel = () => { document.getElementById('interactive-journey')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); activeJourneyPanel.value = null; activeSection.value = 'hub'; if (lastFocusedElement.value) { lastFocusedElement.value.focus(); } };
                     const handleNavClick = (id) => { if (id === 'hub' || id === 'footer') { closeJourneyPanel(); document.getElementById(id === 'hub' ? 'interactive-journey' : 'footer')?.scrollIntoView({ behavior: 'smooth' }); } else { openJourneyPanel(id); } };
-                    const currentSongId = ref("local"), newSongIdInput = ref(""), newSongNameInput = ref("");
-                    const presetSonglists = ref([
-                        { id: "local", name: "「 Animenz 」钢琴曲" }, 
-                        { id: "9206816111", name: "「 BGM 」净尘拂人心" }, 
-                        { id: "8886500589", name: "『纯音乐』美到窒息的旋律" }
-                    ]);
+                    
+                    const currentSongId = ref(null), newSongIdInput = ref(""), newSongNameInput = ref("");
+                    const presetSonglists = ref([]);
                     const customSonglists = ref([]);
+
+                    const playFromLocalFolder = async () => {
+                        if (!('showDirectoryPicker' in window)) {
+                            alert('您的浏览器不支持此功能，请使用最新版的 Chrome 或 Edge 浏览器。');
+                            return;
+                        }
+
+                        try {
+                            const dirHandle = await window.showDirectoryPicker();
+                            const audioFiles = [];
+                            const supportedTypes = ['.mp3', '.flac', '.wav', '.ogg', '.m4a'];
+
+                            for await (const entry of dirHandle.values()) {
+                                if (entry.kind === 'file' && supportedTypes.some(ext => entry.name.toLowerCase().endsWith(ext))) {
+                                    const file = await entry.getFile();
+                                    audioFiles.push({
+                                        name: file.name.replace(/\.[^/.]+$/, ""), // Remove extension for cleaner name
+                                        artist: '本地文件',
+                                        url: URL.createObjectURL(file),
+                                        cover: './content/icon/128.png', // A default cover
+                                    });
+                                }
+                            }
+
+                            if (audioFiles.length === 0) {
+                                alert('选择的文件夹中没有找到支持的音乐文件。');
+                                return;
+                            }
+                            
+                            // Revoke old object URLs before creating a new playlist to prevent memory leaks
+                            if(music.player.value.playlist && currentSongId.value === 'local_folder'){
+                                music.player.value.playlist.forEach(song => {
+                                    if(song.url.startsWith('blob:')){
+                                        URL.revokeObjectURL(song.url);
+                                    }
+                                });
+                            }
+                            
+                            currentSongId.value = 'local_folder'; // Set a special ID
+                            await music.switchPlaylist(audioFiles);
+
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.error('播放本地文件夹时出错:', err);
+                                alert('无法读取文件夹。');
+                            }
+                        }
+                    };
+
                     const switchSonglist = async (id) => {
                         if (music.player.value.isLoading || !id) return;
-                        // Prevent re-clicking the same active online playlist
-                        if (id !== 'local' && id === currentSongId.value && music.player.value.isInitialized) return;
+
+                        if (id === 'local_folder_picker') {
+                            await playFromLocalFolder();
+                            return;
+                        }
+
+                        if (!id.startsWith('local_') && id === currentSongId.value && music.player.value.isInitialized) return;
 
                         currentSongId.value = id;
-                        if (id === 'local') {
-                            // music.switchPlaylist will handle empty list error
-                            await music.switchPlaylist(data.localMusicPlaylist.value);
+                        if (id.startsWith('local_')) {
+                            let playlistData = data.loadedLocalPlaylists.value[id];
+                            if (!playlistData) {
+                                const playlistInfo = data.localPlaylistsManifest.value.find(p => p.id === id);
+                                if (playlistInfo) {
+                                    playlistData = await dataLoaderService.fetchJSON(playlistInfo.file);
+                                    if (playlistData) {
+                                        data.loadedLocalPlaylists.value[id] = playlistData; // Cache it
+                                    }
+                                }
+                            }
+                            await music.switchPlaylist(playlistData || []);
                         } else {
                             await music.switchPlaylist(id);
                         }
                     };
+
                     const addAndSwitchSonglist = () => { const newId = newSongIdInput.value.trim(); if (!newId || !/^\d+$/.test(newId)) { alert("请输入纯数字的歌单ID。"); return; } const newName = newSongNameInput.value.trim() || `歌单 ${newId}`; if (!customSonglists.value.some(l => l.id === newId)) { customSonglists.value.unshift({ id: newId, name: newName }); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); } newSongIdInput.value = ""; newSongNameInput.value = ""; switchSonglist(newId); };
                     const removeCustomSonglist = (id) => { customSonglists.value = customSonglists.value.filter(l => l.id !== id); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); };
                     const loadCustomSonglists = () => { const saved = localStorage.getItem('custom_songlists_v2'); if (saved) customSonglists.value = JSON.parse(saved); };
@@ -2002,6 +2078,20 @@
                         siteUptime.value = `${Math.ceil(Math.abs(new Date() - new Date(config.siteStartDate)) / 864e5)} 天`;
                         chatbot.loadChats(); 
                         await data.loadAllData();
+                        
+                        // Dynamically build the preset song lists
+                        presetSonglists.value = [
+                            { id: "9206816111", name: "「 BGM 」净尘拂人心" },
+                            { id: "8886500589", name: "『纯音乐』美到窒息的旋律" },
+                            ...data.localPlaylistsManifest.value,
+                            { id: "local_folder_picker", name: "📂 从本地文件夹播放" }
+                        ];
+                        
+                        // Set the default song list if available
+                        if (presetSonglists.value.length > 0) {
+                            currentSongId.value = presetSonglists.value[0].id;
+                        }
+
                         if (data.blogPosts.value.length > 0) activePostId.value = data.blogPosts.value[0].id;
                         if (data.interests.value.length > 0) openInterestId.value = data.interests.value[0].id;
                         try { github.value.repos = await apiService.getGithubRepos(); } catch (e) { console.error(e); github.value.error = e.message; }
