@@ -1,0 +1,12 @@
+[
+  {
+    "id": "local_朝花夕拾",
+    "name": "朝花夕拾",
+    "file": "./content/music/朝花夕拾.json"
+  },
+  {
+    "id": "local_Animenz",
+    "name": "Animenz",
+    "file": "./content/music/Animenz.json"
+  }
+]
