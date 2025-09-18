@@ -1,23 +1,23 @@
 [
   {
-    "name": "未闻花名 ED 钢琴版",
-    "artist": "Animenz",
-    "url": "./content/music/未闻花名 ED 钢琴版.mp3",
-    "cover": "./content/music/未闻花名 ED 钢琴版.jpg",
+    "name": "狐妖小红娘-梦回还",
+    "artist": "呦猫UNEKO",
+    "url": "./content/music/狐妖小红娘-梦回还.mp3",
+    "cover": "./content/music/狐妖小红娘-梦回还.jpg",
     "lrc": ""
   },
   {
-    "name": "火花 - 你的名字。OST 钢琴",
-    "artist": "Animenz",
-    "url": "./content/music/火花 - 你的名字。OST 钢琴.mp3",
-    "cover": "./content/music/火花 - 你的名字。OST 钢琴.jpg",
+    "name": "神奇阿呦-我和你",
+    "artist": "唐宁",
+    "url": "./content/music/神奇阿呦-我和你.mp3",
+    "cover": "./content/music/神奇阿呦-我和你.jpg",
     "lrc": ""
   },
   {
-    "name": "打上花火 - 烟花 主题曲 钢琴",
-    "artist": "Animenz",
-    "url": "./content/music/打上花火 - 烟花 主题曲 钢琴.mp3",
-    "cover": "./content/music/打上花火 - 烟花 主题曲 钢琴.jpg",
+    "name": "熊出没-你从未离去",
+    "artist": "白挺",
+    "url": "./content/music/熊出没-你从未离去.mp3",
+    "cover": "./content/music/熊出没-你从未离去.jpg",
     "lrc": ""
   }
 ]
