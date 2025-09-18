@@ -1776,30 +1776,124 @@
                 return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, loadAllData };
             };
             
-            // `useGuestbook` Hook: 封装留言板/弹幕功能
+            // `useGuestbook` Hook: 封装留言板/弹幕功能 (已优化)
             const useGuestbook = () => {
                 const guestbook = ref({ isReady: false, error: null, isSubmitting: false, newName: '', newMessage: '', messages: [], isExpanded: false, status: { message: '', type: '' } });
                 const activeDanmaku = ref([]);
-                let danmakuQueue = [], danmakuInterval = null, pollInterval = null;
-                const fetchMessages = async () => { try { const response = await fetch(config.guestbookApiUrl); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器响应错误: ${response.status}`); } const freshMessages = await response.json(); guestbook.value.messages = freshMessages; danmakuQueue = [...freshMessages].reverse(); guestbook.value.isReady = true; } catch (err) { console.error("获取弹幕失败:", err); guestbook.value.error = err.message || "无法加载弹幕。"; } };
+                let danmakuQueue = [], pollInterval = null;
+
+                // 用于 requestAnimationFrame 循环的状态变量
+                let animationFrameId = null;
+                let lastDanmakuTime = 0;
+                const danmakuIntervalMs = 3000; // 每条弹幕的间隔时间
+
+                const fetchMessages = async () => {
+                    try {
+                        const response = await fetch(config.guestbookApiUrl);
+                        if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器响应错误: ${response.status}`); }
+                        const freshMessages = await response.json();
+                        guestbook.value.messages = freshMessages;
+                        danmakuQueue = [...freshMessages].reverse();
+                        guestbook.value.isReady = true;
+                    } catch (err) {
+                        console.error("获取弹幕失败:", err);
+                        guestbook.value.error = err.message || "无法加载弹幕。";
+                    }
+                };
+
                 const submitMessage = async () => {
-                    if (guestbook.value.isSubmitting) return; const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim(); if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; }
-                    guestbook.value.isSubmitting = true; guestbook.value.status = { message: '', type: '' };
+                    if (guestbook.value.isSubmitting) return;
+                    const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim();
+                    if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; }
+                    guestbook.value.isSubmitting = true;
+                    guestbook.value.status = { message: '', type: '' };
                     try {
                         const response = await fetch(config.guestbookApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message }) });
                         if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器提交错误: ${response.status}`); }
-                        const latestMessages = await response.json(); guestbook.value.messages = latestMessages; danmakuQueue = [...latestMessages].reverse();
-                        guestbook.value.newName = ''; guestbook.value.newMessage = ''; guestbook.value.status = { message: '发射成功！', type: 'success' };
+                        const latestMessages = await response.json();
+                        guestbook.value.messages = latestMessages;
+                        danmakuQueue = [...latestMessages].reverse();
+                        guestbook.value.newName = ''; guestbook.value.newMessage = '';
+                        guestbook.value.status = { message: '发射成功！', type: 'success' };
                         setTimeout(() => { guestbook.value.isExpanded = false; guestbook.value.status = { message: '', type: '' }; }, 1500);
-                    } catch (e) { console.error("提交弹幕失败:", e); guestbook.value.status = { message: e.message || '发射失败，请稍后再试。', type: 'error' }; } finally { guestbook.value.isSubmitting = false; }
+                    } catch (e) {
+                        console.error("提交弹幕失败:", e);
+                        guestbook.value.status = { message: e.message || '发射失败，请稍后再试。', type: 'error' };
+                    } finally {
+                        guestbook.value.isSubmitting = false;
+                    }
                 };
-                const startDanmakuStream = () => { stopDanmakuStream(); danmakuInterval = setInterval(() => { if (danmakuQueue.length === 0 || activeDanmaku.value.length > 10) return; const msg = danmakuQueue.shift(); danmakuQueue.push(msg); const duration = Math.random() * 8 + 12; const danmaku = { id: Date.now() + Math.random(), name: msg.name, message: msg.message, style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` } }; activeDanmaku.value.push(danmaku); setTimeout(() => { activeDanmaku.value.shift(); }, duration * 1000); }, 3000); };
-                const stopDanmakuStream = () => { if (danmakuInterval) clearInterval(danmakuInterval); danmakuInterval = null; };
-                const handleVisibilityChange = () => { document.hidden ? stopDanmakuStream() : startDanmakuStream(); };
-                const init = async () => { await fetchMessages(); startDanmakuStream(); document.addEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); pollInterval = setInterval(fetchMessages, 60000); };
-                onUnmounted(() => { stopDanmakuStream(); document.removeEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); });
+
+                const danmakuLoop = (timestamp) => {
+                    if (!lastDanmakuTime) {
+                        lastDanmakuTime = timestamp;
+                    }
+                    const elapsed = timestamp - lastDanmakuTime;
+
+                    if (elapsed > danmakuIntervalMs) {
+                        lastDanmakuTime = timestamp;
+                        if (danmakuQueue.length > 0 && activeDanmaku.value.length <= 10) {
+                            const msg = danmakuQueue.shift();
+                            danmakuQueue.push(msg); // 循环播放
+                            const duration = Math.random() * 8 + 12;
+                            const danmaku = {
+                                id: Date.now() + Math.random(),
+                                name: msg.name,
+                                message: msg.message,
+                                style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` }
+                            };
+                            activeDanmaku.value.push(danmaku);
+
+                            // 动画结束后精确移除对应的弹幕
+                            setTimeout(() => {
+                                const index = activeDanmaku.value.findIndex(d => d.id === danmaku.id);
+                                if (index > -1) {
+                                    activeDanmaku.value.splice(index, 1);
+                                }
+                            }, duration * 1000 + 100);
+                        }
+                    }
+                    animationFrameId = requestAnimationFrame(danmakuLoop);
+                };
+
+                const startDanmakuStream = () => {
+                    stopDanmakuStream();
+                    lastDanmakuTime = 0; // 重置计时器
+                    animationFrameId = requestAnimationFrame(danmakuLoop);
+                };
+
+                const stopDanmakuStream = () => {
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                        animationFrameId = null;
+                    }
+                };
+
+                const handleVisibilityChange = () => {
+                    if (document.hidden) {
+                        stopDanmakuStream();
+                    } else {
+                        startDanmakuStream();
+                    }
+                };
+
+                const init = async () => {
+                    await fetchMessages();
+                    startDanmakuStream();
+                    document.addEventListener('visibilitychange', handleVisibilityChange);
+                    if (pollInterval) clearInterval(pollInterval);
+                    pollInterval = setInterval(fetchMessages, 60000);
+                };
+
+                onUnmounted(() => {
+                    stopDanmakuStream();
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    if (pollInterval) clearInterval(pollInterval);
+                });
+
                 return { guestbook, activeDanmaku, init, submitMessage };
             };
+
 
             // --- Vue App 主实例 ---
             createApp({
@@ -1917,5 +2011,3 @@
     </script>
 </body>
 </html>
-
-
