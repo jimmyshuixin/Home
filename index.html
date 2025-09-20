@@ -1070,24 +1070,94 @@
         .progress-bar-container { width: 100%; height: 8px; background-color: var(--repo-card-bg); border-radius: 4px; overflow: hidden; }
         .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent-color), #3b82f6); border-radius: 4px; width: 0; transition: width 1s cubic-bezier(0.25, 1, 0.5, 1) 0.3s; }
         
-        /* 组件: 兴趣面板 (手风琴) */
-        .interest-accordion { display: flex; flex-direction: column; gap: 1rem; }
-        .accordion-item { background: var(--repo-card-bg); border-radius: 16px; overflow: hidden; border: 1px solid transparent; transition: all 0.3s ease-in-out; }
-        .accordion-item:has(.is-open) { border-color: var(--glass-border-color); }
-        .accordion-item:hover { transform: translateY(-5px); box-shadow: 0 8px 24px var(--shadow-color); }
-        .accordion-header { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 1rem 1.5rem; background: none; border: none; cursor: pointer; text-align: left; color: var(--text-color-white); font-size: 1.1rem; font-weight: 600; }
-        .accordion-header .header-content { display: flex; align-items: center; gap: 1rem; }
-        .accordion-header .header-content i { font-size: 1.5rem; color: var(--accent-color); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
-        .accordion-item:has(.is-open) .accordion-header .header-content i { transform: scale(1.1) rotate(-5deg); }
-        .chevron-icon { font-size: 1.2rem; transition: transform 0.3s ease-in-out; }
-        .chevron-icon.is-rotated { transform: rotate(180deg); }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 2s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .accordion-content.is-open { max-height: 500px; }
-        .accordion-content-inner { padding: 0 1.5rem 1.5rem; color: var(--text-color-darker); line-height: 1.7; opacity: 0; transform: translateY(-10px); transition: opacity 1s ease-out 0.15s, transform 1s ease-out 0.15s; }
-        .accordion-content.is-open .accordion-content-inner { opacity: 1; transform: translateY(0); }
-        .interest-detail-image { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; }
-        .accordion-content-inner div img { max-width: 100%; height: auto; border-radius: 12px; margin-top: 1rem; margin-bottom: 1rem; }
-        
+        /* 组件: 兴趣面板 (新版) */
+        .interest-pills-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0 1.5rem 0;
+            margin-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .interest-pills-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .interest-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: var(--repo-card-bg);
+            border: 1px solid var(--glass-border-color);
+            color: var(--text-color-darker);
+            padding: 0.75rem 1.5rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .interest-pill:hover {
+            background-color: var(--repo-card-hover-bg);
+            color: var(--text-color-white);
+            transform: translateY(-2px);
+        }
+
+        .interest-pill.is-active {
+            background-color: var(--accent-color);
+            color: #121212;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        .interest-pill i {
+            font-size: 1.25rem;
+        }
+
+        .interest-details-container {
+            min-height: 400px;
+            background-color: var(--repo-card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .interest-details-content .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .interest-details-content .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .interest-markdown-content { line-height: 1.8; }
+        .interest-markdown-content > *:first-child { margin-top: 0; }
+        .interest-markdown-content p { margin-bottom: 1em; }
+        .interest-markdown-content h3 { font-size: 1.5em; margin: 1.5em 0 1em; color: var(--text-color-white); }
+        .interest-markdown-content h4 { font-size: 1.2em; margin: 1.2em 0 1em; color: var(--text-color-white); }
+        .interest-markdown-content a { color: var(--accent-color); }
+        .interest-markdown-content ul, .interest-markdown-content ol { padding-left: 1.5em; margin-bottom: 1em; }
+        .interest-markdown-content blockquote { border-left: 4px solid var(--accent-color); padding-left: 1em; margin: 1.5em 0; color: var(--text-color-darker); }
+        .interest-markdown-content pre { background-color: rgba(0, 0, 0, 0.3); padding: 1rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--glass-border-color); margin: 1.5em 0; }
+        .interest-markdown-content code { font-family: 'Courier New', Courier, monospace; }
+
         /* 组件: AI 对话 (Chatbot) 面板 */
         .chatbot-card { display: flex; flex-direction: column; min-height: 70vh; max-height: 120vh; transition: all 0.3s ease; }
         .chatbot-settings { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; }
@@ -1214,6 +1284,16 @@
         .panel-fade-enter-active .blog-main { animation: slide-up-fade-in 0.6s 0.4s backwards; }
         .dropdown-fade-enter-active, .dropdown-fade-leave-active { transition: all 0.2s ease; }
         .dropdown-fade-enter-from, .dropdown-fade-leave-to { opacity: 0; transform: translateY(10px); }
+        .content-fade-enter-active,
+        .content-fade-leave-active {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .content-fade-enter-from,
+        .content-fade-leave-to {
+            opacity: 0;
+            transform: translateY(15px);
+        }
         
         /* 滚动触发的淡入动画 */
         .anim-fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -1475,7 +1555,35 @@
                         <!-- 成长之路面板 -->
                         <div id="growth-panel" class="journey-panel" v-if="activeJourneyPanel === 'growth'"><article class="content-card glass-effect" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>成长之路</h2><div class="panel-content-grid"><div><h3><i class="ph-fill ph-calendar-blank"></i> 时光</h3><div class="timeline"><div class="timeline-item" v-for="item in timeline" :key="item.date"><div class="timeline-date">{{ item.date }}</div><p class="timeline-desc">{{ item.event }}</p></div></div></div><div><h3><i class="ph-fill ph-flag-checkered"></i> 目标进度</h3><div class="target-list"><div v-for="(target, index) in targets" :key="target.name" class="target-item"><div class="target-info"><span class="target-name">{{ target.name }}</span><span class="target-progress-text">{{ animatedTargetValues[index] || 0 }} / {{ target.total }}</span></div><div class="progress-bar-container"><div class="progress-bar"></div></div></div></div></div></div></article></div>
                         <!-- 兴趣面板 -->
-                        <div id="interests-panel" class="journey-panel" v-if="activeJourneyPanel === 'interests'"><article class="content-card glass-effect" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>兴趣星系</h2><div class="interest-accordion"><div v-for="interest in interests" :key="interest.id" class="accordion-item"><button class="accordion-header" @click="toggleInterest(interest.id)" :aria-expanded="openInterestId === interest.id" :aria-controls="`interest-content-${interest.id}`"><div class="header-content"><i :class="interest.icon"></i><span>{{ interest.title }}</span></div><i class="ph ph-caret-down chevron-icon" :class="{ 'is-rotated': openInterestId === interest.id }"></i></button><div class="accordion-content" :class="{ 'is-open': openInterestId === interest.id }" :id="`interest-content-${interest.id}`" role="region"><div class="accordion-content-inner"><img :src="interest.image" :alt="interest.title" class="interest-detail-image" @error="handleImgError" loading="lazy" /><div v-html="interest.content"></div></div></div></div></div></article></div>
+                        <div id="interests-panel" class="journey-panel" v-if="activeJourneyPanel === 'interests'">
+                            <article class="content-card glass-effect" ref="activePanelRef">
+                                <button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button>
+                                <h2>兴趣星系</h2>
+                                
+                                <div class="interest-pills-container">
+                                    <button
+                                        v-for="interest in interests"
+                                        :key="interest.id"
+                                        class="interest-pill"
+                                        :class="{ 'is-active': openInterestId === interest.id }"
+                                        @click="openInterestId = interest.id">
+                                        <i :class="interest.icon"></i>
+                                        <span>{{ interest.title }}</span>
+                                    </button>
+                                </div>
+
+                                <transition name="content-fade" mode="out-in">
+                                    <div v-if="activeInterest" :key="activeInterest.id" class="interest-details-container">
+                                        <div class="interest-details-content">
+                                            <div v-if="activeInterest.hasVideo && activeInterest.videoUrl" class="video-container">
+                                                <iframe :src="activeInterest.videoUrl" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+                                            </div>
+                                            <div class="interest-markdown-content" v-html="interestMarkdownContent"></div>
+                                        </div>
+                                    </div>
+                                </transition>
+                            </article>
+                        </div>
                         <!-- AI对话面板 -->
                         <div id="chatbot-panel" class="journey-panel" v-if="activeJourneyPanel === 'chatbot'"><article class="content-card glass-effect chatbot-card" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>AI 对话</h2><div class="chatbot-settings"><div class="setting-item api-key-group"><label for="apiKey"><span>API Key</span><a href="https://platform.deepseek.com/api_keys" target="_blank" class="get-api-key-link">获取API Key</a></label><input id="apiKey" type="password" v-model="chatbot.apiKey" placeholder="输入你的 DeepSeek API Key" /></div><div class="setting-item"><label for="temperature"><span>温度: {{ chatbot.temperature }}</span><i class="ph ph-info tooltip-icon" title="仅在关闭深度思考时有效。&#10;代码生成/数学解题: 0.0&#10;数据抽取/分析: 1.0&#10;通用对话/翻译: 1.3&#10;创意类写作: 1.5"></i></label><input id="temperature" type="range" v-model="chatbot.temperature" min="0" max="2" step="0.1" :disabled="chatbot.use_deep_thinking" /></div><div class="setting-item custom-toggle"><label for="deepThinking">深度思考</label><div class="toggle-switch" :class="{ active: chatbot.use_deep_thinking }" @click="chatbot.use_deep_thinking = !chatbot.use_deep_thinking" role="switch" :aria-checked="chatbot.use_deep_thinking" id="deepThinking" tabindex="0"><div class="toggle-knob"></div></div></div><div class="setting-item chat-history-group"><label>对话历史</label><div class="history-controls"><div class="chat-history-dropdown" ref="dropdownRef"><button @click="isHistoryDropdownOpen = !isHistoryDropdownOpen" class="dropdown-trigger" aria-haspopup="true" :aria-expanded="isHistoryDropdownOpen"><span>{{ activeChat ? activeChat.title : '选择对话' }}</span><i class="ph-fill ph-caret-down"></i></button><transition name="dropdown-fade"><ul v-if="isHistoryDropdownOpen" class="dropdown-menu glass-effect" role="menu"><li v-for="chat in chatHistories" :key="chat.id" @click="selectChat(chat.id)" class="dropdown-item" role="menuitem" :class="{ active: chat.id === activeChatId }">{{ chat.title }}</li></ul></transition></div><button @click="createNewChat" class="history-btn" aria-label="新建对话" title="新建对话"><i class="ph ph-plus"></i></button><button @click="deleteActiveChat" class="history-btn" aria-label="删除当前对话" title="删除当前对话"><i class="ph ph-trash"></i></button></div></div></div><div class="chat-window" ref="chatWindow"><div v-if="activeChat"><div v-for="message in activeChat.messages" :key="message.id" class="message" :class="message.role"><div v-if="message.role !== 'system'" class="message-content"><div v-if="message.thinking" class="thinking-process-container"><button class="toggle-thinking-btn" @click="message.isThinkingVisible = !message.isThinkingVisible"><i class="ph-fill" :class="message.isThinkingVisible ? 'ph-caret-down' : 'ph-caret-right'"></i><span>思考过程</span></button><div v-show="message.isThinkingVisible" class="thinking-process-content" v-html="renderMarkdown(message.thinking)"></div></div><div v-if="chatbot.isLoading && activeChat.messages[activeChat.messages.length - 1].id === message.id && !message.content && !message.thinking" style="display: flex; align-items: center; justify-content: center; height: 1.6em;"><span class="typing-cursor-hero" style="height: 1.2em; background-color: var(--text-color);"></span></div><div v-else v-html="renderMarkdown(message.content)"></div><button v-if="message.content" @click="copyToClipboard(message.content, $event)" class="copy-button" aria-label="复制消息" title="复制"><i class="ph ph-copy"></i></button></div></div></div></div><div v-if="chatbot.status" class="chat-status" aria-live="polite"><i class="ph ph-spinner-gap animate-spin"></i><span>{{ chatbot.status }}</span></div><form @submit.prevent="sendMessage" class="chat-input-area"><textarea v-model="chatbot.currentMessage" @keydown.enter.exact.prevent="sendMessage" placeholder="输入消息..." aria-label="聊天输入框"></textarea><button type="submit" class="send-button" :disabled="chatbot.isLoading || !chatbot.apiKey">发送</button></form></article></div>
                     </div>
@@ -1794,10 +1902,10 @@
                         dataLoaderService.fetchJSON(config.contentPaths.bookshelf), 
                         dataLoaderService.fetchJSON(config.contentPaths.blogManifest), 
                         dataLoaderService.fetchJSON(config.contentPaths.footerLinks),
-                        dataLoaderService.fetchJSON(config.contentPaths.localPlaylistsManifest) // Fetch the manifest
+                        dataLoaderService.fetchJSON(config.contentPaths.localPlaylistsManifest)
                     ]);
                     aboutContent.value = utils.renderMarkdown(aboutMd || ""); resumeData.value = resume || { name: "数据加载失败" };
-                    if (interestsData) interests.value = interestsData.map(item => ({ ...item, content: utils.renderMarkdown(item.content), image: item.image.startsWith('http') ? item.image : `https://placehold.co/800x400/1a1a1a/ffffff?text=${encodeURIComponent(item.title)}` }));
+                    interests.value = interestsData || [];
                     if (growth) { timeline.value = growth.timeline; targets.value = growth.targets; }
                     bookshelf.value = books || []; blogPosts.value = blogManifest || []; footerIconLinks.value = footerLinks || [];
                     localPlaylistsManifest.value = localManifest || [];
@@ -1953,6 +2061,7 @@
                     // --- 组件局部状态定义 ---
                     const isLoginModalVisible = ref(false);
                     const github = ref({ repos: [], contributionsUrl: config.github.contributionsUrl, spaceUrl: config.github.spaceUrl, error: null }), siteUptime = ref(""), icp = ref(config.icpNumber), username = ref(""), password = ref(""), loginStatus = ref({ message: '', type: '' }), isLoggingIn = ref(false), activeSection = ref("hero"), activeJourneyPanel = ref(null), openInterestId = ref(null), activePostId = ref(null), activeCategory = ref('全部分类'), lastFocusedElement = ref(null), activePanelRef = ref(null);
+                    const interestMarkdownContent = ref('');
                     
                     // --- 计算属性 (Computed Properties) ---
                     // 派生状态，当依赖项变化时自动更新。
@@ -1963,7 +2072,11 @@
                     const allNavLinks = ref([ { id: 'hub', text: '主页', priority: 1 }, { id: 'resume', text: '简历', priority: 2 }, { id: 'creations', text: '创造', priority: 3 }, { id: 'blog', text: '文章', priority: 4 }, { id: 'growth', text: '成长', priority: 5 }, { id: 'interests', text: '兴趣', priority: 6 }, { id: 'chatbot', text: 'AI', priority: 7 }, { id: 'footer', text: '更多', priority: 99 }, ]);
                     const windowWidth = ref(window.innerWidth);
                     const visibleNavLinks = computed(() => { const w = windowWidth.value, c = w > 1024 ? 7 : w > 900 ? 6 : w > 768 ? 5 : w > 640 ? 4 : w > 500 ? 3 : 2, s = [...allNavLinks.value].sort((a,b)=>a.priority-b.priority); if (c >= allNavLinks.value.length) return s; const v = s.slice(0,c-1), m = allNavLinks.value.find(l=>l.id==='footer'); if(m&&!v.some(l=>l.id==='footer')) v.push(m); return v; });
-                    
+                    const activeInterest = computed(() => {
+                        if (!openInterestId.value || !data.interests.value) return null;
+                        return data.interests.value.find(i => i.id === openInterestId.value);
+                    });
+
                     // --- 方法 (Methods) ---
                     // 定义处理用户交互和其他业务逻辑的函数。
                     const toggleLoginModal = () => { isLoginModalVisible.value = !isLoginModalVisible.value; loginStatus.value = { message: '', type: '' }; };
@@ -2069,6 +2182,22 @@
                     watch(activePanelRef, (newPanelEl) => { if (newPanelEl && activeJourneyPanel.value === 'growth') { resetGrowthAnimations(newPanelEl); setTimeout(() => { triggerGrowthAnimations(newPanelEl); }, 50); } });
                     watch(activePostId, async (newId) => { if (newId === null) return; const post = data.blogPosts.value.find(p => p.id === newId); if (post && !post.content) { post.content = await dataLoaderService.fetchMarkdown(post.filePath); } utils.triggerMathRendering('.blog-post-body'); });
                     
+                    watch(activeInterest, async (newInterest) => {
+                        if (newInterest && newInterest.mdFilePath) {
+                            interestMarkdownContent.value = '加载中...';
+                            try {
+                                const markdown = await dataLoaderService.fetchMarkdown(newInterest.mdFilePath);
+                                interestMarkdownContent.value = utils.renderMarkdown(markdown);
+                                utils.triggerMathRendering('.interest-markdown-content');
+                            } catch (error) {
+                                console.error(`Failed to load interest content for ${newInterest.id}:`, error);
+                                interestMarkdownContent.value = '<p>内容加载失败。</p>';
+                            }
+                        } else {
+                            interestMarkdownContent.value = '';
+                        }
+                    });
+
                     // --- 生命周期钩子 (Lifecycle Hooks) ---
                     onMounted(async () => {
                         initTheme(); 
@@ -2122,8 +2251,8 @@
                         github, icp, siteUptime, hubNodes, visibleNavLinks, currentTheme, isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, 
                         isLoginModalVisible, username, password, loginStatus, isLoggingIn, 
                         activeSection, activeJourneyPanel, activePostId, activePost, activeCategory, blogCategories, filteredBlogPosts, openInterestId, currentSongId, presetSonglists, customSonglists, newSongIdInput, newSongNameInput, activePanelRef,
-                        animatedTargetValues,
-                        setTheme, toggleLoginModal, handleLogin, onBeforeEnter, onEnter, openJourneyPanel, closeJourneyPanel, handleNavClick, switchSonglist, addAndSwitchSonglist, removeCustomSonglist, toggleInterest: (id) => openInterestId.value = openInterestId.value === id ? null : id,
+                        animatedTargetValues, activeInterest, interestMarkdownContent,
+                        setTheme, toggleLoginModal, handleLogin, onBeforeEnter, onEnter, openJourneyPanel, closeJourneyPanel, handleNavClick, switchSonglist, addAndSwitchSonglist, removeCustomSonglist,
                     };
                 }
             }).mount("#app"); // 将Vue应用挂载到 #app 元素上
@@ -2131,4 +2260,5 @@
     </script>
 </body>
 </html>
+
 
