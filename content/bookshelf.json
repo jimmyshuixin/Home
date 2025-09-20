@@ -1,38 +1,74 @@
 [
   {
-    "title": "放射化学",
-    "author": "虚宁",
-    "coverUrl": "icon/放射化学.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "三体",
+    "author": "刘慈欣",
+    "coverUrl": "https://placehold.co/400x600/000000/FFFFFF?text=三体",
+    "url": "https://book.douban.com/subject/2567698/",
+    "category": "科幻",
+    "status": "read",
+    "rating": 5,
+    "review": "一部颠覆想象力的科幻史诗。它所构建的宇宙社会学和黑暗森林法则，深刻地影响了我对文明和宇宙的看法。",
+    "startDate": "2024-01-15",
+    "finishDate": "2024-02-10"
   },
   {
-    "title": "辐射环境监测",
-    "author": "虚宁",
-    "coverUrl": "icon/辐射环境检测.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "你不知道的JavaScript (上卷)",
+    "author": "Kyle Simpson",
+    "coverUrl": "https://placehold.co/400x600/DE9F5F/FFFFFF?text=You+Don't+Know+JS",
+    "url": "https://book.douban.com/subject/26351021/",
+    "category": "技术",
+    "status": "read",
+    "rating": 5,
+    "review": "这本书帮助我真正理解了作用域和闭包的核心概念，是每个前端开发者都应该反复阅读的经典。",
+    "startDate": "2024-03-01",
+    "finishDate": "2024-03-25"
   },
   {
-    "title": "辐射探测",
-    "author": "虚宁",
-    "coverUrl": "icon/辐射探测.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "人类简史",
+    "author": "尤瓦尔·赫拉利",
+    "coverUrl": "https://placehold.co/400x600/3A6EA5/FFFFFF?text=Sapiens",
+    "url": "https://book.douban.com/subject/25985021/",
+    "category": "历史",
+    "status": "read",
+    "rating": 5,
+    "review": "从认知革命到科学革命，这本书以一个极其宏大的视角审视了人类的整个发展历程，令人震撼。",
+    "startDate": "2024-04-05",
+    "finishDate": "2024-05-01"
   },
   {
-    "title": "模拟电路与数字电路",
-    "author": "虚宁",
-    "coverUrl": "icon/模拟电路与数字电路.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "设计模式",
+    "author": "Erich Gamma",
+    "coverUrl": "https://placehold.co/400x600/666666/FFFFFF?text=Design+Patterns",
+    "url": "https://book.douban.com/subject/1052241/",
+    "category": "技术",
+    "status": "reading",
+    "rating": 0,
+    "review": "正在学习如何用更优雅、可复用的方式构建软件。这本书是软件工程领域的圣经。",
+    "startDate": "2024-06-10",
+    "finishDate": null
   },
   {
-    "title": "原子核物理",
-    "author": "虚宁",
-    "coverUrl": "icon/原子核物理.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "呼吸",
+    "author": "特德·姜",
+    "coverUrl": "https://placehold.co/400x600/80CED7/000000?text=Exhalation",
+    "url": "https://book.douban.com/subject/34821808/",
+    "category": "科幻",
+    "status": "read",
+    "rating": 5,
+    "review": "每一篇都是一部构思精巧的杰作，充满了对科学、哲学和人性的深刻思考，温暖而又发人深省。",
+    "startDate": "2024-05-15",
+    "finishDate": "2024-05-30"
   },
   {
-    "title": "核燃料",
-    "author": "虚宁",
-    "coverUrl": "icon/核燃料.png",
-    "url": "https://kdocs.cn/join/g2ouzur?f=101"
+    "title": "活着",
+    "author": "余华",
+    "coverUrl": "https://placehold.co/400x600/C3423F/FFFFFF?text=活着",
+    "url": "https://book.douban.com/subject/4913064/",
+    "category": "文学",
+    "status": "read",
+    "rating": 5,
+    "review": "文字平实而又充满力量，讲述了一个人在巨大苦难中的坚韧。读完后，对生命本身有了更深的敬畏。",
+    "startDate": "2023-11-20",
+    "finishDate": "2023-11-28"
   }
 ]
