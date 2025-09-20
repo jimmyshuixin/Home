@@ -1,0 +1,26 @@
+[
+  {
+    "id": "music",
+    "icon": "ph-fill ph-music-notes",
+    "title": "音乐影视",
+    "mdFilePath": "./content/interests/music.md",
+    "hasVideo": true,
+    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1Kj411g7Lu&page=1&as_wide=1&high_quality=1&danmaku=0"
+  },
+  {
+    "id": "coding",
+    "icon": "ph-fill ph-code",
+    "title": "编程创造",
+    "mdFilePath": "./content/interests/coding.md",
+    "hasVideo": false,
+    "videoUrl": ""
+  },
+  {
+    "id": "gaming",
+    "icon": "ph-fill ph-game-controller",
+    "title": "电子游戏",
+    "mdFilePath": "./content/interests/gaming.md",
+    "hasVideo": false,
+    "videoUrl": ""
+  }
+]
