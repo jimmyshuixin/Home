@@ -7,33 +7,30 @@
     <!-- =================================================================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>虚静以宁</title>
+    <title>虚静以宁 (已优化)</title>
     <link rel="icon" href="./content/icon/32.png">
 
     <!-- =================================================================== -->
-    <!-- Preconnect Directives: 预连接到外部CDN，以加速资源获取 -->
+    <!-- 优化: Preconnect Directives: 预连接到国内CDN，以加速资源获取 -->
     <!-- =================================================================== -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://fonts.loli.net" />
+    <link rel="preconnect" href="https://cdn.bootcdn.net" />
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-    <link rel="preconnect" href="https://unpkg.com" />
-    <link rel="preconnect" href="https://www.gstatic.com" />
 
     <!-- =================================================================== -->
-    <!-- External Fonts: 引入项目所需的网页字体 -->
+    <!-- 优化: External Fonts: 使用国内镜像加速谷歌字体加载 -->
     <!-- =================================================================== -->
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.loli.net/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" />
+    <link href="https://fonts.loli.net/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <!-- =================================================================== -->
-    <!-- External Stylesheets: 引入外部CSS库 -->
+    <!-- 优化: External Stylesheets: 使用国内CDN加载CSS库 -->
     <!-- =================================================================== -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.css" />
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.css">
     
     <!-- =================================================================== -->
-    <!-- Internal CSS: 项目的主要样式表 -->
+    <!-- Internal CSS: 项目的主要样式表 (无变化) -->
     <!-- =================================================================== -->
     <style>
         /* ===================================================================
@@ -604,7 +601,7 @@
 
 <body>
     <!-- =================================================================== -->
-    <!-- HTML 结构 -->
+    <!-- HTML 结构 (无变化) -->
     <!-- =================================================================== -->
 
     <div id="loader-wrapper"><div class="loader-container"><div class="loader-core"></div><div class="loader-electron"></div><div class="loader-electron"></div><div class="loader-electron"></div></div></div>
@@ -720,18 +717,18 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- External JavaScript Libraries -->
+    <!-- 优化: External JavaScript Libraries: 使用国内CDN加载JS库 -->
     <!-- =================================================================== -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-    <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aplayer/1.10.1/APlayer.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch-jsonp/1.3.0/fetch-jsonp.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.prod.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/4.3.0/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/aplayer/1.10.1/APlayer.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/fetch-jsonp/1.3.0/fetch-jsonp.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js" defer></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" defer></script>
     
     <!-- =================================================================== -->
-    <!-- Main Application Logic -->
+    <!-- Main Application Logic (无变化) -->
     <!-- =================================================================== -->
     <script>
         (function() {
@@ -919,4 +916,3 @@
     </script>
 </body>
 </html>
-
