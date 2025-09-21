@@ -166,11 +166,9 @@
         input[type="range"].volume-slider::-moz-range-thumb { height: 12px; width: 12px; border-radius: 50%; background: var(--text-color-white); border: none; }
         .custom-lrc-container { height: 60px; margin-top: 1rem; overflow: hidden; text-align: center; }
         .aplayer-lrc { padding: 0 !important; margin: 0 !important; text-shadow: none !important; background: none !important; height: 100%; }
-        .aplayer-lrc-contents { display: flex; flex-direction: column; transition: transform 0.4s ease-out !important; height: 100%; }
-        .aplayer-lrc p { font-size: 1rem; font-weight: 500; color: var(--text-color-darker); padding: 4px 0; margin: 0; line-height: 1.5; transition: all 0.4s ease-in-out; opacity: 0.5; flex-shrink: 0; }
-        .aplayer-lrc p.aplayer-lrc-current { color: var(--text-color-white); font-weight: 700; transform: scale(1.05); opacity: 1; margin-top: auto; margin-bottom: auto; }
-        .aplayer-lrc p:first-child { margin-top: auto; }
-        .aplayer-lrc p:last-child { margin-bottom: auto; }
+        .aplayer-lrc-contents { display: flex; flex-direction: column; height: 100%; padding-top: 25px; padding-bottom: 25px; }
+        .aplayer-lrc p { font-size: 1rem; font-weight: 700; color: var(--text-color-darker); padding: 4px 0; margin: 0; line-height: 1.5; transition: color 0.4s ease-in-out, opacity 0.4s ease-in-out; opacity: 0.5; flex-shrink: 0; }
+        .aplayer-lrc p.aplayer-lrc-current { color: var(--text-color-white); opacity: 1; }
         .playlist-container, .songlist-switcher { max-height: 0; overflow-y: auto; transition: max-height 0.5s ease-in-out, margin-top 0.5s ease-in-out, padding-top 0.5s ease-in-out; border-top: 1px solid transparent; margin-top: 0; padding-top: 0; }
         .playlist-container.show, .songlist-switcher.show { max-height: 250px; margin-top: 1rem; padding-top: 0.5rem; border-top-color: var(--glass-border-color); }
         .playlist-container::-webkit-scrollbar, .songlist-switcher ul::-webkit-scrollbar { width: 10px; }
@@ -818,7 +816,134 @@
             const useTheme = () => { const currentTheme = ref("dark"); let themeCheckInterval = null; const autoSetThemeByTime = () => { const newTheme = (new Date().getHours() >= 6 && new Date().getHours() < 18) ? 'light' : 'dark'; if (newTheme !== currentTheme.value) { currentTheme.value = newTheme; document.documentElement.classList.toggle("light-theme", newTheme === "light"); } }; const setTheme = (theme) => { currentTheme.value = theme; document.documentElement.classList.toggle("light-theme", theme === "light"); }; const initTheme = () => { autoSetThemeByTime(); if (themeCheckInterval) clearInterval(themeCheckInterval); themeCheckInterval = setInterval(autoSetThemeByTime, 60000); }; onUnmounted(() => { if (themeCheckInterval) clearInterval(themeCheckInterval); }); return { currentTheme, setTheme, initTheme }; };
             const useScroll = () => { const isScrolling = ref(false), scrollProgress = ref(0), isHeaderVisible = ref(false), isHeaderExpanded = ref(false), lastScrollY = ref(0); let scrollTimeout = null; const handleScroll = () => { const scrollTop = window.scrollY, docHeight = document.documentElement.scrollHeight - window.innerHeight; scrollProgress.value = docHeight > 0 ? scrollTop / docHeight : 0; isScrolling.value = true; if (scrollTimeout) clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => { isScrolling.value = false; }, 1500); isHeaderVisible.value = scrollTop > 100; isHeaderExpanded.value = scrollTop > lastScrollY.value && scrollTop > 100; lastScrollY.value = scrollTop <= 0 ? 0 : scrollTop; }; return { isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, handleScroll }; };
             const useHeroTypewriter = () => { const heroLine1 = ref(""), heroLine2 = ref(""), heroLine3 = ref(""), heroLine4 = ref(""); const heroLine1Active = ref(false), heroLine2Active = ref(false), heroLine3Active = ref(false), heroLine4Active = ref(false); const showHeroButtons = ref(false); function typeLine(targetRef, text, speed = 120) { return new Promise((resolve) => { let i = 0; targetRef.value = ""; const interval = setInterval(() => { if (i < text.length) targetRef.value += text[i++]; else { clearInterval(interval); resolve(); } }, speed); }); } async function start() { const lines = [{ ref: heroLine1, text: "Hi! ", activeRef: heroLine1Active }, { ref: heroLine2, text: "I'm 虚宁", activeRef: heroLine2Active }, { ref: heroLine3, text: "A Developer", activeRef: heroLine3Active }, { ref: heroLine4, text: "For Anything!", activeRef: heroLine4Active }]; for (const line of lines) { line.activeRef.value = true; await typeLine(line.ref, line.text); line.activeRef.value = false; if (line.ref === heroLine1) heroLine1Active.value = true; } showHeroButtons.value = true; } return { heroLine1, heroLine2, heroLine3, heroLine4, heroLine1Active, heroLine2Active, heroLine3Active, heroLine4Active, showHeroButtons, start }; };
-            const useMusicPlayer = () => { const player = ref({ aplayer: null, playlist: [], isInitialized: false, isLoading: false, isPlaying: false, isPlaylistVisible: false, isSongSwitcherVisible: false, currentSong: {}, progress: 0, volume: 0.7, error: null, loopMode: 'all', isShuffle: false, playbackRate: 1.0 }); const lrcContainer = ref(null), originalPlaylist = ref([]); const switchPlaylist = async (playlistSource) => { if (player.value.isLoading) return; player.value.isLoading = true; player.value.error = null; try { let audioList; if (typeof playlistSource === 'string') { audioList = await apiService.getMusicPlaylist(playlistSource); } else if (Array.isArray(playlistSource)) { audioList = playlistSource; } else { throw new Error("无效的播放列表源。"); } if (!Array.isArray(audioList) || audioList.length === 0) { console.error("API响应无效或播放列表为空:", audioList); throw new Error("播放列表为空或加载失败。"); } originalPlaylist.value = [...audioList]; player.value.isShuffle = false; if (!player.value.aplayer) { await nextTick(); const ap = new APlayer({ container: document.getElementById("player-hidden"), audio: audioList, lrcType: 3, loop: player.value.loopMode }); player.value.aplayer = ap; player.value.isInitialized = true; ap.on("play", () => player.value.isPlaying = true); ap.on("pause", () => player.value.isPlaying = false); ap.on("volumechange", () => player.value.volume = ap.audio.volume); ap.on("timeupdate", () => { player.value.progress = ap.audio.duration ? (ap.audio.currentTime / ap.audio.duration) * 100 : 0; const lrcContents = lrcContainer.value?.querySelector(".aplayer-lrc-contents"), currentLrc = lrcContainer.value?.querySelector(".aplayer-lrc-current"); if (lrcContents && currentLrc) lrcContents.style.transform = `translateY(-${currentLrc.offsetTop}px)`; }); ap.on("listswitch", (data) => { player.value.currentSong = player.value.playlist[data.index]; moveLrcElement(); }); } else { player.value.aplayer.list.clear(); player.value.aplayer.list.add(audioList); player.value.aplayer.list.switch(0); } player.value.playlist = audioList; player.value.currentSong = audioList[0]; player.value.aplayer.volume(player.value.volume, true); player.value.aplayer.audio.playbackRate = player.value.playbackRate; player.value.aplayer.play(); moveLrcElement(); } catch (error) { console.error("音乐播放器操作失败:", error); player.value.error = "音乐加载失败，请刷新或切换歌单。"; if (player.value.aplayer) { player.value.aplayer.destroy(); player.value.aplayer = null; player.value.isInitialized = false; } } finally { player.value.isLoading = false; } }; const moveLrcElement = () => nextTick(() => { const lrc = document.querySelector("#player-hidden .aplayer-lrc"); if (lrc && lrcContainer.value) { lrcContainer.value.innerHTML = ""; lrcContainer.value.appendChild(lrc); } }); const toggleLoop = () => { const modes = ['all', 'one', 'none']; player.value.loopMode = modes[(modes.indexOf(player.value.loopMode) + 1) % modes.length]; if (player.value.aplayer) player.value.aplayer.loop = player.value.loopMode; }; const loopModeIcon = computed(() => ({ one: 'ph-repeat-once', all: 'ph-repeat' }[player.value.loopMode] || 'ph-arrow-right')); const loopModeTooltip = computed(() => ({ one: '单曲循环', all: '列表循环' }[player.value.loopMode] || '顺序播放')); const toggleShuffle = () => { const ap = player.value.aplayer; if (!ap || originalPlaylist.value.length <= 1) return; player.value.isShuffle = !player.value.isShuffle; const currentAudio = ap.list.audios[ap.list.index]; const wasPlaying = player.value.isPlaying; let newPlaylist; if (player.value.isShuffle) { const others = originalPlaylist.value.filter(s => s.url !== currentAudio.url); for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[others[i], others[j]] = [others[j], others[i]]; } newPlaylist = [currentAudio, ...others]; } else { newPlaylist = [...originalPlaylist.value]; } player.value.playlist = newPlaylist; ap.list.clear(); ap.list.add(newPlaylist); ap.list.switch(newPlaylist.findIndex(s => s.url === currentAudio.url)); if (wasPlaying) ap.play(); else ap.pause(); }; const cyclePlaybackRate = () => { if (!player.value.aplayer) return; const rates = [1.0, 1.25, 1.5, 2.0, 0.5, 0.75]; const nextIndex = (rates.indexOf(player.value.playbackRate) + 1) % rates.length; player.value.playbackRate = rates[nextIndex]; player.value.aplayer.audio.playbackRate = rates[nextIndex]; }; const seek = (e) => { const p = e.currentTarget; player.value.aplayer.seek(player.value.aplayer.audio.duration * ((e.clientX - p.getBoundingClientRect().left) / p.offsetWidth)); }; const setVolume = (e) => { const vol = parseFloat(e.target.value); player.value.volume = vol; player.value.aplayer.volume(vol, true); e.target.style.setProperty("--volume-percent", `${vol * 100}%`); }; return { player, lrcContainer, switchPlaylist, seek, setVolume, togglePlaylist: () => player.value.isPlaylistVisible = !player.value.isPlaylistVisible, toggleSonglistSwitcher: () => player.value.isSongSwitcherVisible = !player.value.isSongSwitcherVisible, toggleLoop, loopModeIcon, loopModeTooltip, toggleShuffle, cyclePlaybackRate }; };
+            const useMusicPlayer = () => {
+                const player = ref({ aplayer: null, playlist: [], isInitialized: false, isLoading: false, isPlaying: false, isPlaylistVisible: false, isSongSwitcherVisible: false, currentSong: {}, progress: 0, volume: 0.7, error: null, loopMode: 'all', isShuffle: false, playbackRate: 1.0 });
+                const lrcContainer = ref(null);
+                const originalPlaylist = ref([]);
+
+                const lrcAnimation = {
+                    rafId: null,
+                    currentY: 0,
+                    targetY: 0,
+                    isRunning: false
+                };
+
+                const smoothScrollLrc = () => {
+                    if (!lrcAnimation.isRunning) {
+                        lrcAnimation.rafId = null;
+                        return;
+                    }
+
+                    const lrcContents = lrcContainer.value?.querySelector(".aplayer-lrc-contents");
+                    if (lrcContents) {
+                        const diff = lrcAnimation.targetY - lrcAnimation.currentY;
+                        if (Math.abs(diff) > 0.1) {
+                            lrcAnimation.currentY += diff * 0.1;
+                        } else {
+                            lrcAnimation.currentY = lrcAnimation.targetY;
+                        }
+                        lrcContents.style.transform = `translateY(-${lrcAnimation.currentY}px)`;
+                    }
+                    
+                    lrcAnimation.rafId = requestAnimationFrame(smoothScrollLrc);
+                };
+
+                const switchPlaylist = async (playlistSource) => {
+                    if (player.value.isLoading) return;
+                    player.value.isLoading = true;
+                    player.value.error = null;
+                    try {
+                        let audioList;
+                        if (typeof playlistSource === 'string') {
+                            audioList = await apiService.getMusicPlaylist(playlistSource);
+                        } else if (Array.isArray(playlistSource)) {
+                            audioList = playlistSource;
+                        } else {
+                            throw new Error("无效的播放列表源。");
+                        }
+                        if (!Array.isArray(audioList) || audioList.length === 0) {
+                            console.error("API响应无效或播放列表为空:", audioList);
+                            throw new Error("播放列表为空或加载失败。");
+                        }
+                        originalPlaylist.value = [...audioList];
+                        player.value.isShuffle = false;
+
+                        if (!player.value.aplayer) {
+                            await nextTick();
+                            const ap = new APlayer({ container: document.getElementById("player-hidden"), audio: audioList, lrcType: 3, loop: player.value.loopMode });
+                            player.value.aplayer = ap;
+                            player.value.isInitialized = true;
+                            
+                            if (!lrcAnimation.isRunning) {
+                                lrcAnimation.isRunning = true;
+                                smoothScrollLrc();
+                            }
+
+                            ap.on("play", () => player.value.isPlaying = true);
+                            ap.on("pause", () => player.value.isPlaying = false);
+                            ap.on("volumechange", () => player.value.volume = ap.audio.volume);
+                            ap.on("timeupdate", () => {
+                                player.value.progress = ap.audio.duration ? (ap.audio.currentTime / ap.audio.duration) * 100 : 0;
+                                const lrcContainerEl = lrcContainer.value;
+                                if (lrcContainerEl) {
+                                    const currentLrc = lrcContainerEl.querySelector(".aplayer-lrc-current");
+                                    if (currentLrc) {
+                                        const containerHeight = lrcContainerEl.offsetHeight;
+                                        lrcAnimation.targetY = currentLrc.offsetTop - (containerHeight / 2) + (currentLrc.offsetHeight / 2);
+                                    }
+                                }
+                            });
+                            ap.on("listswitch", (data) => {
+                                player.value.currentSong = player.value.playlist[data.index];
+                                lrcAnimation.currentY = 0;
+                                lrcAnimation.targetY = 0;
+                                moveLrcElement();
+                            });
+                        } else {
+                            lrcAnimation.currentY = 0;
+                            lrcAnimation.targetY = 0;
+                            player.value.aplayer.list.clear();
+                            player.value.aplayer.list.add(audioList);
+                            player.value.aplayer.list.switch(0);
+                        }
+                        player.value.playlist = audioList;
+                        player.value.currentSong = audioList[0];
+                        player.value.aplayer.volume(player.value.volume, true);
+                        player.value.aplayer.audio.playbackRate = player.value.playbackRate;
+                        player.value.aplayer.play();
+                        moveLrcElement();
+                    } catch (error) {
+                        console.error("音乐播放器操作失败:", error);
+                        player.value.error = "音乐加载失败，请刷新或切换歌单。";
+                        lrcAnimation.isRunning = false;
+                        if (lrcAnimation.rafId) cancelAnimationFrame(lrcAnimation.rafId);
+                        if (player.value.aplayer) {
+                            player.value.aplayer.destroy();
+                            player.value.aplayer = null;
+                            player.value.isInitialized = false;
+                        }
+                    } finally {
+                        player.value.isLoading = false;
+                    }
+                };
+                const moveLrcElement = () => nextTick(() => { const lrc = document.querySelector("#player-hidden .aplayer-lrc"); if (lrc && lrcContainer.value) { lrcContainer.value.innerHTML = ""; lrcContainer.value.appendChild(lrc); } });
+                const toggleLoop = () => { const modes = ['all', 'one', 'none']; player.value.loopMode = modes[(modes.indexOf(player.value.loopMode) + 1) % modes.length]; if (player.value.aplayer) player.value.aplayer.loop = player.value.loopMode; };
+                const loopModeIcon = computed(() => ({ one: 'ph-repeat-once', all: 'ph-repeat' }[player.value.loopMode] || 'ph-arrow-right'));
+                const loopModeTooltip = computed(() => ({ one: '单曲循环', all: '列表循环' }[player.value.loopMode] || '顺序播放'));
+                const toggleShuffle = () => { const ap = player.value.aplayer; if (!ap || originalPlaylist.value.length <= 1) return; player.value.isShuffle = !player.value.isShuffle; const currentAudio = ap.list.audios[ap.list.index]; const wasPlaying = player.value.isPlaying; let newPlaylist; if (player.value.isShuffle) { const others = originalPlaylist.value.filter(s => s.url !== currentAudio.url); for (let i = others.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[others[i], others[j]] = [others[j], others[i]]; } newPlaylist = [currentAudio, ...others]; } else { newPlaylist = [...originalPlaylist.value]; } player.value.playlist = newPlaylist; ap.list.clear(); ap.list.add(newPlaylist); ap.list.switch(newPlaylist.findIndex(s => s.url === currentAudio.url)); if (wasPlaying) ap.play(); else ap.pause(); };
+                const cyclePlaybackRate = () => { if (!player.value.aplayer) return; const rates = [1.0, 1.25, 1.5, 2.0, 0.5, 0.75]; const nextIndex = (rates.indexOf(player.value.playbackRate) + 1) % rates.length; player.value.playbackRate = rates[nextIndex]; player.value.aplayer.audio.playbackRate = rates[nextIndex]; };
+                const seek = (e) => { const p = e.currentTarget; player.value.aplayer.seek(player.value.aplayer.audio.duration * ((e.clientX - p.getBoundingClientRect().left) / p.offsetWidth)); };
+                const setVolume = (e) => { const vol = parseFloat(e.target.value); player.value.volume = vol; player.value.aplayer.volume(vol, true); e.target.style.setProperty("--volume-percent", `${vol * 100}%`); };
+                
+                onUnmounted(() => {
+                    lrcAnimation.isRunning = false;
+                    if (lrcAnimation.rafId) {
+                        cancelAnimationFrame(lrcAnimation.rafId);
+                    }
+                });
+
+                return { player, lrcContainer, switchPlaylist, seek, setVolume, togglePlaylist: () => player.value.isPlaylistVisible = !player.value.isPlaylistVisible, toggleSonglistSwitcher: () => player.value.isSongSwitcherVisible = !player.value.isSongSwitcherVisible, toggleLoop, loopModeIcon, loopModeTooltip, toggleShuffle, cyclePlaybackRate };
+            };
             const useChatbot = (utils) => { const chatbot = ref({ apiKey: '', temperature: 1.3, use_deep_thinking: false, status: '', currentMessage: '', isLoading: false }); const chatHistories = ref([]), activeChatId = ref(null), isHistoryDropdownOpen = ref(false), dropdownRef = ref(null), chatWindow = ref(null); const activeChat = computed(() => chatHistories.value.find(c => c.id === activeChatId.value)); const sendMessage = async () => { const messageText = chatbot.value.currentMessage.trim(); if (!messageText || chatbot.value.isLoading || !chatbot.value.apiKey) return; chatbot.value.isLoading = true; chatbot.value.status = '正在准备请求...'; activeChat.value.messages.push({ id: `user-${Date.now()}`, role: 'user', content: messageText }); if (activeChat.value.messages.length === 2) activeChat.value.title = messageText.substring(0, 30) + (messageText.length > 30 ? '...' : ''); chatbot.value.currentMessage = ''; const assistantMsg = { id: `assistant-${Date.now()}`, role: 'assistant', content: '', thinking: '', isThinkingVisible: false }; activeChat.value.messages.push(assistantMsg); await nextTick(); if (chatWindow.value) chatWindow.value.scrollTop = chatWindow.value.scrollHeight; const messagesForApi = activeChat.value.messages.slice(0, -1).map(({ role, content }) => ({ role, content })); try { chatbot.value.status = '正在与 DeepSeek 通信...'; const payload = { messages: messagesForApi, stream: true, model: chatbot.value.use_deep_thinking ? "deepseek-reasoner" : "deepseek-chat", max_tokens: chatbot.value.use_deep_thinking ? 65536 : 8192, }; if (!chatbot.value.use_deep_thinking) payload.temperature = parseFloat(chatbot.value.temperature); const response = await fetch("https://api.deepseek.com/chat/completions", { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${chatbot.value.apiKey}` }, body: JSON.stringify(payload) }); if (!response.ok) { const err = await response.json(); throw new Error(err.error?.message || `API 请求失败: ${response.status}`); } const reader = response.body.getReader(), decoder = new TextDecoder(); let buffer = ''; while (true) { const { value, done } = await reader.read(); if (done) break; buffer += decoder.decode(value, { stream: true }); const lines = buffer.split('\n'); buffer = lines.pop(); for (const line of lines) { if (line.startsWith('data: ')) { const jsonStr = line.substring(6); if (jsonStr === '[DONE]') break; try { const chunk = JSON.parse(jsonStr), delta = chunk.choices[0]?.delta; if (delta) { if (delta.reasoning_content) assistantMsg.thinking += delta.reasoning_content; if (delta.content) assistantMsg.content += delta.content; } } catch (e) { console.error('解析流JSON错误:', e, jsonStr); } } } } } catch (error) { assistantMsg.content = `**错误:** ${error.message}`; } finally { chatbot.value.isLoading = false; chatbot.value.status = ''; } }; const saveChats = () => { localStorage.setItem('deepseek_chat_histories_v2', JSON.stringify(chatHistories.value)); localStorage.setItem('deepseek_active_chat_id_v2', activeChatId.value); }; const loadChats = () => { const saved = localStorage.getItem('deepseek_chat_histories_v2'), savedId = localStorage.getItem('deepseek_active_chat_id_v2'); if (saved) { chatHistories.value = JSON.parse(saved); activeChatId.value = savedId ? parseInt(savedId) : (chatHistories.value[0]?.id || null); } if (chatHistories.value.length === 0) createNewChat(); }; const createNewChat = () => { const newChat = { id: Date.now(), title: '新的对话', messages: [{ id: 'initial-message', role: 'assistant', content: '你好！有什么可以帮助你的吗？' }] }; chatHistories.value.push(newChat); activeChatId.value = newChat.id; }; const deleteActiveChat = () => { if (!activeChat.value) return; const idx = chatHistories.value.findIndex(c => c.id === activeChatId.value); if (chatHistories.value.length <= 1) { createNewChat(); chatHistories.value.splice(0, 1); return; } chatHistories.value.splice(idx, 1); activeChatId.value = chatHistories.value[idx > 0 ? idx - 1 : 0].id; }; const selectChat = (id) => { activeChatId.value = id; isHistoryDropdownOpen.value = false; }; const handleClickOutside = (e) => { if (dropdownRef.value && !dropdownRef.value.contains(e.target)) isHistoryDropdownOpen.value = false; }; watch(chatHistories, saveChats, { deep: true }); watch(activeChatId, saveChats); watch(() => chatbot.value.apiKey, (key) => localStorage.setItem('deepseek_api_key', key)); watch(() => activeChat.value?.messages, () => utils.triggerMathRendering('.message:last-child .message-content'), { deep: true }); return { chatbot, chatWindow, dropdownRef, chatHistories, activeChatId, activeChat, isHistoryDropdownOpen, sendMessage, createNewChat, deleteActiveChat, selectChat, loadChats, handleClickOutside }; };
             const useDataService = (utils) => { const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]), localPlaylistsManifest = ref([]); const loadedLocalPlaylists = ref({}); const loadAllData = async () => { const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks, localManifest] = await Promise.all([ dataLoaderService.fetchMarkdown(config.contentPaths.about), dataLoaderService.fetchJSON(config.contentPaths.resume), dataLoaderService.fetchJSON(config.contentPaths.interests), dataLoaderService.fetchJSON(config.contentPaths.growth), dataLoaderService.fetchJSON(config.contentPaths.bookshelf), dataLoaderService.fetchJSON(config.contentPaths.blogManifest), dataLoaderService.fetchJSON(config.contentPaths.footerLinks), dataLoaderService.fetchJSON(config.contentPaths.localPlaylistsManifest) ]); aboutContent.value = utils.renderMarkdown(aboutMd || ""); resumeData.value = resume || { name: "数据加载失败" }; interests.value = interestsData || []; if (growth) { timeline.value = growth.timeline; targets.value = growth.targets; } bookshelf.value = books || []; blogPosts.value = blogManifest || []; footerIconLinks.value = footerLinks || []; localPlaylistsManifest.value = localManifest || []; }; return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, localPlaylistsManifest, loadedLocalPlaylists, loadAllData }; };
             const useGuestbook = () => { const guestbook = ref({ isReady: false, error: null, isSubmitting: false, newName: '', newMessage: '', messages: [], isExpanded: false, status: { message: '', type: '' } }); const activeDanmaku = ref([]); let danmakuQueue = [], pollInterval = null; let animationFrameId = null; let lastDanmakuTime = 0; const danmakuIntervalMs = 3000; const fetchMessages = async () => { try { const response = await fetch(config.guestbookApiUrl); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器响应错误: ${response.status}`); } const freshMessages = await response.json(); guestbook.value.messages = freshMessages; danmakuQueue = [...freshMessages].reverse(); guestbook.value.isReady = true; } catch (err) { console.error("获取弹幕失败:", err); guestbook.value.error = err.message || "无法加载弹幕。"; } }; const submitMessage = async () => { if (guestbook.value.isSubmitting) return; const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim(); if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; } guestbook.value.isSubmitting = true; guestbook.value.status = { message: '', type: '' }; try { const response = await fetch(config.guestbookApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message }) }); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器提交错误: ${response.status}`); } const latestMessages = await response.json(); guestbook.value.messages = latestMessages; danmakuQueue = [...latestMessages].reverse(); guestbook.value.newName = ''; guestbook.value.newMessage = ''; guestbook.value.status = { message: '发射成功！', type: 'success' }; setTimeout(() => { guestbook.value.isExpanded = false; guestbook.value.status = { message: '', type: '' }; }, 1500); } catch (e) { console.error("提交弹幕失败:", e); guestbook.value.status = { message: e.message || '发射失败，请稍后再试。', type: 'error' }; } finally { guestbook.value.isSubmitting = false; } }; const danmakuLoop = (timestamp) => { if (!lastDanmakuTime) { lastDanmakuTime = timestamp; } const elapsed = timestamp - lastDanmakuTime; if (elapsed > danmakuIntervalMs) { lastDanmakuTime = timestamp; if (danmakuQueue.length > 0 && activeDanmaku.value.length <= 10) { const msg = danmakuQueue.shift(); danmakuQueue.push(msg); const duration = Math.random() * 8 + 12; const danmaku = { id: Date.now() + Math.random(), name: msg.name, message: msg.message, style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` } }; activeDanmaku.value.push(danmaku); setTimeout(() => { const index = activeDanmaku.value.findIndex(d => d.id === danmaku.id); if (index > -1) { activeDanmaku.value.splice(index, 1); } }, duration * 1000 + 100); } } animationFrameId = requestAnimationFrame(danmakuLoop); }; const startDanmakuStream = () => { stopDanmakuStream(); lastDanmakuTime = 0; animationFrameId = requestAnimationFrame(danmakuLoop); }; const stopDanmakuStream = () => { if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; } }; const handleVisibilityChange = () => { if (document.hidden) { stopDanmakuStream(); } else { startDanmakuStream(); } }; const init = async () => { await fetchMessages(); startDanmakuStream(); document.addEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); pollInterval = setInterval(fetchMessages, 60000); }; onUnmounted(() => { stopDanmakuStream(); document.removeEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); }); return { guestbook, activeDanmaku, init, submitMessage }; };
@@ -1019,7 +1144,3 @@
     </script>
 </body>
 </html>
-
-
-
-
