@@ -769,8 +769,6 @@
             const appElement = document.getElementById('app');
             if (appElement) appElement.style.visibility = 'hidden';
 
-            window.onload = () => { if (loader) loader.classList.add('is-hidden'); if (appElement) { setTimeout(() => { if (loader) loader.style.display = 'none'; appElement.style.visibility = 'visible'; }, 800); } };
-
             if (!window.Vue) { console.error("Vue.js未能加载。应用无法启动。"); return; }
             const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
             
@@ -918,7 +916,7 @@
                     watch(activeInterest, async (newInterest) => { if (newInterest && newInterest.mdFilePath) { interestMarkdownContent.value = '加载中...'; try { const markdown = await dataLoaderService.fetchMarkdown(newInterest.mdFilePath); interestMarkdownContent.value = utils.renderMarkdown(markdown); utils.triggerMathRendering('.interest-markdown-content'); } catch (error) { console.error(`Failed to load interest content for ${newInterest.id}:`, error); interestMarkdownContent.value = '<p>内容加载失败。</p>'; } } else { interestMarkdownContent.value = ''; } });
 
                     onMounted(async () => {
-                        initTheme(); hero.start(); loadCustomSonglists(); initGuestbook();
+                        initTheme(); loadCustomSonglists(); initGuestbook();
                         siteUptime.value = `${Math.ceil(Math.abs(new Date() - new Date(config.siteStartDate)) / 864e5)} 天`;
                         chatbot.loadChats(); 
                         await data.loadAllData();
@@ -977,6 +975,24 @@
                         
                         github.value.isLoading = false;
                         
+                        // [修复] 全新的加载动画处理逻辑
+                        const loader = document.getElementById('loader-wrapper');
+                        
+                        if (loader) {
+                            loader.classList.add('is-hidden');
+                        }
+
+                        if (appElement) {
+                            // 等待加载动画的淡出效果 (0.8s) 结束后再显示内容并开始打字
+                            setTimeout(() => {
+                                if (loader) {
+                                    loader.style.display = 'none';
+                                }
+                                appElement.style.visibility = 'visible';
+                                hero.start(); // 在应用可见后启动打字机效果
+                            }, 800);
+                        }
+
                         const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (entry.isIntersecting && !activeJourneyPanel.value) activeSection.value = entry.target.getAttribute("data-section"); }); }, { threshold: 0.1 });
                         document.querySelectorAll("[data-section]").forEach(el => observer.observe(el));
                         const animObserver = new IntersectionObserver((entries, obs) => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-visible"); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
@@ -1003,6 +1019,7 @@
     </script>
 </body>
 </html>
+
 
 
 
