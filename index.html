@@ -1,41 +1,21 @@
-<!-- 
-  重要提示:
-  请使用你代码编辑器的“查找和替换”功能，
-  将下面文件中的 "https://source.xvyin.com"
-  全部替换为你自己部署的 Cloudflare Worker 的真实 URL 地址！
--->
 <!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
-    <!-- =================================================================== -->
-    <!-- Meta Tags: 页面元数据，定义字符集、视口、标题和图标 -->
-    <!-- =================================================================== -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>虚静以宁</title>
     <link rel="icon" href="./content/icon/32.png">
 
-    <!-- =================================================================== -->
-    <!-- 优化: Preconnect Directives: 预连接到你的 Cloudflare Worker 代理 -->
-    <!-- =================================================================== -->
     <link rel="preconnect" href="https://source.xvyin.com" />
+    <link rel="preconnect" href="https://github.xvyin.com" />
 
-    <!-- =================================================================== -->
-    <!-- 优化: External Fonts: 通过 Cloudflare Worker 代理加载 -->
-    <!-- =================================================================== -->
     <link href="https://source.xvyin.com/?target=https%3A%2F%2Ffonts.loli.net%2Fcss2%3Ffamily%3DZCOOL%2BKuaiLe%26display%3Dswap" rel="stylesheet" />
     <link href="https://source.xvyin.com/?target=https%3A%2F%2Ffonts.loli.net%2Fcss2%3Ffamily%3DInter%3Awght%40400%3B500%3B600%3B700%3B800%26display%3Dswap" rel="stylesheet" />
 
-    <!-- =================================================================== -->
-    <!-- 优化: External Stylesheets: 通过 Cloudflare Worker 代理加载 -->
-    <!-- =================================================================== -->
     <link rel="stylesheet" href="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.css" />
     <link rel="stylesheet" href="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2FKaTeX%2F0.16.9%2Fkatex.min.css">
     
-    <!-- =================================================================== -->
-    <!-- Internal CSS: 项目的主要样式表 (无变化) -->
-    <!-- =================================================================== -->
     <style>
         /* ===================================================================
          * CSS 结构化注释
@@ -69,6 +49,7 @@
             --repo-card-hover-bg: rgba(255, 255, 255, 0.1);
             --error-color: #ef4444;
             --success-color: #22c55e;
+            --bili-pink: #fb7299;
         }
 
         html.light-theme {
@@ -288,7 +269,7 @@
         .honor-item { background-color: var(--repo-card-bg); color: var(--text-color); padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; }
         .honor-item i { font-size: 1.5rem; color: var(--accent-color); }
 
-        /* 组件: 创造与知识面板 (Github & 书架) - 已升级 */
+        /* 组件: 创造与知识面板 (Github & 书架) */
         .creations-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border-color); padding: 0 1rem; }
         .tab-button { background: none; border: none; color: var(--text-color-darker); padding: 1rem; cursor: pointer; font-size: 1.05rem; font-weight: 500; position: relative; transition: color 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
         .tab-button::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background-color: var(--accent-color); transform: scaleX(0); transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
@@ -336,17 +317,17 @@
         .pinned-repo-card::before {
             content: '置顶';
             position: absolute;
-            top: 15px;      /* 调整垂直位置 */
-            right: -35px;   /* 调整水平位置，使其伸出卡片 */
+            top: 15px;      
+            right: -35px;   
             background: var(--accent-color);
             color: #121212;
-            width: 120px;   /* 定义缎带宽度 */
+            width: 120px;   
             text-align: center;
-            padding: 4px 0; /* 调整内边距 */
+            padding: 4px 0; 
             font-size: 0.8rem;
             font-weight: 600;
-            transform: rotate(45deg); /* 旋转45度 */
-            z-index: 2; /* 确保在内容之上 */
+            transform: rotate(45deg); 
+            z-index: 2; 
         }
         .load-more-btn { width: 100%; padding: 0.8rem 1rem; margin-top: 1.5rem; border: none; background-color: var(--repo-card-bg); color: var(--text-color); font-size: 1rem; font-weight: 500; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
         .load-more-btn:hover { background-color: var(--repo-card-hover-bg); }
@@ -542,6 +523,160 @@
         .theme-switcher button.active { background: var(--subscribe-btn-bg); color: white; }
         .theme-switcher svg { width: 14px; height: 14px; }
 
+        /* 组件: BiliBili 面板样式 */
+        .bili-user-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border-color);
+            margin-bottom: 1.5rem;
+        }
+        .bili-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid var(--bili-pink);
+            flex-shrink: 0;
+        }
+        .bili-user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .bili-user-info .name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color-white);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .bili-vip-label {
+            background-color: var(--bili-pink);
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .bili-user-info .sign {
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+            font-style: italic;
+        }
+        .bili-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .bili-stat-item {
+            font-size: 0.9rem;
+            color: var(--text-color-darker);
+        }
+        .bili-stat-item strong {
+            color: var(--text-color-white);
+            font-weight: 600;
+        }
+        .bili-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+            border-bottom: 1px solid var(--glass-border-color);
+        }
+        .bili-tab-button {
+            background: none;
+            border: none;
+            color: var(--text-color-darker);
+            padding: 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .bili-tab-button::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--bili-pink);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .bili-tab-button.active {
+            color: var(--bili-pink);
+        }
+        .bili-tab-button.active::after {
+            transform: scaleX(1);
+        }
+        .bili-video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 0.5rem 1rem;
+        }
+        .bili-video-grid::-webkit-scrollbar { width: 8px; }
+        .bili-video-grid::-webkit-scrollbar-thumb { background-color: var(--bili-pink); border-radius: 8px; }
+
+        .bili-video-embed {
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* 组件: 创造与知识面板 (Github & 书架) - '成长与动态' Tab 优化布局 */
+        .growth-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        @media (min-width: 900px) {
+            .growth-grid {
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                align-items: stretch; /* Stretch cards to be same height */
+            }
+        }
+        .growth-right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .growth-card {
+            background: var(--repo-card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+        .growth-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color-white);
+            margin: 0 0 1.5rem 0;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+        /* Make right-column cards share space, with activity feed being flexible */
+        .growth-right-column .growth-card:last-child {
+            flex-grow: 1;
+        }
+        .growth-card .activity-feed {
+            flex-grow: 1;
+            min-height: 200px; /* Ensure it has some height even if content is short */
+            max-height: 350px;
+        }
+
         /* --- 6. 动画效果 --- */
         @keyframes wave { 0% { transform: rotate(0deg); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 30% { transform: rotate(14deg); } 40% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } 60% { transform: rotate(0deg); } 100% { transform: rotate(0deg); } }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -591,6 +726,7 @@
             .custom-player { flex-direction: column; gap: 1.5rem; }
             .custom-player-info-wrapper { width: 100%; }
             .custom-player-controls { flex-wrap: wrap; justify-content: center; }
+             .bili-user-header { flex-direction: column; text-align: center; }
         }
         @media (max-width: 600px) {
             .main-header { padding: 4px; }
@@ -604,6 +740,7 @@
             .hero-player-container { padding: 0; width: calc(100% - 40px); max-width: calc(100% - 40px); }
             .hub-grid { grid-template-columns: 1fr; }
             .book-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+             .bili-video-grid { grid-template-columns: 1fr; }
             .fab-container { bottom: 20px; left: 20px; width: 50px; height: 50px; border-radius: 25px; }
             .fab-toggle { width: 50px; height: 50px; font-size: 1.5rem; }
             .fab-container.expanded { width: min(350px, 90vw); height: 270px; }
@@ -614,10 +751,6 @@
 </head>
 
 <body>
-    <!-- =================================================================== -->
-    <!-- HTML 结构 (无变化) -->
-    <!-- =================================================================== -->
-
     <div id="loader-wrapper"><div class="loader-container"><div class="loader-core"></div><div class="loader-electron"></div><div class="loader-electron"></div><div class="loader-electron"></div></div></div>
     <canvas id="particle-canvas"></canvas>
     <div id="app">
@@ -626,7 +759,6 @@
             <nav class="header-nav" aria-label="主导航"><button v-for="link in visibleNavLinks" :key="link.id" @click="handleNavClick(link.id)" :class="{ active: activeSection === link.id }" :aria-current="activeSection === link.id ? 'page' : false">{{ link.text }}</button></nav>
         </header>
 
-        <!-- 管理员登录模态框 -->
         <div class="modal-overlay" :class="{'is-visible': isLoginModalVisible}" @click.self="toggleLoginModal">
             <div role="dialog" aria-modal="true" aria-labelledby="login-title" class="modal-container">
                 <div class="modal-card-container">
@@ -637,7 +769,6 @@
             </div>
         </div>
 
-        <!-- 书籍详情模态框 -->
         <div class="modal-overlay" :class="{'is-visible': isBookModalVisible}" @click.self="closeBookModal">
             <div role="dialog" aria-modal="true" aria-labelledby="book-title" class="modal-container" v-if="selectedBook">
                 <div class="modal-card-container">
@@ -677,10 +808,10 @@
                                 <div class="creations-tabs">
                                     <button class="tab-button" :class="{ active: creationsTabActive === 'github' }" @click="creationsTabActive = 'github'"><i class="ph-fill ph-github-logo"></i><span>GitHub</span></button>
                                     <button class="tab-button" :class="{ active: creationsTabActive === 'bookshelf' }" @click="creationsTabActive = 'bookshelf'"><i class="ph-fill ph-books"></i><span>我的书架</span></button>
-                                    <button class="tab-button" :class="{ active: creationsTabActive === 'activity' }" @click="creationsTabActive = 'activity'"><i class="ph-fill ph-chart-line"></i><span>知识动态</span></button>
+                                    <button class="tab-button" :class="{ active: creationsTabActive === 'growth' }" @click="creationsTabActive = 'growth'"><i class="ph-fill ph-trend-up"></i><span>成长与动态</span></button>
                                 </div>
                                 <div class="tab-content">
-                                    <transition name="content-fade" mode="out-in">
+                                    <transition name="content-fade" mode="out-in" @after-enter="onTabTransitionEnd" @before-leave="onTabTransitionStart">
                                         <div v-if="creationsTabActive === 'github'" key="github">
                                             <div class="github-overview">
                                                 <div class="stat-card"><div class="stat-value">{{ github.stats.contributions }}</div><div class="stat-label">年度贡献数</div></div>
@@ -701,12 +832,37 @@
                                             <div class="filters-container book-category-pills"><button v-for="category in bookCategories" :key="category" @click="bookshelf.activeCategory = category" :class="{ active: bookshelf.activeCategory === category }">{{ category }}</button></div>
                                             <div class="book-grid"><div v-for="book in filteredBooks" :key="book.title" @click="openBookModal(book)" class="book-card"><span v-if="book.status" class="book-status-tag" :class="book.status">{{ book.status === 'reading' ? '在读' : '已读' }}</span><img :src="book.coverUrl" :alt="book.title" class="book-cover" @error="handleImgError" loading="lazy" /><h3>{{ book.title }}</h3><p>{{ book.author }}</p></div></div>
                                         </div>
-                                        <div v-else-if="creationsTabActive === 'activity'" key="activity">
-                                            <div class="activity-feed">
-                                                <div v-if="activityStream.length === 0 && !github.isLoading">暂无动态</div>
-                                                <div v-for="(item, index) in activityStream" :key="index" class="activity-item">
-                                                    <div class="activity-icon"><i class="ph-fill" :class="item.type === 'github' ? 'ph-git-commit' : 'ph-book-open'"></i></div>
-                                                    <div class="activity-content"><p class="activity-text" v-html="item.content"></p><p class="activity-date">{{ item.date }}</p></div>
+                                        <div v-else-if="creationsTabActive === 'growth'" key="growth">
+                                            <div class="growth-grid">
+                                                <div class="growth-card">
+                                                    <h3><i class="ph-fill ph-calendar-blank"></i> 时光</h3>
+                                                    <div class="timeline">
+                                                        <div class="timeline-item" v-for="item in timeline" :key="item.date">
+                                                            <div class="timeline-date">{{ item.date }}</div>
+                                                            <p class="timeline-desc">{{ item.event }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="growth-right-column">
+                                                    <div class="growth-card">
+                                                        <h3><i class="ph-fill ph-flag-checkered"></i> 目标进度</h3>
+                                                        <div class="target-list">
+                                                            <div v-for="(target, index) in targets" :key="target.name" class="target-item">
+                                                                <div class="target-info"><span class="target-name">{{ target.name }}</span><span class="target-progress-text">{{ animatedTargetValues[index] || 0 }} / {{ target.total }}</span></div>
+                                                                <div class="progress-bar-container"><div class="progress-bar"></div></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="growth-card">
+                                                        <h3><i class="ph-fill ph-chart-line"></i> 知识动态</h3>
+                                                        <div class="activity-feed">
+                                                            <div v-if="activityStream.length === 0 && !github.isLoading">暂无动态</div>
+                                                            <div v-for="(item, index) in activityStream" :key="index" class="activity-item">
+                                                                <div class="activity-icon"><i class="ph-fill" :class="item.type === 'github' ? 'ph-git-commit' : 'ph-book-open'"></i></div>
+                                                                <div class="activity-content"><p class="activity-text" v-html="item.content"></p><p class="activity-date">{{ item.date }}</p></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -715,8 +871,55 @@
                             </article>
                         </div>
                         <div id="blog-panel" class="journey-panel" v-if="activeJourneyPanel === 'blog'"><article class="content-card glass-effect" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>我的文章</h2><div class="blog-panel-content"><div class="blog-sidebar"><div class="blog-category-filter"><button v-for="category in blogCategories" :key="category" @click="activeCategory = category" :class="{ active: activeCategory === category }">{{ category }}</button></div><div class="blog-post-list-container"><transition-group name="list-fade" tag="div"><div v-for="post in filteredBlogPosts" :key="post.id" @click="activePostId = post.id" class="blog-post-item" :class="{ active: post.id === activePostId }" tabindex="0" @keydown.enter="activePostId = post.id"><h4>{{ post.title }}</h4><p>{{ post.date }}</p></div></transition-group></div></div><div class="blog-main"><transition name="post-fade" mode="out-in"><div v-if="activePost" class="blog-post-content" :key="activePost.id"><h2>{{ activePost.title }}</h2><p class="blog-post-meta">发布于 {{ activePost.date }} | 分类: {{ activePost.category }}</p><div class="blog-post-body" v-html="renderMarkdown(activePost.content)"></div></div></transition></div></div></article></div>
-                        <div id="growth-panel" class="journey-panel" v-if="activeJourneyPanel === 'growth'"><article class="content-card glass-effect" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>成长之路</h2><div class="panel-content-grid"><div><h3><i class="ph-fill ph-calendar-blank"></i> 时光</h3><div class="timeline"><div class="timeline-item" v-for="item in timeline" :key="item.date"><div class="timeline-date">{{ item.date }}</div><p class="timeline-desc">{{ item.event }}</p></div></div></div><div><h3><i class="ph-fill ph-flag-checkered"></i> 目标进度</h3><div class="target-list"><div v-for="(target, index) in targets" :key="target.name" class="target-item"><div class="target-info"><span class="target-name">{{ target.name }}</span><span class="target-progress-text">{{ animatedTargetValues[index] || 0 }} / {{ target.total }}</span></div><div class="progress-bar-container"><div class="progress-bar"></div></div></div></div></div></div></article></div>
                         <div id="interests-panel" class="journey-panel" v-if="activeJourneyPanel === 'interests'"><article class="content-card glass-effect" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>兴趣星系</h2><div class="interest-pills-container"><button v-for="interest in interests" :key="interest.id" class="interest-pill" :class="{ 'is-active': openInterestId === interest.id }" @click="openInterestId = interest.id"><i :class="interest.icon"></i><span>{{ interest.title }}</span></button></div><transition name="content-fade" mode="out-in"><div v-if="activeInterest" :key="activeInterest.id" class="interest-details-container"><div class="interest-details-content"><div v-if="activeInterest.hasVideo && activeInterest.videoUrl" class="video-container"><iframe :src="activeInterest.videoUrl" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe></div><div class="interest-markdown-content" v-html="interestMarkdownContent"></div></div></div></transition></article></div>
+                        <div id="bilibili-panel" class="journey-panel" v-if="activeJourneyPanel === 'bilibili'">
+                            <article class="content-card glass-effect" ref="activePanelRef">
+                                <button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button>
+                                <h2>BiliBili 动态</h2>
+                                <div v-if="bilibili.isLoading" class="loading-placeholder">正在加载B站动态...</div>
+                                <div v-else-if="bilibili.error" class="error-message">{{ bilibili.error }}</div>
+                                <div v-else-if="bilibili.userInfo">
+                                    <header class="bili-user-header">
+                                        <img :src="bilibili.userInfo.face" alt="用户头像" class="bili-avatar" />
+                                        <div class="bili-user-info">
+                                            <h3 class="name">
+                                                <span>{{ bilibili.userInfo.name }}</span>
+                                                <span v-if="bilibili.userInfo.vip" class="bili-vip-label">{{ bilibili.userInfo.vip }}</span>
+                                            </h3>
+                                            <p class="sign">{{ bilibili.userInfo.sign }}</p>
+                                            <div class="bili-stats">
+                                                <span class="bili-stat-item"><strong>{{ bilibili.userInfo.followers }}</strong> 粉丝</span>
+                                                <span class="bili-stat-item"><strong>{{ bilibili.userInfo.likes }}</strong> 获赞</span>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="bili-tabs">
+                                        <button v-for="fav in bilibili.favorites" 
+                                                :key="fav.id" 
+                                                class="bili-tab-button"
+                                                :class="{ active: bilibili.activeFavoriteId === fav.id }"
+                                                @click="bilibili.activeFavoriteId = fav.id">
+                                            {{ fav.title }} ({{ fav.media_count }})
+                                        </button>
+                                    </div>
+                                    <transition name="content-fade" mode="out-in">
+                                        <div class="bili-video-grid" :key="bilibili.activeFavoriteId">
+                                            <div v-for="video in activeFavoriteVideos" :key="video.bvid">
+                                                <iframe 
+                                                    :src="`https://player.bilibili.com/player.html?bvid=${video.bvid}&page=1&as_wide=1&high_quality=1&danmaku=0`" 
+                                                    class="bili-video-embed" 
+                                                    scrolling="no" 
+                                                    border="0" 
+                                                    frameborder="no" 
+                                                    framespacing="0" 
+                                                    allowfullscreen="true">
+                                                </iframe>
+                                            </div>
+                                        </div>
+                                    </transition>
+                                </div>
+                            </article>
+                        </div>
                         <div id="chatbot-panel" class="journey-panel" v-if="activeJourneyPanel === 'chatbot'"><article class="content-card glass-effect chatbot-card" ref="activePanelRef"><button @click="closeJourneyPanel" class="close-panel-btn" aria-label="关闭面板" title="关闭"><i class="ph ph-x"></i></button><h2>AI 对话</h2><div class="chatbot-settings"><div class="setting-item api-key-group"><label for="apiKey"><span>API Key</span><a href="https://platform.deepseek.com/api_keys" target="_blank" class="get-api-key-link">获取API Key</a></label><input id="apiKey" type="password" v-model="chatbot.apiKey" placeholder="输入你的 DeepSeek API Key" /></div><div class="setting-item"><label for="temperature"><span>温度: {{ chatbot.temperature }}</span><i class="ph ph-info tooltip-icon" title="仅在关闭深度思考时有效。&#10;代码生成/数学解题: 0.0&#10;数据抽取/分析: 1.0&#10;通用对话/翻译: 1.3&#10;创意类写作: 1.5"></i></label><input id="temperature" type="range" v-model="chatbot.temperature" min="0" max="2" step="0.1" :disabled="chatbot.use_deep_thinking" /></div><div class="setting-item custom-toggle"><label for="deepThinking">深度思考</label><div class="toggle-switch" :class="{ active: chatbot.use_deep_thinking }" @click="chatbot.use_deep_thinking = !chatbot.use_deep_thinking" role="switch" :aria-checked="chatbot.use_deep_thinking" id="deepThinking" tabindex="0"><div class="toggle-knob"></div></div></div><div class="setting-item chat-history-group"><label>对话历史</label><div class="history-controls"><div class="chat-history-dropdown" ref="dropdownRef"><button @click="isHistoryDropdownOpen = !isHistoryDropdownOpen" class="dropdown-trigger" aria-haspopup="true" :aria-expanded="isHistoryDropdownOpen"><span>{{ activeChat ? activeChat.title : '选择对话' }}</span><i class="ph-fill ph-caret-down"></i></button><transition name="dropdown-fade"><ul v-if="isHistoryDropdownOpen" class="dropdown-menu glass-effect" role="menu"><li v-for="chat in chatHistories" :key="chat.id" @click="selectChat(chat.id)" class="dropdown-item" role="menuitem" :class="{ active: chat.id === activeChatId }">{{ chat.title }}</li></ul></transition></div><button @click="createNewChat" class="history-btn" aria-label="新建对话" title="新建对话"><i class="ph ph-plus"></i></button><button @click="deleteActiveChat" class="history-btn" aria-label="删除当前对话" title="删除当前对话"><i class="ph ph-trash"></i></button></div></div></div><div class="chat-window" ref="chatWindow"><div v-if="activeChat"><div v-for="message in activeChat.messages" :key="message.id" class="message" :class="message.role"><div v-if="message.role !== 'system'" class="message-content"><div v-if="message.thinking" class="thinking-process-container"><button class="toggle-thinking-btn" @click="message.isThinkingVisible = !message.isThinkingVisible"><i class="ph-fill" :class="message.isThinkingVisible ? 'ph-caret-down' : 'ph-caret-right'"></i><span>思考过程</span></button><div v-show="message.isThinkingVisible" class="thinking-process-content" v-html="renderMarkdown(message.thinking)"></div></div><div v-if="chatbot.isLoading && activeChat.messages[activeChat.messages.length - 1].id === message.id && !message.content && !message.thinking" style="display: flex; align-items: center; justify-content: center; height: 1.6em;"><span class="typing-cursor-hero" style="height: 1.2em; background-color: var(--text-color);"></span></div><div v-else v-html="renderMarkdown(message.content)"></div><button v-if="message.content" @click="copyToClipboard(message.content, $event)" class="copy-button" aria-label="复制消息" title="复制"><i class="ph ph-copy"></i></button></div></div></div></div><div v-if="chatbot.status" class="chat-status" aria-live="polite"><i class="ph ph-spinner-gap animate-spin"></i><span>{{ chatbot.status }}</span></div><form @submit.prevent="sendMessage" class="chat-input-area"><textarea v-model="chatbot.currentMessage" @keydown.enter.exact.prevent="sendMessage" placeholder="输入消息..." aria-label="聊天输入框"></textarea><button type="submit" class="send-button" :disabled="chatbot.isLoading || !chatbot.apiKey">发送</button></form></article></div>
                     </div>
                 </transition>
@@ -729,9 +932,6 @@
         </footer>
     </div>
 
-    <!-- =================================================================== -->
-    <!-- 优化: External JavaScript Libraries: 通过 Cloudflare Worker 代理加载 -->
-    <!-- =================================================================== -->
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fvue%2F3.2.47%2Fvue.global.prod.js" defer></script>
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fmarked%2F4.3.0%2Fmarked.min.js" defer></script>
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40phosphor-icons%2Fweb" defer></script>
@@ -740,12 +940,7 @@
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2FKaTeX%2F0.16.9%2Fkatex.min.js" defer></script>
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2FKaTeX%2F0.16.9%2Fcontrib%2Fauto-render.min.js" defer></script>
     
-    <!-- =================================================================== -->
-    <!-- Main Application Logic (已升级) -->
-    <!-- =================================================================== -->
-    <script>
-        // The rest of your script remains the same...
-        // ... (The entire original script content from line 859 to the end)
+<script>
         (function() {
             const isLightTheme = new Date().getHours() >= 6 && new Date().getHours() < 18;
             if (isLightTheme) { document.documentElement.classList.add('light-theme'); }
@@ -769,6 +964,8 @@
             const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
             
             const config = {
+                // 在这里填写您部署的 Cloudflare Worker 地址
+                bilibiliApiUrl: "YOUR_CLOUDFLARE_WORKER_URL", 
                 guestbookApiUrl: "https://firebase.xvyin.com/messages",
                 siteStartDate: "2024-03-02",
                 icpNumber: "渝ICP备2025053763号-1",
@@ -785,32 +982,87 @@
             };
 
             const apiService = {
-                // [升级] 统一的 GitHub 数据获取函数，通过 Cloudflare Worker 代理
+                cache: {
+                    get(key) {
+                        const itemStr = sessionStorage.getItem(key);
+                        if (!itemStr) return null;
+                        try {
+                            const item = JSON.parse(itemStr);
+                            const isExpired = new Date().getTime() > item.expiry;
+                            if (isExpired) {
+                                sessionStorage.removeItem(key);
+                                return null;
+                            }
+                            return item.value;
+                        } catch (e) {
+                            sessionStorage.removeItem(key);
+                            return null;
+                        }
+                    },
+                    set(key, value, ttlMinutes = 15) {
+                        const now = new Date();
+                        const item = {
+                            value: value,
+                            expiry: now.getTime() + ttlMinutes * 60 * 1000,
+                        };
+                        try {
+                           sessionStorage.setItem(key, JSON.stringify(item));
+                        } catch (e) {
+                            console.error("设置缓存失败:", e);
+                        }
+                    }
+                },
+
                 async getGithubData(endpoint, params = {}) {
-                    // [重要] 请将下面的 URL 替换为您自己部署的 Cloudflare Worker 地址
                     const workerUrl = 'https://github.xvyin.com/'; 
-                    
                     const url = new URL(workerUrl);
                     url.searchParams.append('endpoint', endpoint);
                     url.searchParams.append('username', config.github.username);
                     for (const key in params) {
-                        url.searchParams.append(key, params[key]);
+                        if (params.hasOwnProperty(key)) {
+                           url.searchParams.append(key, params[key]);
+                        }
                     }
 
+                    const cacheKey = `github_${endpoint}_${JSON.stringify(params)}`;
+                    const cachedData = this.cache.get(cacheKey);
+
+                    if (cachedData) {
+                        console.log(`[Cache] 从缓存加载: ${cacheKey}`);
+                        return cachedData;
+                    }
+
+                    console.log(`[API] 从网络请求: ${cacheKey}`);
                     const response = await fetch(url.toString());
+                    
                     if (!response.ok) {
                         const errorText = await response.text();
                         throw new Error(`获取 GitHub 数据失败 (${endpoint}): ${response.status} - ${errorText}`);
                     }
-                    return response.json();
+                    
+                    const data = await response.json();
+                    this.cache.set(cacheKey, data); 
+                    return data;
                 },
-                // 音乐 API 保持不变
                 async getMusicPlaylist(songId) { if (!songId) throw new Error("必须提供歌单ID。"); const apiUrl = `${config.music.api}?server=${config.music.server}&type=${config.music.type}&id=${songId}`; const response = await fetch(apiUrl); if (!response.ok) throw new Error(`音乐API请求失败: ${response.status}`); const data = await response.json(); if (data.error) throw new Error(data.error); if (!Array.isArray(data) || data.length === 0) { console.error("API响应无效或播放列表为空:", data); throw new Error("播放列表为空或加载失败。"); } return data; },
+                 async getBilibiliData() {
+                    if (!config.bilibiliApiUrl || config.bilibiliApiUrl === "https://bilibili.xvyin.com") {
+                         throw new Error("请先在 config 中配置您的 Cloudflare Worker URL。");
+                    }
+                    const response = await fetch(config.bilibiliApiUrl);
+                    if (!response.ok) {
+                        throw new Error(`获取 BiliBili 数据失败: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    if (data.error) {
+                        throw new Error(`Worker 错误: ${data.error}`);
+                    }
+                    return data;
+                },
             };
             
             const dataLoaderService = { async fetchJSON(path) { try { const response = await fetch(path); if (!response.ok) throw new Error(`无法加载 ${path}`); return await response.json(); } catch (error) { console.error(`加载JSON文件失败: ${path}`, error); return null; } }, async fetchMarkdown(path) { try { const response = await fetch(path); if (!response.ok) throw new Error(`无法加载 ${path}`); return await response.text(); } catch (error) { console.error(`加载Markdown文件失败: ${path}`, error); return `### 内容加载失败\n抱歉，无法加载此部分的内容: ${path}`; } } };
             
-            // --- Vue Composition API Hooks ---
             const useTheme = () => { const currentTheme = ref("dark"); let themeCheckInterval = null; const autoSetThemeByTime = () => { const newTheme = (new Date().getHours() >= 6 && new Date().getHours() < 18) ? 'light' : 'dark'; if (newTheme !== currentTheme.value) { currentTheme.value = newTheme; document.documentElement.classList.toggle("light-theme", newTheme === "light"); } }; const setTheme = (theme) => { currentTheme.value = theme; document.documentElement.classList.toggle("light-theme", theme === "light"); }; const initTheme = () => { autoSetThemeByTime(); if (themeCheckInterval) clearInterval(themeCheckInterval); themeCheckInterval = setInterval(autoSetThemeByTime, 60000); }; onUnmounted(() => { if (themeCheckInterval) clearInterval(themeCheckInterval); }); return { currentTheme, setTheme, initTheme }; };
             const useScroll = () => { const isScrolling = ref(false), scrollProgress = ref(0), isHeaderVisible = ref(false), isHeaderExpanded = ref(false), lastScrollY = ref(0); let scrollTimeout = null; const handleScroll = () => { const scrollTop = window.scrollY, docHeight = document.documentElement.scrollHeight - window.innerHeight; scrollProgress.value = docHeight > 0 ? scrollTop / docHeight : 0; isScrolling.value = true; if (scrollTimeout) clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => { isScrolling.value = false; }, 1500); isHeaderVisible.value = scrollTop > 100; isHeaderExpanded.value = scrollTop > lastScrollY.value && scrollTop > 100; lastScrollY.value = scrollTop <= 0 ? 0 : scrollTop; }; return { isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, handleScroll }; };
             const useHeroTypewriter = () => { const heroLine1 = ref(""), heroLine2 = ref(""), heroLine3 = ref(""), heroLine4 = ref(""); const heroLine1Active = ref(false), heroLine2Active = ref(false), heroLine3Active = ref(false), heroLine4Active = ref(false); const showHeroButtons = ref(false); function typeLine(targetRef, text, speed = 120) { return new Promise((resolve) => { let i = 0; targetRef.value = ""; const interval = setInterval(() => { if (i < text.length) targetRef.value += text[i++]; else { clearInterval(interval); resolve(); } }, speed); }); } async function start() { const lines = [{ ref: heroLine1, text: "Hi! ", activeRef: heroLine1Active }, { ref: heroLine2, text: "I'm 虚宁", activeRef: heroLine2Active }, { ref: heroLine3, text: "A Developer", activeRef: heroLine3Active }, { ref: heroLine4, text: "For Anything!", activeRef: heroLine4Active }]; for (const line of lines) { line.activeRef.value = true; await typeLine(line.ref, line.text); line.activeRef.value = false; if (line.ref === heroLine1) heroLine1Active.value = true; } showHeroButtons.value = true; } return { heroLine1, heroLine2, heroLine3, heroLine4, heroLine1Active, heroLine2Active, heroLine3Active, heroLine4Active, showHeroButtons, start }; };
@@ -943,7 +1195,6 @@
             const useDataService = (utils) => { const aboutContent = ref('加载中...'), resumeData = ref({}), interests = ref([]), timeline = ref([]), targets = ref([]), bookshelf = ref([]), blogPosts = ref([]), footerIconLinks = ref([]), localPlaylistsManifest = ref([]); const loadedLocalPlaylists = ref({}); const loadAllData = async () => { const [aboutMd, resume, interestsData, growth, books, blogManifest, footerLinks, localManifest] = await Promise.all([ dataLoaderService.fetchMarkdown(config.contentPaths.about), dataLoaderService.fetchJSON(config.contentPaths.resume), dataLoaderService.fetchJSON(config.contentPaths.interests), dataLoaderService.fetchJSON(config.contentPaths.growth), dataLoaderService.fetchJSON(config.contentPaths.bookshelf), dataLoaderService.fetchJSON(config.contentPaths.blogManifest), dataLoaderService.fetchJSON(config.contentPaths.footerLinks), dataLoaderService.fetchJSON(config.contentPaths.localPlaylistsManifest) ]); aboutContent.value = utils.renderMarkdown(aboutMd || ""); resumeData.value = resume || { name: "数据加载失败" }; interests.value = interestsData || []; if (growth) { timeline.value = growth.timeline; targets.value = growth.targets; } bookshelf.value = books || []; blogPosts.value = blogManifest || []; footerIconLinks.value = footerLinks || []; localPlaylistsManifest.value = localManifest || []; }; return { aboutContent, resumeData, interests, timeline, targets, bookshelf, blogPosts, footerIconLinks, localPlaylistsManifest, loadedLocalPlaylists, loadAllData }; };
             const useGuestbook = () => { const guestbook = ref({ isReady: false, error: null, isSubmitting: false, newName: '', newMessage: '', messages: [], isExpanded: false, status: { message: '', type: '' } }); const activeDanmaku = ref([]); let danmakuQueue = [], pollInterval = null; let animationFrameId = null; let lastDanmakuTime = 0; const danmakuIntervalMs = 3000; const fetchMessages = async () => { try { const response = await fetch(config.guestbookApiUrl); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器响应错误: ${response.status}`); } const freshMessages = await response.json(); guestbook.value.messages = freshMessages; danmakuQueue = [...freshMessages].reverse(); guestbook.value.isReady = true; } catch (err) { console.error("获取弹幕失败:", err); guestbook.value.error = err.message || "无法加载弹幕。"; } }; const submitMessage = async () => { if (guestbook.value.isSubmitting) return; const name = guestbook.value.newName.trim(), message = guestbook.value.newMessage.trim(); if (!name || !message) { guestbook.value.status = { message: '昵称和内容不能为空。', type: 'error' }; return; } guestbook.value.isSubmitting = true; guestbook.value.status = { message: '', type: '' }; try { const response = await fetch(config.guestbookApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, message }) }); if (!response.ok) { const errorData = await response.json(); throw new Error(errorData.error || `代理服务器提交错误: ${response.status}`); } const latestMessages = await response.json(); guestbook.value.messages = latestMessages; danmakuQueue = [...latestMessages].reverse(); guestbook.value.newName = ''; guestbook.value.newMessage = ''; guestbook.value.status = { message: '发射成功！', type: 'success' }; setTimeout(() => { guestbook.value.isExpanded = false; guestbook.value.status = { message: '', type: '' }; }, 1500); } catch (e) { console.error("提交弹幕失败:", e); guestbook.value.status = { message: e.message || '发射失败，请稍后再试。', type: 'error' }; } finally { guestbook.value.isSubmitting = false; } }; const danmakuLoop = (timestamp) => { if (!lastDanmakuTime) { lastDanmakuTime = timestamp; } const elapsed = timestamp - lastDanmakuTime; if (elapsed > danmakuIntervalMs) { lastDanmakuTime = timestamp; if (danmakuQueue.length > 0 && activeDanmaku.value.length <= 10) { const msg = danmakuQueue.shift(); danmakuQueue.push(msg); const duration = Math.random() * 8 + 12; const danmaku = { id: Date.now() + Math.random(), name: msg.name, message: msg.message, style: { top: `${Math.random() * 80 + 5}%`, animationDuration: `${duration}s`, color: `hsl(${Math.random() * 360}, 80%, 85%)` } }; activeDanmaku.value.push(danmaku); setTimeout(() => { const index = activeDanmaku.value.findIndex(d => d.id === danmaku.id); if (index > -1) { activeDanmaku.value.splice(index, 1); } }, duration * 1000 + 100); } } animationFrameId = requestAnimationFrame(danmakuLoop); }; const startDanmakuStream = () => { stopDanmakuStream(); lastDanmakuTime = 0; animationFrameId = requestAnimationFrame(danmakuLoop); }; const stopDanmakuStream = () => { if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; } }; const handleVisibilityChange = () => { if (document.hidden) { stopDanmakuStream(); } else { startDanmakuStream(); } }; const init = async () => { await fetchMessages(); startDanmakuStream(); document.addEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); pollInterval = setInterval(fetchMessages, 60000); }; onUnmounted(() => { stopDanmakuStream(); document.removeEventListener('visibilitychange', handleVisibilityChange); if (pollInterval) clearInterval(pollInterval); }); return { guestbook, activeDanmaku, init, submitMessage }; };
             
-            // --- Vue App 主实例 ---
             createApp({
                 setup() {
                     const utils = { renderMarkdown(content) { if (!window.marked) return (content || '').replace(/\n/g, '<br>'); const mathPlaceholders = []; let i = 0; const text = (content || '').replace(/(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\(.*?\\\))/g, (match) => { const p = `<!--MATH_${i++}-->`; mathPlaceholders.push(match); return p; }); let html = window.marked.parse(text, { gfm: true, breaks: true }); return html.replace(/<!--MATH_(\d+)-->/g, (m, idx) => mathPlaceholders[parseInt(idx)]); }, triggerMathRendering(selector) { nextTick(() => { if (window.renderMathInElement) { const el = document.querySelector(selector); if (el) try { window.renderMathInElement(el, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\[', right: '\\]', display: true }], throwOnError: false }); } catch (e) { console.error("KaTeX渲染错误", e); } } }); }, handleImgError(event) { event.target.src = 'https://placehold.co/400x600/1a1a1a/ffffff?text=Image+Failed'; } };
@@ -957,8 +1208,17 @@
                     const data = useDataService(utils);
                     
                     const isLoginModalVisible = ref(false), isBookModalVisible = ref(false), selectedBook = ref(null);
-                    // [升级] 调整 github ref 结构
                     const github = ref({ repos: [], pinnedRepos: [], events: [], page: 1, canLoadMore: true, isLoading: true, isLoadingMore: false, sortKey: 'pushed_at', filterLanguage: '', stats: { stars: 0, forks: 0, repos: 0, contributions: 0 }, error: null, spaceUrl: config.github.spaceUrl });
+                    
+                    const bilibili = ref({
+                        isLoading: true,
+                        error: null,
+                        userInfo: null,
+                        favorites: [],
+                        activeFavoriteId: null,
+                        isDataFetched: false,
+                    });
+
                     const siteUptime = ref(""), icp = ref(config.icpNumber), username = ref(""), password = ref(""), loginStatus = ref({ message: '', type: '' }), isLoggingIn = ref(false), activeSection = ref("hero"), activeJourneyPanel = ref(null), openInterestId = ref(null), activePostId = ref(null), activeCategory = ref('全部分类'), lastFocusedElement = ref(null), activePanelRef = ref(null);
                     const interestMarkdownContent = ref(''), creationsTabActive = ref('github'), bookshelf = ref({ activeCategory: '全部' });
                     
@@ -985,11 +1245,16 @@
                     const activePost = computed(() => data.blogPosts.value.find(p => p.id === activePostId.value));
                     const blogCategories = computed(() => ['全部分类', ...new Set(data.blogPosts.value.map(p => p.category))]);
                     const filteredBlogPosts = computed(() => activeCategory.value === '全部分类' ? data.blogPosts.value : data.blogPosts.value.filter(p => p.category === activeCategory.value));
-                    const hubNodes = ref([ { id: 'resume', icon: 'ph-fill ph-user-list', title: '我的简历', text: '教育背景、项目经验与专业技能' }, { id: 'creations', icon: 'ph-fill ph-brain', title: '创造与知识', text: 'GitHub仓库、阅读书单与知识动态' }, { id: 'blog', icon: 'ph-fill ph-pencil-line', title: '我的文章', text: '思考、分享与技术沉淀' }, { id: 'growth', icon: 'ph-fill ph-trend-up', title: '成长之路', text: '记录我的时光足迹与目标进度' }, { id: 'interests', icon: 'ph-fill ph-game-controller', title: '个人兴趣', text: '探索我工作之外的热情所在' }, { id: 'chatbot', icon: 'ph-fill ph-robot', title: 'AI 助手', text: '与我的智能助手进行对话' }, ]);
-                    const allNavLinks = ref([ { id: 'hub', text: '主页', priority: 1 }, { id: 'resume', text: '简历', priority: 2 }, { id: 'creations', text: '创造', priority: 3 }, { id: 'blog', text: '文章', priority: 4 }, { id: 'growth', text: '成长', priority: 5 }, { id: 'interests', text: '兴趣', priority: 6 }, { id: 'chatbot', text: 'AI', priority: 7 }, { id: 'footer', text: '更多', priority: 99 }, ]);
+                    const hubNodes = ref([ { id: 'resume', icon: 'ph-fill ph-user-list', title: '我的简历', text: '教育背景、项目经验与专业技能' }, { id: 'creations', icon: 'ph-fill ph-brain', title: '创造与知识', text: '代码仓库、阅读书单与个人成长动态' }, { id: 'blog', icon: 'ph-fill ph-pencil-line', title: '我的文章', text: '思考、分享与技术沉淀' }, { id: 'interests', icon: 'ph-fill ph-game-controller', title: '个人兴趣', text: '探索我工作之外的热情所在' }, { id: 'bilibili', icon: 'ph-fill ph-video', title: 'BiliBili', text: '我的B站收藏与动态' }, { id: 'chatbot', icon: 'ph-fill ph-robot', title: 'AI 助手', text: '与我的智能助手进行对话' }, ]);
+                    const allNavLinks = ref([ { id: 'hub', text: '主页', priority: 1 }, { id: 'resume', text: '简历', priority: 2 }, { id: 'creations', text: '创造', priority: 3 }, { id: 'blog', text: '文章', priority: 4 }, {id: 'bilibili', text: 'B站', priority: 5}, { id: 'interests', text: '兴趣', priority: 6 }, { id: 'chatbot', text: 'AI', priority: 7 }, { id: 'footer', text: '更多', priority: 99 }, ]);
                     const windowWidth = ref(window.innerWidth);
                     const visibleNavLinks = computed(() => { const w = windowWidth.value, c = w > 1024 ? 7 : w > 900 ? 6 : w > 768 ? 5 : w > 640 ? 4 : w > 500 ? 3 : 2, s = [...allNavLinks.value].sort((a,b)=>a.priority-b.priority); if (c >= allNavLinks.value.length) return s; const v = s.slice(0,c-1), m = allNavLinks.value.find(l=>l.id==='footer'); if(m&&!v.some(l=>l.id==='footer')) v.push(m); return v; });
                     const activeInterest = computed(() => { if (!openInterestId.value || !data.interests.value) return null; return data.interests.value.find(i => i.id === openInterestId.value); });
+                     const activeFavoriteVideos = computed(() => {
+                        if (!bilibili.value.activeFavoriteId || bilibili.value.favorites.length === 0) return [];
+                        const activeFav = bilibili.value.favorites.find(f => f.id === bilibili.value.activeFavoriteId);
+                        return activeFav ? activeFav.medias : [];
+                    });
 
                     const toggleLoginModal = () => { isLoginModalVisible.value = !isLoginModalVisible.value; loginStatus.value = { message: '', type: '' }; };
                     const handleLogin = () => { if(isLoggingIn.value) return; isLoggingIn.value = true; loginStatus.value = { message: '登录中...', type: ''}; setTimeout(() => { if (username.value === "admin" && password.value === "password") { loginStatus.value = { message: '登录成功!', type: 'success' }; setTimeout(() => { toggleLoginModal(); username.value = ""; password.value = ""; }, 1000); } else { loginStatus.value = { message: '用户名或密码错误。', type: 'error' }; } isLoggingIn.value = false; }, 1500); };
@@ -1005,10 +1270,95 @@
                     const addAndSwitchSonglist = () => { const newId = newSongIdInput.value.trim(); if (!newId || !/^\d+$/.test(newId)) { alert("请输入纯数字的歌单ID。"); return; } const newName = newSongNameInput.value.trim() || `歌单 ${newId}`; if (!customSonglists.value.some(l => l.id === newId)) { customSonglists.value.unshift({ id: newId, name: newName }); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); } newSongIdInput.value = ""; newSongNameInput.value = ""; switchSonglist(newId); };
                     const removeCustomSonglist = (id) => { customSonglists.value = customSonglists.value.filter(l => l.id !== id); localStorage.setItem('custom_songlists_v2', JSON.stringify(customSonglists.value)); };
                     const loadCustomSonglists = () => { const saved = localStorage.getItem('custom_songlists_v2'); if (saved) customSonglists.value = JSON.parse(saved); };
+                    
                     const animatedTargetValues = ref({});
-                    const useAnimatedCounter = (targetValue, onUpdate) => { let frameId; const animate = (start, end, startTime, duration) => { const now = performance.now(); const progress = Math.min((now - startTime) / duration, 1); const currentValue = Math.floor(start + (end - start) * progress); onUpdate(currentValue); if (progress < 1) { frameId = requestAnimationFrame(() => animate(start, end, startTime, duration)); } }; const startAnimation = (options = {}) => { const { duration = 1000, delay = 0 } = options; cancelAnimationFrame(frameId); setTimeout(() => { animate(0, targetValue, performance.now(), duration); }, delay); }; onUnmounted(() => cancelAnimationFrame(frameId)); return { startAnimation }; };
-                    const triggerGrowthAnimations = (panel) => { if (!panel) return; panel.querySelector('.timeline')?.classList.add('is-visible'); panel.querySelectorAll('.timeline-item').forEach((item, index) => { setTimeout(() => item.classList.add('is-visible'), index * 150 + 200); }); const progressBars = panel.querySelectorAll('.progress-bar'); data.targets.value.forEach((target, index) => { if (progressBars[index]) { progressBars[index].style.width = `${(target.current / target.total) * 100}%`; } const { startAnimation } = useAnimatedCounter(target.current, (val) => { animatedTargetValues.value[index] = val; }); startAnimation({ duration: 1000, delay: 300 }); }); };
-                    const resetGrowthAnimations = (panel) => { if (!panel) return; panel.querySelector('.timeline')?.classList.remove('is-visible'); panel.querySelectorAll('.timeline-item').forEach(item => item.classList.remove('is-visible')); panel.querySelectorAll('.progress-bar').forEach(bar => { bar.style.transition = 'none'; bar.style.width = '0%'; void bar.offsetWidth; bar.style.transition = 'width 1s cubic-bezier(0.25, 1, 0.5, 1) 0.3s'; }); animatedTargetValues.value = {}; };
+                    const useGrowthAnimations = (data, panelRef) => {
+                        let animationFrameId = null;
+
+                        const animateValue = (start, end, duration, onUpdate) => {
+                            let startTime = null;
+                            const step = (timestamp) => {
+                                if (!startTime) startTime = timestamp;
+                                const progress = Math.min((timestamp - startTime) / duration, 1);
+                                const currentValue = Math.floor(start + (end - start) * progress);
+                                onUpdate(currentValue);
+                                if (progress < 1) {
+                                    animationFrameId = requestAnimationFrame(step);
+                                }
+                            };
+                            animationFrameId = requestAnimationFrame(step);
+                        };
+
+                        const trigger = () => {
+                            const panel = panelRef.value;
+                            if (!panel) return;
+                            
+                            if (animationFrameId) {
+                                cancelAnimationFrame(animationFrameId);
+                            }
+
+                            // 1. Reset styles INSTANTLY
+                            const timeline = panel.querySelector('.timeline');
+                            const timelineItems = panel.querySelectorAll('.timeline-item');
+                            const progressBars = panel.querySelectorAll('.progress-bar');
+                            
+                            timeline?.classList.remove('is-visible');
+                            timelineItems.forEach(item => item.classList.remove('is-visible'));
+                            
+                            data.targets.value.forEach((_, index) => {
+                                animatedTargetValues.value[index] = 0;
+                            });
+
+                            progressBars.forEach(bar => {
+                                bar.style.transition = 'none';
+                                bar.style.width = '0%';
+                            });
+
+                            // 2. Force repaint and then start animations
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    if (!panelRef.value) return; // Guard against component unmount
+                                    
+                                    timeline?.classList.add('is-visible');
+                                    timelineItems.forEach((item, index) => {
+                                        setTimeout(() => item.classList.add('is-visible'), index * 150 + 200);
+                                    });
+
+                                    progressBars.forEach((bar, index) => {
+                                        bar.style.transition = '';
+                                        const target = data.targets.value[index];
+                                        if(target) {
+                                            bar.style.width = `${(target.current / target.total) * 100}%`;
+                                        }
+                                    });
+
+                                    data.targets.value.forEach((target, index) => {
+                                        setTimeout(() => {
+                                            animateValue(0, target.current, 1000, (val) => {
+                                                animatedTargetValues.value[index] = val;
+                                            });
+                                        }, 300);
+                                    });
+                                });
+                            });
+                        };
+                        return { trigger };
+                    };
+
+                    const { trigger: triggerGrowthAnimations } = useGrowthAnimations(data, activePanelRef);
+
+                    const isTabTransitioning = ref(false);
+
+                    const onTabTransitionStart = () => {
+                        isTabTransitioning.value = true;
+                    };
+                    
+                    const onTabTransitionEnd = () => {
+                        isTabTransitioning.value = false;
+                        if (creationsTabActive.value === 'growth') {
+                            triggerGrowthAnimations();
+                        }
+                    };
                     const throttle = (func, limit) => { let inThrottle; return function(...args) { if (!inThrottle) { func.apply(this, args); inThrottle = true; setTimeout(() => inThrottle = false, limit); } }; };
                     const throttledScrollHandler = throttle(handleScroll, 100);
                     const openBookModal = (book) => { selectedBook.value = book; isBookModalVisible.value = true; };
@@ -1031,7 +1381,41 @@
                         } 
                     };
                     
-                    watch(activePanelRef, (newPanelEl) => { if (newPanelEl && activeJourneyPanel.value === 'growth') { resetGrowthAnimations(newPanelEl); setTimeout(() => { triggerGrowthAnimations(newPanelEl); }, 50); } });
+                    const isGrowthTabVisible = computed(() => activeJourneyPanel.value === 'creations' && creationsTabActive.value === 'growth');
+                    
+                    watch(isGrowthTabVisible, (isVisible) => {
+                        if (isVisible && !isTabTransitioning.value) {
+                            nextTick(() => {
+                                triggerGrowthAnimations();
+                            });
+                        }
+                    });
+                     const fetchBilibiliData = async () => {
+                        if (bilibili.value.isDataFetched) return;
+                        bilibili.value.isLoading = true;
+                        bilibili.value.error = null;
+                        try {
+                            const data = await apiService.getBilibiliData();
+                            bilibili.value.userInfo = data.userInfo;
+                            bilibili.value.favorites = data.favorites;
+                            if (data.favorites.length > 0) {
+                                bilibili.value.activeFavoriteId = data.favorites[0].id;
+                            }
+                            bilibili.value.isDataFetched = true;
+                        } catch (error) {
+                            console.error("获取 BiliBili 数据失败:", error);
+                            bilibili.value.error = error.message;
+                        } finally {
+                            bilibili.value.isLoading = false;
+                        }
+                    };
+
+                    watch(activeJourneyPanel, (newPanel) => {
+                        if (newPanel === 'bilibili') {
+                            fetchBilibiliData();
+                        }
+                    });
+                    
                     watch(activePostId, async (newId) => { if (newId === null) return; const post = data.blogPosts.value.find(p => p.id === newId); if (post && !post.content) { post.content = await dataLoaderService.fetchMarkdown(post.filePath); } utils.triggerMathRendering('.blog-post-body'); });
                     watch(activeInterest, async (newInterest) => { if (newInterest && newInterest.mdFilePath) { interestMarkdownContent.value = '加载中...'; try { const markdown = await dataLoaderService.fetchMarkdown(newInterest.mdFilePath); interestMarkdownContent.value = utils.renderMarkdown(markdown); utils.triggerMathRendering('.interest-markdown-content'); } catch (error) { console.error(`Failed to load interest content for ${newInterest.id}:`, error); interestMarkdownContent.value = '<p>内容加载失败。</p>'; } } else { interestMarkdownContent.value = ''; } });
 
@@ -1046,7 +1430,6 @@
                         if (data.blogPosts.value.length > 0) activePostId.value = data.blogPosts.value[0].id;
                         if (data.interests.value.length > 0) openInterestId.value = data.interests.value[0].id;
 
-                        // [升级] 全新的、更稳健的 GitHub 数据加载逻辑
                         github.value.isLoading = true;
                         const results = await Promise.allSettled([
                             apiService.getGithubData('stats'),
@@ -1057,7 +1440,6 @@
 
                         const [statsResult, reposResult, pinnedResult, eventsResult] = results;
 
-                        // 处理统计信息
                         if (statsResult.status === 'fulfilled') {
                             const statsData = statsResult.value;
                             github.value.stats.repos = statsData.publicRepos;
@@ -1067,7 +1449,6 @@
                             github.value.error = (github.value.error || '') + ' 统计信息加载失败.';
                         }
 
-                        // 处理仓库列表
                         if (reposResult.status === 'fulfilled') {
                             const reposData = reposResult.value;
                             github.value.repos = reposData;
@@ -1079,14 +1460,12 @@
                             github.value.error = (github.value.error || '') + ' 仓库列表加载失败.';
                         }
 
-                        // 处理置顶仓库
                         if (pinnedResult.status === 'fulfilled') {
                             github.value.pinnedRepos = pinnedResult.value;
                         } else {
                             console.error("获取 GitHub 置顶仓库失败:", pinnedResult.reason);
                         }
 
-                        // 处理动态
                         if (eventsResult.status === 'fulfilled') {
                             github.value.events = eventsResult.value;
                         } else {
@@ -1095,7 +1474,6 @@
                         
                         github.value.isLoading = false;
                         
-                        // [修复] 全新的加载动画处理逻辑
                         const loader = document.getElementById('loader-wrapper');
                         
                         if (loader) {
@@ -1103,13 +1481,12 @@
                         }
 
                         if (appElement) {
-                            // 等待加载动画的淡出效果 (0.8s) 结束后再显示内容并开始打字
                             setTimeout(() => {
                                 if (loader) {
                                     loader.style.display = 'none';
                                 }
                                 appElement.style.visibility = 'visible';
-                                hero.start(); // 在应用可见后启动打字机效果
+                                hero.start(); 
                             }, 800);
                         }
 
@@ -1126,12 +1503,14 @@
                     
                     return { ...utils, ...hero, ...data, ...chatbot, ...music,
                         guestbook, activeDanmaku, submitGuestbookMessage, toggleGuestbookExpanded,
-                        github, icp, siteUptime, hubNodes, visibleNavLinks, currentTheme, isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, 
+                        github, bilibili, activeFavoriteVideos,
+                        icp, siteUptime, hubNodes, visibleNavLinks, currentTheme, isScrolling, scrollProgress, isHeaderVisible, isHeaderExpanded, 
                         isLoginModalVisible, username, password, loginStatus, isLoggingIn, 
                         activeSection, activeJourneyPanel, activePostId, activePost, activeCategory, blogCategories, filteredBlogPosts, openInterestId, currentSongId, presetSonglists, customSonglists, newSongIdInput, newSongNameInput, activePanelRef,
                         animatedTargetValues, activeInterest, interestMarkdownContent, creationsTabActive, bookshelf, filteredAndSortedRepos, bookCategories, filteredBooks, activityStream,
                         isBookModalVisible, selectedBook, openBookModal, closeBookModal, loadMoreRepos,
                         setTheme, toggleLoginModal, handleLogin, onBeforeEnter, onEnter, openJourneyPanel, closeJourneyPanel, handleNavClick, switchSonglist, addAndSwitchSonglist, removeCustomSonglist,
+                        onTabTransitionEnd, onTabTransitionStart
                     };
                 }
             }).mount("#app");
