@@ -965,7 +965,7 @@
             
             const config = {
                 // 在这里填写您部署的 Cloudflare Worker 地址
-                bilibiliApiUrl: "YOUR_CLOUDFLARE_WORKER_URL", 
+                bilibiliApiUrl: "https://bilibili.xvyin.com/", 
                 guestbookApiUrl: "https://firebase.xvyin.com/messages",
                 siteStartDate: "2024-03-02",
                 icpNumber: "渝ICP备2025053763号-1",
@@ -1046,7 +1046,7 @@
                 },
                 async getMusicPlaylist(songId) { if (!songId) throw new Error("必须提供歌单ID。"); const apiUrl = `${config.music.api}?server=${config.music.server}&type=${config.music.type}&id=${songId}`; const response = await fetch(apiUrl); if (!response.ok) throw new Error(`音乐API请求失败: ${response.status}`); const data = await response.json(); if (data.error) throw new Error(data.error); if (!Array.isArray(data) || data.length === 0) { console.error("API响应无效或播放列表为空:", data); throw new Error("播放列表为空或加载失败。"); } return data; },
                  async getBilibiliData() {
-                    if (!config.bilibiliApiUrl || config.bilibiliApiUrl === "https://bilibili.xvyin.com") {
+                    if (!config.bilibiliApiUrl || config.bilibiliApiUrl === "YOUR_CLOUDFLARE_WORKER_URL") {
                          throw new Error("请先在 config 中配置您的 Cloudflare Worker URL。");
                     }
                     const response = await fetch(config.bilibiliApiUrl);
