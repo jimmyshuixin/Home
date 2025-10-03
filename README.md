@@ -186,7 +186,7 @@ cd YOUR_REPO
 4.  推送到分支 (`git push origin feature/AmazingFeature`)
 5.  打开一个 Pull Request
 
-## 鸣谢 (Acknowledgements)
+## 鸣谢
 
 本项目的构建离不开以下优秀的开源项目和服务，在此表示特别感谢：
 
