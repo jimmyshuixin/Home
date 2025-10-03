@@ -1,19 +1,19 @@
-# 虚静以宁 - 个人主页与 Serverless API 代理全栈项目
+# 虚静以宁 - 个人主页全栈项目
 
-![GitHub stars](https://img.shields.io/github/stars/YOUR_USERNAME/YOUR_REPO?style=flat-square&logo=github)
-![GitHub forks](https://img.shields.io/github/forks/YOUR_USERNAME/YOUR_REPO?style=flat-square&logo=github)
-![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
+![GitHub stars](https://img.shields.io/github/stars/jimmyshuixin/YOUR_REPO?style=flat-square&logo=github)
+![GitHub forks](https://img.shields.io/github/forks/jimmyshuixin/YOUR_REPO?style=flat-square&logo=github)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)
 ![Tech Stack](https://img.shields.io/badge/Tech-Vue.js%20%7C%20Cloudflare-06D6A0?style=flat-square)
 
 这是一个高度可定制、功能丰富的现代化个人主页项目。前端基于原生 HTML/CSS/JavaScript 和 **Vue.js 3** 构建，后端完全由 **Cloudflare Workers** 驱动，构成了一套完整、安全、高性能的 **Serverless** 架构。
 
 ---
 
-### ✨ [在线演示 (Live Demo)](https://xvyin.com/)  ---
+### ✨ [在线演示 (Live Demo)](https://xvyin.com/)
 
 ## 核心功能
 
-### 🚀 前端 (home-g5.html)
+### 🚀 前端 (index.html)
 - **动态交互式仪表盘**: 通过卡片式布局清晰地展示个人简历、GitHub 仓库、博客文章、书架、兴趣爱好等。
 - **集成 AI 聊天机器人**: 内置一个基于 [DeepSeek API](https://platform.deepseek.com/) 的 AI 对话助手，支持对话历史记录和参数调整。
 - **实时留言板/弹幕**: 基于 Firestore 实现的实时留言功能，新消息会以弹幕的形式在主页顶部滚动。
@@ -54,20 +54,16 @@
 ```
 
 .
-├── content/                \# 存放所有个人数据的目录
-│   ├── about.md            \# "关于我" 页面的内容
-│   ├── bookshelf.json      \# "我的书架" 数据
-│   ├── growth.json         \# "成长与动态" 数据
-│   ├── interests/          \# "个人兴趣" 相关内容
-│   ├── resume.json         \# "我的简历" 数据
-│   └── ...
-├── home-g5.html            \# 项目唯一的 HTML 入口文件 (包含所有 CSS 和 JS 逻辑)
-├── firebase-proxy.js       \# Firebase Worker 脚本
-├── github-proxy.js         \# GitHub Worker 脚本
-├── music-proxy.js          \# 音乐 API Worker 脚本
-├── source-proxy.js         \# 静态资源 Worker 脚本
-└── README.md               \# 就是你正在看的这个文件
-
+├── content/                # 存放所有个人数据的目录
+├── icon/                   # 存放图标和图片的目录
+├── worker/                 # 存放所有 Cloudflare Worker 脚本的目录
+│   ├── firebase-proxy.js
+│   ├── github-proxy.js
+│   ├── music-proxy.js
+│   └── source-proxy.js
+├── index.html              # 项目唯一的 HTML 入口文件
+├── LICENSE                 # 项目许可证文件
+└── README.md               # 就是你正在看的这个文件
 ````
 
 ## 部署指南 (手把手教程)
@@ -92,10 +88,10 @@ cd YOUR_REPO
 
 ### 第 2 步：配置前端内容
 
-所有前端的配置和个人数据都在 `home-g5.html` 文件和 `content/` 目录中。
+所有前端的配置和个人数据都在 `index.html` 文件和 `content/` 目录中。
 
 1.  **修改核心配置**:
-    打开 `home-g5.html`，找到靠近文件底部的 `<script>` 标签内的 `config` 对象。
+    打开 `index.html`，找到靠近文件底部的 `<script>` 标签内的 `config` 对象。
 
     ```javascript
     const config = {
@@ -128,14 +124,14 @@ cd YOUR_REPO
 2.  为你的 Worker 命名，例如 `source-proxy`，然后点击 **Deploy**。
 3.  点击 **Edit code**，将 `source-proxy.js` 的全部内容复制粘贴到在线编辑器中，再次点击 **Save and Deploy**。
 4.  部署成功后，你会得到一个 URL，例如 `source-proxy.yourname.workers.dev`。
-5.  **重要**: 回到 `home-g5.html`，使用“查找并替换”功能，将所有 `https://source.xvyin.com` 替换为你刚刚获取的 Worker URL。
+5.  **重要**: 回到 `index.html`，使用“查找并替换”功能，将所有 `https://source.xvyin.com` 替换为你刚刚获取的 Worker URL。
 
 #### 部署 `music-proxy.js` (音乐代理)
 
 1.  重复上述创建 Worker 的步骤，命名为 `music-proxy`。
 2.  将 `music-proxy.js` 的代码部署上去。
 3.  获取其 URL，例如 `music-proxy.yourname.workers.dev`。
-4.  在 `home-g5.html` 的 `config` 对象中，将 `music.api` 的值修改为你的 Worker URL (记得保留末尾的 `/`)。
+4.  在 `index.html` 的 `config` 对象中，将 `music.api` 的值修改为你的 Worker URL (记得保留末尾的 `/`)。
 
 #### 部署 `github-proxy.js` (GitHub 代理)
 
@@ -145,7 +141,7 @@ cd YOUR_REPO
       - 在 Cloudflare 中，进入你刚创建的 `github-proxy` Worker 的设置页面 (**Settings** \> **Variables**)。
       - 在 **Environment Variables** 下，点击 **Add secret**，变量名设为 `GITHUB_TOKEN`，值为你刚刚创建的 GitHub PAT。
 3.  获取其 URL，例如 `github.yourname.workers.dev` (你可以自定义子域)。
-4.  在 `home-g5.html` 中，找到 `apiService` 对象，将其中的 `workerUrl` ( `https://github.xvyin.com/` ) 替换为你的 Worker URL。
+4.  在 `index.html` 中，找到 `apiService` 对象，将其中的 `workerUrl` ( `https://github.xvyin.com/` ) 替换为你的 Worker URL。
 
 #### 部署 `firebase-proxy.js` (Firestore 代理)
 
@@ -161,7 +157,7 @@ cd YOUR_REPO
           - `FIREBASE_CLIENT_EMAIL`: 值为 JSON 文件中的 `client_email`。
           - `FIREBASE_PRIVATE_KEY`: 值为 JSON 文件中的 `private_key` (请务必完整复制，包括 `-----BEGIN PRIVATE KEY-----` 和 `-----END PRIVATE KEY-----`)。
 4.  获取其 URL，例如 `firebase.yourname.workers.dev`。
-5.  在 `home-g5.html` 的 `config` 对象中，将 `guestbookApiUrl` 的值修改为你的 Worker URL 加上 `/messages` 路径 (例如 `https://firebase.yourname.workers.dev/messages`)。
+5.  在 `index.html` 的 `config` 对象中，将 `guestbookApiUrl` 的值修改为你的 Worker URL 加上 `/messages` 路径 (例如 `https://firebase.yourname.workers.dev/messages`)。
 
 ### 第 4 步：部署前端页面
 
@@ -192,4 +188,7 @@ cd YOUR_REPO
 
 ## 许可证
 
-本项目采用 [MIT](https://choosealicense.com/licenses/mit/) 许可证。
+本项目采用 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html) 许可证。
+
+```eof
+```
