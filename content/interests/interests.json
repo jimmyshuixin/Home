@@ -11,7 +11,7 @@
     "id": "coding",
     "icon": "ph-fill ph-code",
     "title": "编程创造",
-    "mdFilePath": "./content/interests/coding.md",
+    "mdFilePath": "./content/interests/music.md",
     "hasVideo": false,
     "videoUrl": ""
   },
@@ -19,8 +19,9 @@
     "id": "gaming",
     "icon": "ph-fill ph-game-controller",
     "title": "电子游戏",
-    "mdFilePath": "./content/interests/gaming.md",
+    "mdFilePath": "./content/interests/music.md",
     "hasVideo": false,
     "videoUrl": ""
   }
 ]
+
