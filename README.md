@@ -1,7 +1,7 @@
 # 虚静以宁 - 个人主页全栈项目
 
-![GitHub stars](https://img.shields.io/github/stars/jimmyshuixin/YOUR_REPO?style=flat-square&logo=github)
-![GitHub forks](https://img.shields.io/github/forks/jimmyshuixin/YOUR_REPO?style=flat-square&logo=github)
+![GitHub stars](https://img.shields.io/github/stars/jimmyshuixin/Home?style=flat-square&logo=github)
+![GitHub forks](https://img.shields.io/github/forks/jimmyshuixin/Home?style=flat-square&logo=github)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg?style=flat-square)
 ![Tech Stack](https://img.shields.io/badge/Tech-Vue.js%20%7C%20Cloudflare-06D6A0?style=flat-square)
 
