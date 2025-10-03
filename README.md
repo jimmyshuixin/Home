@@ -186,6 +186,15 @@ cd YOUR_REPO
 4.  推送到分支 (`git push origin feature/AmazingFeature`)
 5.  打开一个 Pull Request
 
+## 鸣谢 (Acknowledgements)
+
+本项目的构建离不开以下优秀的开源项目和服务，在此表示特别感谢：
+
+  - **Meting API / MetingJS**: 为本项目的音乐播放器提供了强大、稳定的跨平台数据支持。感谢 [metowolf](https://github.com/metowolf) 的卓越工作。
+  - **Vue.js**: 提供了现代化的前端开发体验。
+  - **Cloudflare**: 提供了强大的 Workers 和 Pages 服务，使得 Serverless 架构成为可能。
+  - **DeepSeek AI**: 提供了 AI 对话模型的 API 支持。
+
 ## 许可证
 
 本项目采用 [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html) 许可证。
