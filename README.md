@@ -1,4 +1,3 @@
-```markdown
 # 虚静以宁 - 个人主页与 Serverless API 代理全栈项目
 
 ![GitHub stars](https://img.shields.io/github/stars/YOUR_USERNAME/YOUR_REPO?style=flat-square&logo=github)
