@@ -21,6 +21,7 @@
     <style>
         /* --- 1. :root 变量定义 (与你的主页风格保持一致) --- */
         :root {
+            color-scheme: dark;
             --body-bg-color: #121212;
             --glass-bg-optimized: rgba(38, 38, 38, 0.65);
             --glass-border-color: rgba(255, 255, 255, 0.1);
@@ -38,6 +39,7 @@
         }
 
         html.light-theme {
+            color-scheme: light;
             --body-bg-color: #f5f5f7;
             --glass-bg-optimized: rgba(242, 242, 247, 0.7);
             --glass-border-color: rgba(0, 0, 0, 0.1);
@@ -149,45 +151,13 @@
             background: var(--input-bg);
             border: 1px solid var(--glass-border-color);
             transition: all 0.3s ease;
+            position: relative; /* 新增 */
         }
         .contact-input-group:focus-within {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.3);
         }
-        .select-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .select-wrapper::after {
-            content: '';
-            width: 0; 
-            height: 0; 
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid var(--text-color-darker);
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-        .contact-input-group select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
-            padding: 0.8rem 2.5rem 0.8rem 1rem;
-            font-size: 1rem;
-            border-right: 1px solid var(--glass-border-color);
-            cursor: pointer;
-            border-radius: 12px 0 0 12px;
-        }
-        .contact-input-group select:focus {
-            outline: none;
-        }
+        
         .contact-input-group input {
             border: none;
             background: transparent;
@@ -196,7 +166,70 @@
         }
          .contact-input-group input:focus {
             box-shadow: none;
+            outline: none;
         }
+
+        /* --- 全新的自定义下拉框样式 --- */
+        .custom-select-container {
+            position: relative;
+            user-select: none;
+        }
+        .visually-hidden {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .select-selected {
+            color: var(--text-color);
+            padding: 0.8rem 2.5rem 0.8rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+        }
+        .select-selected::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--text-color-darker);
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.2s ease;
+        }
+        .select-selected.select-arrow-active::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        .select-items {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            background: var(--body-bg-color);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 12px;
+            z-index: 99;
+            width: 100%;
+            min-width: 120px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .select-hide {
+            display: none;
+        }
+        .select-items div {
+            color: var(--text-color-darker);
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .select-items div:hover, .same-as-selected {
+            background-color: rgba(var(--accent-color-rgb), 0.1);
+            color: var(--text-color-white);
+        }
+
+        /* --- 结束自定义下拉框样式 --- */
         
         .form-submit-button {
             width: 100%;
@@ -311,13 +344,16 @@
             <div class="form-group">
                 <label for="contact-method">你的联系方式</label>
                 <div class="contact-input-group">
-                    <div class="select-wrapper">
-                        <select id="contact-method" name="contact_method">
+                    <!-- 全新的自定义下拉框 HTML 结构 -->
+                    <div class="custom-select-container">
+                        <select id="contact-method" name="contact_method" class="visually-hidden">
                             <option value="email">邮箱</option>
                             <option value="qq">QQ</option>
                             <option value="wechat">微信</option>
                             <option value="phone">手机号</option>
                         </select>
+                        <div class="select-selected"></div>
+                        <div class="select-items select-hide"></div>
                     </div>
                     <input type="email" id="contact-value" name="contact_value" required placeholder="请输入你的邮箱地址" autocomplete="email">
                 </div>
@@ -465,6 +501,75 @@
             window.addEventListener("resize", startAnimation);
             startAnimation();
         });
+
+        // --- 全新的自定义下拉框 JavaScript ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.custom-select-container');
+            if (!container) return;
+
+            const originalSelect = container.querySelector('select');
+            const selectedDisplay = container.querySelector('.select-selected');
+            const itemsContainer = container.querySelector('.select-items');
+
+            // 1. 根据原始select创建自定义选项
+            for (let i = 0; i < originalSelect.options.length; i++) {
+                const option = originalSelect.options[i];
+                const itemDiv = document.createElement('div');
+                itemDiv.innerHTML = option.innerHTML;
+                itemDiv.setAttribute('data-value', option.value);
+
+                // 设置初始选中项
+                if (i === originalSelect.selectedIndex) {
+                    selectedDisplay.innerHTML = option.innerHTML;
+                    itemDiv.classList.add('same-as-selected');
+                }
+
+                // 2. 为每个选项添加点击事件
+                itemDiv.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    
+                    // 更新原始select的值
+                    originalSelect.value = value;
+                    
+                    // 更新显示的值
+                    selectedDisplay.innerHTML = this.innerHTML;
+
+                    // 标记新的选中项
+                    const currentSelected = itemsContainer.querySelector('.same-as-selected');
+                    if (currentSelected) {
+                        currentSelected.classList.remove('same-as-selected');
+                    }
+                    this.classList.add('same-as-selected');
+
+                    // 关闭下拉列表
+                    closeAllSelect();
+
+                    // 手动触发change事件，以确保我们的旧代码能工作
+                    originalSelect.dispatchEvent(new Event('change'));
+                });
+                itemsContainer.appendChild(itemDiv);
+            }
+
+            // 3. 为“已选中”框添加点击事件来打开/关闭列表
+            selectedDisplay.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isHidden = itemsContainer.classList.contains('select-hide');
+                closeAllSelect(); // 先关闭所有可能打开的
+                if (isHidden) {
+                    itemsContainer.classList.remove('select-hide');
+                    this.classList.add('select-arrow-active');
+                }
+            });
+
+            function closeAllSelect() {
+                itemsContainer.classList.add('select-hide');
+                selectedDisplay.classList.remove('select-arrow-active');
+            }
+
+            // 4. 点击页面其他地方关闭下拉列表
+            document.addEventListener('click', closeAllSelect);
+        });
+
 
         // --- 表单提交处理 ---
         const form = document.getElementById('contact-form');
