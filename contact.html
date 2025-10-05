@@ -301,15 +301,9 @@
 
     <main class="contact-container glass-effect">
         <h1>联系我</h1>
-        
-        <!-- 
-            说明：
-            这个表单现在将数据发送到你的 Cloudflare Worker。
-            1. 部署 "worker/contact-form-worker.js" 脚本到一个新的 Cloudflare Worker。
-            2. 获取该 Worker 的 URL。
-            3. 把下面的 action="..." 中的 URL 替换成你自己的 Worker URL。
-         -->
+
         <form id="contact-form" action="https://email.xvyin.com" method="POST">
+            <!-- !! 重要: 将上面的 action URL 替换成你自己的 Worker URL !! -->
             <div class="form-group">
                 <label for="name">你的称呼</label>
                 <input type="text" id="name" name="name" required autocomplete="name">
@@ -342,12 +336,7 @@
             <a href="https://github.com/jimmyshuixin" target="_blank" class="contact-link" title="GitHub">
                 GitHub
             </a>
-            <a href="mailto:your-email@example.com" class="contact-link" title="发送邮件">
-                <!-- 请将 your-email@example.com 替换为你的真实邮箱地址 -->
-                Email
-            </a>
-            <a href="https://space.bilibili.com/your_bilibili_id" target="_blank" class="contact-link" title="Bilibili">
-                 <!-- 请将 your_bilibili_id 替换为你的B站用户ID -->
+            <a href="https://space.bilibili.com/520237303" target="_blank" class="contact-link" title="Bilibili">
                 Bilibili
             </a>
         </div>
@@ -364,7 +353,7 @@
             }
         })();
 
-        // --- 粒子背景 (与你的主页一致) ---
+        // --- 粒子背景 ---
         document.addEventListener("DOMContentLoaded", () => {
             const canvas = document.getElementById("particle-canvas");
             if (!canvas) return;
@@ -520,7 +509,6 @@
             statusDiv.textContent = '';
             statusDiv.className = '';
 
-            // 从表单元素中直接获取数据
             const formData = {
                 name: form.elements.name.value,
                 contact_method: form.elements.contact_method.value,
@@ -549,6 +537,7 @@
                     statusDiv.classList.add('error');
                 }
             } catch (error) {
+                console.error("Fetch Error:", error);
                 statusDiv.textContent = "网络似乎有问题，请检查后重试。";
                 statusDiv.classList.add('error');
             } finally {
