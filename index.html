@@ -4316,7 +4316,7 @@
         </div>
         <div class="copyright-info">
           <p>
-            Copyright&copy;2022-2025 虚宁<span
+            Copyright&copy;{{ copyrightYear }} 虚宁<span
               class="site-info-item"
               v-if="siteUptime"
               >| 站点已运行 {{ siteUptime }}</span
@@ -5535,6 +5535,16 @@
               creationsTabActive = ref("github"),
               bookshelf = ref({ activeCategory: "全部" });
 
+            const copyrightYear = computed(() => {
+                const startYear = 2022;
+                const currentYear = new Date().getFullYear();
+                if (currentYear > startYear) {
+                    return `${startYear}-${currentYear}`;
+                } else {
+                    return startYear;
+                }
+            });
+
             const filteredAndSortedRepos = computed(() => {
               if (!github.value.repos) return [];
               const pinnedNames = github.value.pinnedRepos.map((p) => p.repo);
@@ -6233,6 +6243,7 @@
               submitGuestbookMessage,
               toggleGuestbookExpanded,
               github,
+              copyrightYear,
               icp,
               siteUptime,
               hubNodes,
