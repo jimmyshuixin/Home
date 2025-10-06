@@ -21,7 +21,6 @@
     <style>
         /* --- 1. :root 变量定义 (与你的主页风格保持一致) --- */
         :root {
-            color-scheme: dark;
             --body-bg-color: #121212;
             --glass-bg-optimized: rgba(38, 38, 38, 0.65);
             --glass-border-color: rgba(255, 255, 255, 0.1);
@@ -39,7 +38,6 @@
         }
 
         html.light-theme {
-            color-scheme: light;
             --body-bg-color: #f5f5f7;
             --glass-bg-optimized: rgba(242, 242, 247, 0.7);
             --glass-border-color: rgba(0, 0, 0, 0.1);
@@ -92,6 +90,8 @@
             border: 1px solid var(--glass-border-color);
             border-radius: 24px;
             box-shadow: 0 8px 32px 0 var(--shadow-color), 0 0 15px var(--glow-color);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
         }
         
@@ -99,6 +99,7 @@
             width: 100%;
             max-width: 600px;
             padding: 3rem;
+            position: relative;
         }
 
         .contact-container h1 {
@@ -107,10 +108,38 @@
             text-align: center;
             margin-bottom: 2.5rem;
             color: var(--text-color-white);
+            padding-top: 2rem; /* 为顶部按钮留出空间 */
         }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: none;
+            border: none;
+            color: var(--text-color-darker);
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        .theme-toggle:hover {
+            background-color: var(--input-bg);
+        }
+        .theme-toggle .ph-sun { display: none; }
+        .theme-toggle .ph-moon { display: block; }
+        html.light-theme .theme-toggle .ph-sun { display: block; }
+        html.light-theme .theme-toggle .ph-moon { display: none; }
+
 
         .form-group {
             margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-group label {
@@ -151,86 +180,142 @@
             background: var(--input-bg);
             border: 1px solid var(--glass-border-color);
             transition: all 0.3s ease;
-            position: relative; /* 新增 */
         }
         .contact-input-group:focus-within {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.3);
         }
-        
+       
         .contact-input-group input {
             border: none;
             background: transparent;
             flex-grow: 1;
             padding: 0.8rem 1rem;
+            border-radius: 0 12px 12px 0;
         }
-         .contact-input-group input:focus {
+        .contact-input-group input:focus {
             box-shadow: none;
-            outline: none;
+        }
+        
+        .form-group.error-state .contact-input-group,
+        .form-group.error-state input,
+        .form-group.error-state textarea {
+            border-color: var(--error-color);
+        }
+        .form-group.error-state input:focus,
+        .form-group.error-state textarea:focus {
+             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
         }
 
-        /* --- 全新的自定义下拉框样式 --- */
-        .custom-select-container {
-            position: relative;
-            user-select: none;
-        }
-        .visually-hidden {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-        .select-selected {
-            color: var(--text-color);
-            padding: 0.8rem 2.5rem 0.8rem 1rem;
-            font-size: 1rem;
-            cursor: pointer;
-            position: relative;
-        }
-        .select-selected::after {
-            content: '';
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid var(--text-color-darker);
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: transform 0.2s ease;
-        }
-        .select-selected.select-arrow-active::after {
-            transform: translateY(-50%) rotate(180deg);
-        }
-        .select-items {
-            position: absolute;
-            top: calc(100% + 5px);
-            left: 0;
-            background: var(--body-bg-color);
-            border: 1px solid var(--glass-border-color);
-            border-radius: 12px;
-            z-index: 99;
-            width: 100%;
-            min-width: 120px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        .select-hide {
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            padding-top: 0.3rem;
             display: none;
         }
-        .select-items div {
-            color: var(--text-color-darker);
-            padding: 0.7rem 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+        .form-group.error-state .error-message {
+            display: block;
         }
-        .select-items div:hover, .same-as-selected {
-            background-color: rgba(var(--accent-color-rgb), 0.1);
-            color: var(--text-color-white);
+        
+        .textarea-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1rem;
+        }
+        .char-counter {
+            font-size: 0.8rem;
+            color: var(--text-color-darker);
         }
 
-        /* --- 结束自定义下拉框样式 --- */
+
+        /* --- 4. 自定义下拉菜单样式 --- */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            width: 125px; 
+            border-right: 1px solid var(--glass-border-color);
+        }
+
+        .custom-select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .custom-select-trigger span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         
+        .custom-select-trigger i {
+            font-size: 1.2rem;
+            color: var(--text-color-darker);
+            transition: transform 0.3s ease;
+        }
+
+        .custom-select.open .custom-select-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .custom-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 100%;
+            background: var(--glass-bg-optimized);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 12px;
+            padding: 0.5rem;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+            box-shadow: 0 8px 24px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .custom-select.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-option {
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transform: translateY(5px);
+            opacity: 0;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.3s ease, opacity 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .custom-select.open .custom-option {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .custom-select.open .custom-option:nth-child(2) { transition-delay: 0.05s; }
+        .custom-select.open .custom-option:nth-child(3) { transition-delay: 0.1s; }
+        .custom-select.open .custom-option:nth-child(4) { transition-delay: 0.15s; }
+
+        .custom-option:hover {
+            background-color: rgba(var(--accent-color-rgb), 0.15);
+        }
+        
+        .custom-option.selected {
+            background-color: rgba(var(--accent-color-rgb), 0.3);
+            font-weight: 500;
+        }
+        
+        /* --- 5. 表单提交和其他元素 --- */
         .form-submit-button {
             width: 100%;
             padding: 0.9rem 1rem;
@@ -243,6 +328,9 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .form-submit-button:hover {
@@ -255,6 +343,37 @@
             cursor: not-allowed;
         }
 
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: none;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        .form-submit-button.loading .loader {
+            display: inline-block;
+        }
+        .form-submit-button.loading .button-text {
+            visibility: hidden;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .shake {
+            animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
         #form-status {
             text-align: center;
             margin-top: 1rem;
@@ -264,31 +383,12 @@
         #form-status.success { color: var(--success-color); }
         #form-status.error { color: var(--error-color); }
         
-        .divider {
-            text-align: center;
-            margin: 2.5rem 0;
-            color: var(--text-color-darker);
-            font-size: 0.9rem;
-            position: relative;
-        }
-
-        .divider::before, .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: calc(50% - 60px);
-            height: 1px;
-            background-color: var(--glass-border-color);
-        }
-
-        .divider::before { left: 0; }
-        .divider::after { right: 0; }
-
         .other-contacts {
             display: flex;
             justify-content: center;
             gap: 1.5rem;
             flex-wrap: wrap;
+            margin-top: 1.5rem; /* 调整间距 */
         }
         
         .contact-link {
@@ -303,17 +403,54 @@
             text-decoration: underline;
         }
         
+        /* 返回主页链接（已移至右上角） */
         .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 3rem;
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
             color: var(--text-color-darker);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease, background-color 0.3s ease;
         }
         .back-link:hover {
-            color: var(--text-color-white);
+            background-color: var(--input-bg);
+            color: var(--text-color);
         }
+
+        .site-footer {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--glass-border-color);
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-color-darker);
+        }
+        
+        .site-footer p {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 0.25rem 0.75rem; /* 行间距 列间距 */
+            line-height: 1.5;
+        }
+
+        .site-footer a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .site-footer a:hover {
+            color: var(--accent-color);
+        }
+
 
         /* 响应式设计 */
         @media (max-width: 600px) {
@@ -326,6 +463,14 @@
             .contact-container h1 {
                 font-size: 2rem;
             }
+            .theme-toggle {
+                top: 1rem;
+                left: 1rem;
+            }
+            .back-link {
+                top: 1rem;
+                right: 1rem;
+            }
         }
     </style>
 </head>
@@ -333,40 +478,58 @@
     <canvas id="particle-canvas"></canvas>
 
     <main class="contact-container glass-effect">
+        <button class="theme-toggle" id="theme-toggle-btn" title="切换主题">
+            <i class="ph ph-sun"></i>
+            <i class="ph ph-moon"></i>
+        </button>
+        <a href="./index.html" class="back-link" title="返回主页">
+            <i class="ph ph-house"></i>
+        </a>
         <h1>联系我</h1>
 
-        <form id="contact-form" action="https://email.xvyin.com" method="POST">
+        <form id="contact-form" action="https://email.xvyin.com" method="POST" novalidate>
             <!-- !! 重要: 将上面的 action URL 替换成你自己的 Worker URL !! -->
             <div class="form-group">
                 <label for="name">你的称呼</label>
                 <input type="text" id="name" name="name" required autocomplete="name">
+                <div class="error-message">称呼不能为空</div>
             </div>
             <div class="form-group">
-                <label for="contact-method">你的联系方式</label>
+                <label for="contact-value">你的联系方式</label>
                 <div class="contact-input-group">
-                    <!-- 全新的自定义下拉框 HTML 结构 -->
-                    <div class="custom-select-container">
-                        <select id="contact-method" name="contact_method" class="visually-hidden">
-                            <option value="email">邮箱</option>
-                            <option value="qq">QQ</option>
-                            <option value="wechat">微信</option>
-                            <option value="phone">手机号</option>
-                        </select>
-                        <div class="select-selected"></div>
-                        <div class="select-items select-hide"></div>
+                    <div class="custom-select-wrapper">
+                        <div class="custom-select">
+                            <div class="custom-select-trigger">
+                                <span>邮箱</span>
+                                <i class="ph ph-caret-down"></i>
+                            </div>
+                            <div class="custom-options">
+                                <span class="custom-option selected" data-value="email">邮箱</span>
+                                <span class="custom-option" data-value="qq">QQ</span>
+                                <span class="custom-option" data-value="wechat">微信</span>
+                                <span class="custom-option" data-value="phone">手机号</span>
+                            </div>
+                        </div>
                     </div>
+                    <input type="hidden" name="contact_method" id="contact-method-hidden" value="email">
                     <input type="email" id="contact-value" name="contact_value" required placeholder="请输入你的邮箱地址" autocomplete="email">
                 </div>
+                <div class="error-message">联系方式格式不正确</div>
             </div>
             <div class="form-group">
                 <label for="message">你想说的话</label>
-                <textarea id="message" name="message" required></textarea>
+                <textarea id="message" name="message" required maxlength="500"></textarea>
+                <div class="textarea-footer">
+                   <div class="error-message">内容不能为空</div>
+                   <span class="char-counter">0 / 500</span>
+                </div>
             </div>
-            <button type="submit" class="form-submit-button">发送</button>
+            <button type="submit" class="form-submit-button">
+                <span class="button-text">发送</span>
+                <div class="loader"></div>
+            </button>
         </form>
         <div id="form-status"></div>
-
-        <div class="divider">其他方式</div>
 
         <div class="other-contacts">
             <a href="https://github.com/jimmyshuixin" target="_blank" class="contact-link" title="GitHub">
@@ -377,17 +540,46 @@
             </a>
         </div>
         
-        <a href="./index.html" class="back-link">← 返回主页</a>
+        <footer class="site-footer">
+            <p>
+                <span>Copyright&copy; <span id="copyright-year"></span> 虚宁</span>
+                <span>|</span>
+                <a href="https://beian.miit.gov.cn/" target="_blank">渝ICP备2025053763号-1</a>
+            </p>
+        </footer>
     </main>
     
     <script>
         // --- 主题切换 ---
-        (function () {
-            const isLightTheme = new Date().getHours() >= 6 && new Date().getHours() < 18;
-            if (isLightTheme) {
-                document.documentElement.classList.add("light-theme");
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const docElement = document.documentElement;
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                docElement.classList.add('light-theme');
+            } else {
+                docElement.classList.remove('light-theme');
             }
-        })();
+        }
+
+        function toggleTheme() {
+            const currentTheme = docElement.classList.contains('light-theme') ? 'light' : 'dark';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        }
+
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        
+        // 初始化主题
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            const isAutoLight = new Date().getHours() >= 6 && new Date().getHours() < 18;
+            applyTheme(isAutoLight ? 'light' : 'dark');
+        }
+
 
         // --- 粒子背景 ---
         document.addEventListener("DOMContentLoaded", () => {
@@ -501,85 +693,94 @@
             window.addEventListener("resize", startAnimation);
             startAnimation();
         });
+        
+        const form = document.getElementById('contact-form');
+        const nameInput = document.getElementById('name');
+        const contactValueInput = document.getElementById('contact-value');
+        const messageInput = document.getElementById('message');
+        const hiddenInput = document.getElementById('contact-method-hidden');
 
-        // --- 全新的自定义下拉框 JavaScript ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.custom-select-container');
-            if (!container) return;
+        // --- “断点续写” (表单状态保存) ---
+        const FORM_STATE_KEY = 'contactFormState';
 
-            const originalSelect = container.querySelector('select');
-            const selectedDisplay = container.querySelector('.select-selected');
-            const itemsContainer = container.querySelector('.select-items');
+        function saveFormState() {
+            const state = {
+                name: nameInput.value,
+                contact_method: hiddenInput.value,
+                contact_value: contactValueInput.value,
+                message: messageInput.value,
+            };
+            localStorage.setItem(FORM_STATE_KEY, JSON.stringify(state));
+        }
 
-            // 1. 根据原始select创建自定义选项
-            for (let i = 0; i < originalSelect.options.length; i++) {
-                const option = originalSelect.options[i];
-                const itemDiv = document.createElement('div');
-                itemDiv.innerHTML = option.innerHTML;
-                itemDiv.setAttribute('data-value', option.value);
-
-                // 设置初始选中项
-                if (i === originalSelect.selectedIndex) {
-                    selectedDisplay.innerHTML = option.innerHTML;
-                    itemDiv.classList.add('same-as-selected');
+        function loadFormState() {
+            const savedState = localStorage.getItem(FORM_STATE_KEY);
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                nameInput.value = state.name || '';
+                contactValueInput.value = state.contact_value || '';
+                messageInput.value = state.message || '';
+                
+                // 更新自定义下拉菜单
+                const method = state.contact_method || 'email';
+                hiddenInput.value = method;
+                const optionToSelect = customSelect.querySelector(`.custom-option[data-value="${method}"]`);
+                const currentSelected = customSelect.querySelector('.custom-option.selected');
+                if (currentSelected) currentSelected.classList.remove('selected');
+                if (optionToSelect) {
+                    optionToSelect.classList.add('selected');
+                    trigger.querySelector('span').textContent = optionToSelect.textContent;
                 }
-
-                // 2. 为每个选项添加点击事件
-                itemDiv.addEventListener('click', function() {
-                    const value = this.getAttribute('data-value');
-                    
-                    // 更新原始select的值
-                    originalSelect.value = value;
-                    
-                    // 更新显示的值
-                    selectedDisplay.innerHTML = this.innerHTML;
-
-                    // 标记新的选中项
-                    const currentSelected = itemsContainer.querySelector('.same-as-selected');
-                    if (currentSelected) {
-                        currentSelected.classList.remove('same-as-selected');
-                    }
-                    this.classList.add('same-as-selected');
-
-                    // 关闭下拉列表
-                    closeAllSelect();
-
-                    // 手动触发change事件，以确保我们的旧代码能工作
-                    originalSelect.dispatchEvent(new Event('change'));
-                });
-                itemsContainer.appendChild(itemDiv);
+                updateContactInput(method, true); // true表示不清空value
+                messageInput.dispatchEvent(new Event('input')); // 触发字数统计
             }
-
-            // 3. 为“已选中”框添加点击事件来打开/关闭列表
-            selectedDisplay.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const isHidden = itemsContainer.classList.contains('select-hide');
-                closeAllSelect(); // 先关闭所有可能打开的
-                if (isHidden) {
-                    itemsContainer.classList.remove('select-hide');
-                    this.classList.add('select-arrow-active');
-                }
-            });
-
-            function closeAllSelect() {
-                itemsContainer.classList.add('select-hide');
-                selectedDisplay.classList.remove('select-arrow-active');
-            }
-
-            // 4. 点击页面其他地方关闭下拉列表
-            document.addEventListener('click', closeAllSelect);
+        }
+        
+        [nameInput, contactValueInput, messageInput].forEach(input => {
+            input.addEventListener('input', saveFormState);
         });
 
+        // 页面加载时恢复表单
+        loadFormState();
 
-        // --- 表单提交处理 ---
-        const form = document.getElementById('contact-form');
-        const statusDiv = document.getElementById('form-status');
-        const contactMethodSelect = document.getElementById('contact-method');
-        const contactValueInput = document.getElementById('contact-value');
 
-        // 根据选择更新输入框提示
-        contactMethodSelect.addEventListener('change', () => {
-            switch (contactMethodSelect.value) {
+        // --- 自定义下拉菜单逻辑 ---
+        const customSelect = document.querySelector('.custom-select');
+        const trigger = customSelect.querySelector('.custom-select-trigger');
+        const options = customSelect.querySelectorAll('.custom-option');
+        
+        trigger.addEventListener('click', () => {
+            customSelect.classList.toggle('open');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                if (option.classList.contains('selected')) {
+                    customSelect.classList.remove('open');
+                    return;
+                }
+                const currentlySelected = customSelect.querySelector('.custom-option.selected');
+                if (currentlySelected) currentlySelected.classList.remove('selected');
+                
+                option.classList.add('selected');
+                trigger.querySelector('span').textContent = option.textContent;
+                hiddenInput.value = option.getAttribute('data-value');
+                
+                updateContactInput(hiddenInput.value);
+                validateInput(contactValueInput);
+                saveFormState(); // 切换后保存状态
+                customSelect.classList.remove('open');
+            });
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (!customSelect.contains(e.target)) {
+                customSelect.classList.remove('open');
+            }
+        });
+
+        function updateContactInput(method, preserveValue = false) {
+            switch (method) {
                 case 'email':
                     contactValueInput.placeholder = '请输入你的邮箱地址';
                     contactValueInput.type = 'email';
@@ -601,56 +802,143 @@
                     contactValueInput.autocomplete = 'tel';
                     break;
             }
-            contactValueInput.value = ''; // 切换时清空输入
+            if (!preserveValue) contactValueInput.value = '';
+        }
+
+        // --- 表单验证与提交处理 ---
+        const statusDiv = document.getElementById('form-status');
+        const charCounter = document.querySelector('.char-counter');
+
+        const validationRules = {
+            email: {
+                regex: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                message: '请输入有效的邮箱地址'
+            },
+            qq: {
+                regex: /^[1-9][0-9]{4,11}$/,
+                message: '请输入5到12位的QQ号码'
+            },
+            wechat: {
+                regex: /^[a-zA-Z][a-zA-Z0-9_-]{5,19}$/,
+                message: '微信号格式不正确'
+            },
+            phone: {
+                regex: /^1[3-9]\d{9}$/,
+                message: '请输入11位有效手机号码'
+            }
+        };
+
+        function validateInput(input) {
+            const formGroup = input.closest('.form-group');
+            const errorMessageDiv = formGroup.querySelector('.error-message');
+            let isValid = true;
+            let message = '';
+            const value = input.value;
+
+            if (input.required && value.trim() === '') {
+                isValid = false;
+                // 从HTML中获取默认的空值错误信息
+                const defaultEmptyMsg = formGroup.querySelector('.textarea-footer .error-message') || formGroup.querySelector('.error-message');
+                message = defaultEmptyMsg ? defaultEmptyMsg.textContent : '此字段不能为空';
+            } else if (input.id === 'contact-value' && value.trim() !== '') {
+                const method = hiddenInput.value;
+                const rule = validationRules[method];
+                if (rule && !rule.regex.test(value)) {
+                    isValid = false;
+                    message = rule.message;
+                }
+            }
+            
+            if (!isValid) {
+                formGroup.classList.add('error-state');
+                errorMessageDiv.textContent = message;
+            } else {
+                formGroup.classList.remove('error-state');
+            }
+            return isValid;
+        }
+
+        [nameInput, contactValueInput, messageInput].forEach(input => {
+            input.addEventListener('input', () => validateInput(input));
         });
 
+        messageInput.addEventListener('input', () => {
+            const count = messageInput.value.length;
+            charCounter.textContent = `${count} / 500`;
+        });
 
         async function handleSubmit(event) {
             event.preventDefault();
+            
+            const isNameValid = validateInput(nameInput);
+            const isContactValid = validateInput(contactValueInput);
+            const isMessageValid = validateInput(messageInput);
+
+            if (!isNameValid || !isContactValid || !isMessageValid) {
+                form.classList.add('shake');
+                setTimeout(() => form.classList.remove('shake'), 820);
+                return;
+            }
 
             const button = form.querySelector('button[type="submit"]');
             button.disabled = true;
-            button.textContent = '发送中...';
+            button.classList.add('loading');
             statusDiv.textContent = '';
             statusDiv.className = '';
-
-            const formData = {
-                name: form.elements.name.value,
-                contact_method: form.elements.contact_method.value,
-                contact_value: form.elements.contact_value.value,
-                message: form.elements.message.value
-            };
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
 
             try {
                 const response = await fetch(event.target.action, {
                     method: 'POST',
-                    body: JSON.stringify(formData),
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
+                    body: JSON.stringify(data),
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
                 });
 
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 const responseData = await response.json();
+                statusDiv.textContent = "消息发送成功，感谢联系！";
+                statusDiv.classList.add('success');
+                form.reset();
+                localStorage.removeItem(FORM_STATE_KEY); // 发送成功后清除状态
+                
+                charCounter.textContent = '0 / 500';
+                
+                const currentSelected = customSelect.querySelector('.custom-option.selected');
+                if(currentSelected) currentSelected.classList.remove('selected');
+                const defaultOption = customSelect.querySelector('.custom-option[data-value="email"]');
+                defaultOption.classList.add('selected');
+                trigger.querySelector('span').textContent = defaultOption.textContent;
+                updateContactInput('email');
 
-                if (response.ok) {
-                    statusDiv.textContent = "消息发送成功，感谢联系！";
-                    statusDiv.classList.add('success');
-                    form.reset();
-                } else {
-                    statusDiv.textContent = responseData.error || "哎呀，出错了，请稍后再试。";
-                    statusDiv.classList.add('error');
-                }
             } catch (error) {
                 console.error("Fetch Error:", error);
                 statusDiv.textContent = "网络似乎有问题，请检查后重试。";
                 statusDiv.classList.add('error');
+                form.classList.add('shake');
             } finally {
                 button.disabled = false;
-                button.textContent = '发送';
+                button.classList.remove('loading');
+                setTimeout(() => form.classList.remove('shake'), 820);
             }
         }
         form.addEventListener("submit", handleSubmit);
+
+        // --- 动态版权年份 ---
+        (function() {
+            const yearSpan = document.getElementById('copyright-year');
+            if (yearSpan) {
+                const startYear = 2022;
+                const currentYear = new Date().getFullYear();
+                if (currentYear > startYear) {
+                    yearSpan.textContent = `${startYear}-${currentYear}`;
+                } else {
+                    yearSpan.textContent = startYear;
+                }
+            }
+        })();
     </script>
 </body>
 </html>
