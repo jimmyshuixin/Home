@@ -2416,6 +2416,13 @@
       .history-btn:hover {
         border-color: var(--accent-color);
       }
+      .fab-form-title {
+        text-align: center;
+        color: var(--text-color-white);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
       .fab-container {
         position: fixed;
         bottom: 30px;
@@ -2430,7 +2437,7 @@
       }
       .fab-container.expanded {
         width: min(400px, 90vw);
-        height: 280px;
+        height: 320px;
         border-radius: 24px;
       }
       .fab-toggle {
@@ -4238,6 +4245,7 @@
         :class="{ 'expanded': guestbook.isExpanded }"
       >
         <form @submit.prevent="submitGuestbookMessage" class="fab-form">
+          <h3 class="fab-form-title">发弹幕</h3>
           <p
             class="modal-status-message"
             style="
