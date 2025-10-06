@@ -10,7 +10,8 @@
 ---
 
 ### ✨ [在线演示 (Live Demo)](https://xvyin.com/)
-<img width="3199" height="1728" alt="图片" src="https://github.com/user-attachments/assets/39c66c44-8b74-4931-9cb7-f7c3f7d7dabc" />
+<img width="3199" height="1719" alt="图片" src="https://github.com/user-attachments/assets/b15cf6db-fc46-4bcf-9248-0f2f11d053a9" />
+
 
 ## 核心功能
 
