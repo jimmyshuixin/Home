@@ -8,10 +8,5 @@
     "id": "master",
     "label": "硕士",
     "location": "./content/resume/master.json"
-  },
-  {
-    "id": "phd",
-    "label": "博士",
-    "location": "./content/resume/phd.json"
   }
 ]
