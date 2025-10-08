@@ -3429,131 +3429,151 @@
                   >
                     <i class="ph ph-x"></i>
                   </button>
+
                   <div
-                    v-if="!resumeData.name"
-                    class="loading-placeholder"
-                    aria-busy="true"
+                    class="creations-tabs"
+                    style="justify-content: center; margin-bottom: 2rem"
                   >
-                    正在加载简历...
+                    <button
+                      v-for="resume in resumesList"
+                      :key="resume.id"
+                      class="tab-button"
+                      :class="{ active: resume.id === activeResumeId }"
+                      @click="switchResume(resume)"
+                    >
+                      <span>{{ resume.label }}</span>
+                    </button>
                   </div>
-                  <template v-else
-                    ><div class="resume-header">
-                      <h1>{{ resumeData.name }}</h1>
-                      <div class="resume-contact">
-                        <span class="resume-contact-item"
-                          ><i class="ph-fill ph-phone"></i> {{ resumeData.phone
-                          }}</span
-                        ><span class="resume-contact-item"
-                          ><i class="ph-fill ph-envelope-simple"></i> {{
-                          resumeData.email }}</span
-                        ><span class="resume-contact-item"
-                          ><i class="ph-fill ph-map-pin"></i> {{
-                          resumeData.location }}</span
-                        ><span class="resume-contact-item"
-                          ><i class="ph-fill ph-flag"></i> {{
-                          resumeData.politicalStatus }}</span
-                        >
-                      </div>
+
+                  <transition name="content-fade" mode="out-in">
+                    <div
+                      v-if="!resumeData.name"
+                      key="loading"
+                      class="loading-placeholder"
+                      aria-busy="true"
+                      style="text-align: center; padding: 4rem 0"
+                    >
+                      正在加载简历...
                     </div>
-                    <div class="resume-section">
-                      <h3>
-                        <i class="ph-fill ph-graduation-cap"></i> 教育背景
-                      </h3>
-                      <div class="education-grid">
-                        <div
-                          class="education-item"
-                          v-for="edu in resumeData.education"
-                        >
-                          <div class="item-header">
-                            <h4>{{ edu.institution }}</h4>
-                            <span class="date">{{ edu.duration }}</span>
+                    <div v-else key="content">
+                      <div class="resume-header">
+                        <h1>{{ resumeData.name }}</h1>
+                        <div class="resume-contact">
+                          <span class="resume-contact-item"
+                            ><i class="ph-fill ph-phone"></i> {{
+                            resumeData.phone }}</span
+                          ><span class="resume-contact-item"
+                            ><i class="ph-fill ph-envelope-simple"></i> {{
+                            resumeData.email }}</span
+                          ><span class="resume-contact-item"
+                            ><i class="ph-fill ph-map-pin"></i> {{
+                            resumeData.location }}</span
+                          ><span class="resume-contact-item"
+                            ><i class="ph-fill ph-flag"></i> {{
+                            resumeData.politicalStatus }}</span
+                          >
+                        </div>
+                      </div>
+                      <div class="resume-section">
+                        <h3>
+                          <i class="ph-fill ph-graduation-cap"></i> 教育背景
+                        </h3>
+                        <div class="education-grid">
+                          <div
+                            class="education-item"
+                            v-for="edu in resumeData.education"
+                          >
+                            <div class="item-header">
+                              <h4>{{ edu.institution }}</h4>
+                              <span class="date">{{ edu.duration }}</span>
+                            </div>
+                            <p class="item-subheader">
+                              {{ edu.major }} | 辅修: {{ edu.minor }}
+                            </p>
+                            <div class="item-details">
+                              <ul>
+                                <li>
+                                  GPA: {{ edu.gpa }} | 专业成绩: {{
+                                  edu.majorScore }} (排名 {{ edu.ranking }})
+                                </li>
+                                <li>
+                                  主修课程: {{ edu.courses.major.join('、') }}
+                                </li>
+                                <li>
+                                  辅修课程: {{ edu.courses.minor.join('、') }}
+                                </li>
+                              </ul>
+                            </div>
                           </div>
-                          <p class="item-subheader">
-                            {{ edu.major }} | 辅修: {{ edu.minor }}
-                          </p>
-                          <div class="item-details">
-                            <ul>
-                              <li>
-                                GPA: {{ edu.gpa }} | 专业成绩: {{ edu.majorScore
-                                }} (排名 {{ edu.ranking }})
-                              </li>
-                              <li>
-                                主修课程: {{ edu.courses.major.join('、') }}
-                              </li>
-                              <li>
-                                辅修课程: {{ edu.courses.minor.join('、') }}
-                              </li>
-                            </ul>
+                        </div>
+                      </div>
+                      <div class="resume-section">
+                        <h3><i class="ph-fill ph-kanban"></i> 项目经历</h3>
+                        <div class="experience-grid">
+                          <div
+                            class="project-item"
+                            v-for="proj in resumeData.projects"
+                          >
+                            <div class="item-header">
+                              <h4>{{ proj.name }}</h4>
+                              <span class="date">{{ proj.duration }}</span>
+                            </div>
+                            <p class="item-subheader">角色: {{ proj.role }}</p>
+                            <div class="item-details">
+                              <p><strong>任务:</strong> {{ proj.task }}</p>
+                              <p><strong>行动:</strong> {{ proj.action }}</p>
+                              <p><strong>结果:</strong> {{ proj.result }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="resume-section">
+                        <h3><i class="ph-fill ph-users"></i> 在校经历</h3>
+                        <div class="experience-grid">
+                          <div
+                            class="experience-item"
+                            v-for="exp in resumeData.campusExperience"
+                          >
+                            <div class="item-header">
+                              <h4>{{ exp.role }}</h4>
+                              <span class="date">{{ exp.duration }}</span>
+                            </div>
+                            <div class="item-details">
+                              <p>{{ exp.description }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="resume-section">
+                        <h3><i class="ph-fill ph-brain"></i> 相关技能</h3>
+                        <div class="skills-container">
+                          <div
+                            class="skill-category"
+                            v-for="cat in resumeData.skills"
+                          >
+                            <h4>{{ cat.category }}</h4>
+                            <div class="skill-list">
+                              <span class="skill-tag" v-for="skill in cat.items"
+                                >{{ skill }}</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="resume-section">
+                        <h3><i class="ph-fill ph-trophy"></i> 荣誉证书</h3>
+                        <div class="honors-list">
+                          <div
+                            class="honor-item"
+                            v-for="honor in resumeData.honors"
+                          >
+                            <i class="ph-fill ph-seal-check"></i
+                            ><span>{{ honor }}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="resume-section">
-                      <h3><i class="ph-fill ph-kanban"></i> 项目经历</h3>
-                      <div class="experience-grid">
-                        <div
-                          class="project-item"
-                          v-for="proj in resumeData.projects"
-                        >
-                          <div class="item-header">
-                            <h4>{{ proj.name }}</h4>
-                            <span class="date">{{ proj.duration }}</span>
-                          </div>
-                          <p class="item-subheader">角色: {{ proj.role }}</p>
-                          <div class="item-details">
-                            <p><strong>任务:</strong> {{ proj.task }}</p>
-                            <p><strong>行动:</strong> {{ proj.action }}</p>
-                            <p><strong>结果:</strong> {{ proj.result }}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="resume-section">
-                      <h3><i class="ph-fill ph-users"></i> 在校经历</h3>
-                      <div class="experience-grid">
-                        <div
-                          class="experience-item"
-                          v-for="exp in resumeData.campusExperience"
-                        >
-                          <div class="item-header">
-                            <h4>{{ exp.role }}</h4>
-                            <span class="date">{{ exp.duration }}</span>
-                          </div>
-                          <div class="item-details">
-                            <p>{{ exp.description }}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="resume-section">
-                      <h3><i class="ph-fill ph-brain"></i> 相关技能</h3>
-                      <div class="skills-container">
-                        <div
-                          class="skill-category"
-                          v-for="cat in resumeData.skills"
-                        >
-                          <h4>{{ cat.category }}</h4>
-                          <div class="skill-list">
-                            <span class="skill-tag" v-for="skill in cat.items"
-                              >{{ skill }}</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="resume-section">
-                      <h3><i class="ph-fill ph-trophy"></i> 荣誉证书</h3>
-                      <div class="honors-list">
-                        <div
-                          class="honor-item"
-                          v-for="honor in resumeData.honors"
-                        >
-                          <i class="ph-fill ph-seal-check"></i
-                          ><span>{{ honor }}</span>
-                        </div>
-                      </div>
-                    </div></template
-                  >
+                  </transition>
                 </article>
               </div>
               <div
@@ -4563,7 +4583,7 @@
           contentPaths: {
             about: "./content/about.md",
             blogManifest: "./content/blog/manifest.json",
-            resume: "./content/resume.json",
+            resumeManifest: "./content/resume/resumes.json",
             interests: "./content/interests/interests.json",
             growth: "./content/growth.json",
             bookshelf: "./content/bookshelf.json",
@@ -5224,6 +5244,8 @@
         const useDataService = (utils) => {
           const aboutContent = ref("加载中..."),
             resumeData = ref({}),
+            resumesList = ref([]),
+            activeResumeId = ref(null),
             interests = ref([]),
             timeline = ref([]),
             targets = ref([]),
@@ -5231,11 +5253,17 @@
             blogPosts = ref([]),
             footerIconLinks = ref([]),
             localPlaylistsManifest = ref([]);
+          const loadResumeContent = async (path) => {
+            if (!path) return;
+            // 开始加载时清空当前数据，以显示“加载中”状态
+            const resumeContent = await dataLoaderService.fetchJSON(path);
+            resumeData.value = resumeContent || { name: "简历加载失败" };
+          };
           const loadedLocalPlaylists = ref({});
           const loadAllData = async () => {
             const [
               aboutMd,
-              resume,
+              resumeManifest,
               interestsData,
               growth,
               books,
@@ -5244,7 +5272,7 @@
               localManifest,
             ] = await Promise.all([
               dataLoaderService.fetchMarkdown(config.contentPaths.about),
-              dataLoaderService.fetchJSON(config.contentPaths.resume),
+              dataLoaderService.fetchJSON(config.contentPaths.resumeManifest),
               dataLoaderService.fetchJSON(config.contentPaths.interests),
               dataLoaderService.fetchJSON(config.contentPaths.growth),
               dataLoaderService.fetchJSON(config.contentPaths.bookshelf),
@@ -5255,7 +5283,13 @@
               ),
             ]);
             aboutContent.value = utils.renderMarkdown(aboutMd || "");
-            resumeData.value = resume || { name: "数据加载失败" };
+            if (resumeManifest && resumeManifest.length > 0) {
+              resumesList.value = resumeManifest;
+              activeResumeId.value = resumeManifest[0].id; // 默认选中第一个
+              await loadResumeContent(resumeManifest[0].location); // 加载默认简历
+            } else {
+              resumeData.value = { name: "未找到简历清单" };
+            }
             interests.value = interestsData || [];
             if (growth) {
               timeline.value = growth.timeline;
@@ -5269,6 +5303,9 @@
           return {
             aboutContent,
             resumeData,
+            resumesList,
+            activeResumeId,
+            loadResumeContent,
             interests,
             timeline,
             targets,
@@ -5507,7 +5544,12 @@
             const music = useMusicPlayer();
             const chatbot = useChatbot(utils);
             const data = useDataService(utils);
-
+            const switchResume = async (resume) => {
+              if (resume.id === data.activeResumeId.value) return;
+              data.activeResumeId.value = resume.id;
+              data.resumeData.value = {};
+              await data.loadResumeContent(resume.location);
+            };
             const isLoginModalVisible = ref(false),
               isBookModalVisible = ref(false),
               selectedBook = ref(null);
@@ -5544,13 +5586,13 @@
               bookshelf = ref({ activeCategory: "全部" });
 
             const copyrightYear = computed(() => {
-                const startYear = 2022;
-                const currentYear = new Date().getFullYear();
-                if (currentYear > startYear) {
-                    return `${startYear}-${currentYear}`;
-                } else {
-                    return startYear;
-                }
+              const startYear = 2022;
+              const currentYear = new Date().getFullYear();
+              if (currentYear > startYear) {
+                return `${startYear}-${currentYear}`;
+              } else {
+                return startYear;
+              }
             });
 
             const filteredAndSortedRepos = computed(() => {
@@ -6246,6 +6288,7 @@
               ...data,
               ...chatbot,
               ...music,
+              switchResume,
               guestbook,
               activeDanmaku,
               submitGuestbookMessage,
