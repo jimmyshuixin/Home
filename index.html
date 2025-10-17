@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>虚静以宁 - 精简版</title>
+    <title>虚静以宁</title>
     <link rel="icon" href="./content/icon/32.png" />
 
     <link rel="preconnect" href="https://source.xvyin.com" />
@@ -3514,7 +3514,7 @@
                               </h3>
                               <div class="activity-feed">
                                 <div
-                                  v-if="activityStream.length === 0 && !github.isLoading"
+                                  v-if="activityStream && activityStream.length === 0 && !github.isLoading"
                                 >
                                   暂无动态
                                 </div>
@@ -4835,8 +4835,15 @@
                   });
                 return activities;
               });
+              // FIX: This is the section causing the error.
+              // We add a filter to ensure the event payload and commits array exist before mapping.
               const githubActivities = (github.value.events || [])
-                .filter((e) => e.type === "PushEvent")
+                .filter(
+                  (e) =>
+                    e.type === "PushEvent" &&
+                    e.payload &&
+                    Array.isArray(e.payload.commits)
+                )
                 .map((e) => ({
                   date: e.created_at.split("T")[0],
                   type: "github",
