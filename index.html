@@ -1251,6 +1251,14 @@
         margin-bottom: 1.5rem;
         border-bottom: 1px solid var(--glass-border-color);
         padding: 0 1rem;
+        /* 在小屏幕上使标签栏可以横向滚动 */
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* 适用于 Firefox */
+        -ms-overflow-style: none; /* 适用于 IE 和 Edge */
+      }
+      .creations-tabs::-webkit-scrollbar {
+        display: none; /* 适用于 WebKit 内核浏览器 */
       }
       .tab-button {
         background: none;
@@ -1265,6 +1273,7 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-shrink: 0; /* 防止标签按钮被压缩 */
       }
       .tab-button::after {
         content: "";
@@ -1920,7 +1929,7 @@
         display: flex;
         gap: 1rem;
         overflow-x: auto;
-        padding: 0.5rem 0 1.5rem 0;
+        padding: 0.5rem 1rem 1.5rem 1rem; /* 增加水平内边距以改善间距 */
         margin-bottom: 2rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
