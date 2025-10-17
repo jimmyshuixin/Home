@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 助手</title>
+    <link
+      href="https://fonts.loli.net/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.css"
+    />
+    <style>
+      /* --- 基本样式和变量定义 --- */
+      :root {
+        --body-bg-color: #121212;
+        --glass-bg: rgba(38, 38, 38, 0.25);
+        --glass-bg-optimized: rgba(38, 38, 38, 0.65);
+        --glass-border-color: rgba(255, 255, 255, 0.1);
+        --input-bg: rgba(50, 50, 50, 0.2);
+        --text-color: #f0f0f0;
+        --text-color-darker: #b3b3b3;
+        --accent-color: #61dafb;
+        --accent-color-rgb: 97, 218, 251;
+        --shadow-color: rgba(0, 0, 0, 0.25);
+        --glow-color: rgba(var(--accent-color-rgb), 0.1);
+        --subscribe-btn-bg: #3b82f6;
+        --repo-card-bg: rgba(255, 255, 255, 0.05);
+        --repo-card-hover-bg: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: var(--body-bg-color);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+        color: var(--text-color);
+        padding: 2rem;
+      }
+      
+      #app {
+        width: 100%;
+        max-width: 900px; /* 限制最大宽度 */
+      }
+      
+      /* --- 通用效果 --- */
+      .glass-effect {
+        background: var(--glass-bg-optimized);
+        border: 1px solid var(--glass-border-color);
+        border-radius: 24px;
+        box-shadow: 0 8px 32px 0 var(--shadow-color), 0 0 15px var(--glow-color);
+      }
+
+      .animate-spin {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* --- AI 助手组件样式 --- */
+      .chatbot-card {
+        display: flex;
+        flex-direction: column;
+        height: 85vh; /* 设置一个固定的高度 */
+        padding: 2rem;
+        transition: all 0.3s ease;
+      }
+
+      .chatbot-settings {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 900px) {
+        .chatbot-settings {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .setting-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .api-key-group {
+        grid-column: 1 / -1;
+      }
+
+      .setting-item label {
+        font-size: 0.9rem;
+        color: var(--text-color-darker);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .tooltip-icon {
+        color: var(--text-color-darker);
+        font-size: 1rem;
+        cursor: help;
+        margin-left: 0.5rem;
+      }
+
+      .setting-item input[type="password"],
+      .setting-item input[type="range"] {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border-color);
+        background: var(--input-bg);
+        color: var(--text-color);
+        font-size: 0.9rem;
+      }
+      
+      .setting-item input[type="range"]:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .setting-item input[type="password"]:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px var(--accent-color);
+      }
+
+      .get-api-key-link {
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        text-decoration: none;
+      }
+
+      .get-api-key-link:hover {
+        text-decoration: underline;
+      }
+
+      .chat-window {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: var(--repo-card-bg);
+        border-radius: 16px;
+        margin-bottom: 1rem;
+      }
+      
+      .chat-window::-webkit-scrollbar {
+        width: 8px;
+      }
+      .chat-window::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .chat-window::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 8px;
+      }
+
+      .chat-status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-color-darker);
+        margin-bottom: 1rem;
+      }
+
+      .message {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .message.user {
+        align-items: flex-end;
+      }
+
+      .message.assistant {
+        align-items: flex-start;
+      }
+
+      .message-content {
+        max-width: 90%;
+        padding: 0.8rem 1.2rem;
+        border-radius: 18px;
+        line-height: 1.7;
+        position: relative;
+        word-wrap: break-word;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .message-content > :first-child { margin-top: 0; }
+      .message-content > :last-child { margin-bottom: 0; }
+      .message-content p, .message-content ul, .message-content ol { margin: 0; }
+      .message-content ul, .message-content ol { padding-left: 1.5rem; }
+
+      .message.user .message-content {
+        background-color: var(--accent-color);
+        color: #121212;
+        border-bottom-right-radius: 4px;
+      }
+
+      .message.assistant .message-content {
+        background-color: var(--repo-card-hover-bg);
+        color: var(--text-color);
+        border-bottom-left-radius: 4px;
+      }
+      
+      .message.assistant .thinking-process {
+        border-bottom: 1px solid var(--glass-border-color);
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        font-size: 0.9em;
+        color: var(--text-color-darker);
+        opacity: 0.8;
+      }
+
+      .message.assistant pre {
+        background-color: rgba(0, 0, 0, 0.3);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 0.9em;
+        border: 1px solid var(--glass-border-color);
+      }
+      
+      .message.assistant code {
+        font-family: "Courier New", Courier, monospace;
+      }
+      
+      .message-content .katex-display {
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0.5rem 0;
+      }
+      
+      .copy-button {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        color: var(--text-color-darker);
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        opacity: 0;
+        transition: all 0.2s;
+        font-size: 1rem;
+        line-height: 1;
+      }
+
+      .message-content:hover .copy-button {
+        opacity: 1;
+      }
+      
+      .copy-button:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--text-color);
+      }
+
+      .copy-button .ph-check {
+        color: var(--accent-color);
+        font-weight: bold;
+      }
+      
+      .thinking-process-container {
+        border-bottom: 1px solid var(--glass-border-color);
+        margin: -0.25rem 0 0.75rem;
+        padding-bottom: 0.75rem;
+      }
+
+      .toggle-thinking-btn {
+        background: none; border: none;
+        color: var(--text-color-darker);
+        cursor: pointer;
+        display: flex; align-items: center;
+        gap: 0.5rem;
+        padding: 0; margin-bottom: 0.5rem;
+        font-size: 0.9em; font-weight: 500;
+      }
+
+      .toggle-thinking-btn:hover { color: var(--text-color); }
+      .toggle-thinking-btn i { transition: transform 0.2s ease; }
+
+      .thinking-process-content {
+        font-size: 0.9em;
+        color: var(--text-color-darker);
+        opacity: 0.9;
+        max-height: 200px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+      .thinking-process-content::-webkit-scrollbar { width: 4px; }
+      .thinking-process-content::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 4px;
+      }
+
+      .chat-input-area {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .chat-input-area textarea {
+        flex-grow: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 16px;
+        border: 1px solid var(--glass-border-color);
+        background: var(--input-bg);
+        color: var(--text-color);
+        font-size: 1rem;
+        resize: none;
+        height: 50px;
+        transition: all 0.2s;
+      }
+
+      .chat-input-area textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px var(--accent-color);
+        height: 80px;
+      }
+
+      .send-button {
+        padding: 0.75rem 1.25rem;
+        border-radius: 16px;
+        border: none;
+        background-color: var(--subscribe-btn-bg);
+        color: white;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s;
+        flex-shrink: 0;
+        height: 50px;
+      }
+
+      .send-button:disabled {
+        background-color: var(--text-color-darker);
+        cursor: not-allowed;
+      }
+      
+      .custom-toggle {
+        display: flex;
+        flex-direction: row !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border-color);
+        background: var(--input-bg);
+        height: 100%;
+      }
+      
+      .custom-toggle label {
+        margin: 0;
+        color: var(--text-color);
+      }
+
+      .toggle-switch {
+        width: 44px; height: 24px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 2px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .toggle-switch.active { background-color: var(--accent-color); }
+
+      .toggle-knob {
+        width: 20px; height: 20px;
+        background-color: white;
+        border-radius: 50%;
+        transition: transform 0.2s ease;
+      }
+      .toggle-switch.active .toggle-knob { transform: translateX(20px); }
+
+      .history-controls {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+
+      .chat-history-dropdown {
+        position: relative;
+        flex-grow: 1;
+      }
+
+      .dropdown-trigger {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border-color);
+        background: var(--input-bg);
+        color: var(--text-color);
+        font-size: 0.9rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .dropdown-trigger span {
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        bottom: calc(100% + 5px);
+        left: 0;
+        width: 100%;
+        z-index: 10;
+        list-style: none;
+        border-radius: 12px;
+        padding: 0.5rem;
+        max-height: 200px;
+        overflow-y: auto;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border-color);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .dropdown-menu::-webkit-scrollbar { width: 6px; }
+      .dropdown-menu::-webkit-scrollbar-thumb {
+        background-color: var(--accent-color);
+        border-radius: 6px;
+      }
+      
+      .dropdown-item {
+        padding: 0.6rem 0.75rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .dropdown-item:hover { background-color: var(--repo-card-hover-bg); }
+      .dropdown-item.active {
+        background-color: var(--accent-color);
+        color: #121212;
+        font-weight: 500;
+      }
+      .history-btn {
+        flex-shrink: 0;
+        width: 38px; height: 38px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border-color);
+        background: var(--input-bg);
+        color: var(--text-color);
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .history-btn:hover { border-color: var(--accent-color); }
+      
+      .typing-cursor-hero {
+        display: inline-block;
+        width: 0.1em;
+        height: 1em;
+        background-color: var(--text-color);
+        animation: blink 0.7s infinite;
+      }
+
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+      
+      .dropdown-fade-enter-active,
+      .dropdown-fade-leave-active {
+        transition: all 0.2s ease;
+      }
+      .dropdown-fade-enter-from,
+      .dropdown-fade-leave-to {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      
+    </style>
+</head>
+<body>
+    <div id="app">
+        <article class="glass-effect chatbot-card">
+            <h2>AI 对话</h2>
+            <div class="chatbot-settings">
+                <div class="setting-item api-key-group">
+                    <label for="apiKey">
+                        <span>API Key</span>
+                        <a href="https://platform.deepseek.com/api_keys" target="_blank" class="get-api-key-link">获取API Key</a>
+                    </label>
+                    <input id="apiKey" type="password" v-model="chatbot.apiKey" placeholder="输入你的 DeepSeek API Key" />
+                </div>
+                <div class="setting-item">
+                    <label for="temperature">
+                        <span>温度: {{ chatbot.temperature }}</span>
+                        <i class="ph ph-info tooltip-icon" title="仅在关闭深度思考时有效。&#10;代码生成/数学解题: 0.0&#10;数据抽取/分析: 1.0&#10;通用对话/翻译: 1.3&#10;创意类写作: 1.5"></i>
+                    </label>
+                    <input id="temperature" type="range" v-model="chatbot.temperature" min="0" max="2" step="0.1" :disabled="chatbot.use_deep_thinking" />
+                </div>
+                <div class="setting-item custom-toggle">
+                    <label for="deepThinking">深度思考</label>
+                    <div class="toggle-switch" :class="{ active: chatbot.use_deep_thinking }" @click="chatbot.use_deep_thinking = !chatbot.use_deep_thinking" role="switch" :aria-checked="chatbot.use_deep_thinking" id="deepThinking" tabindex="0">
+                        <div class="toggle-knob"></div>
+                    </div>
+                </div>
+                <div class="setting-item chat-history-group">
+                    <label>对话历史</label>
+                    <div class="history-controls">
+                        <div class="chat-history-dropdown" ref="dropdownRef">
+                            <button @click="isHistoryDropdownOpen = !isHistoryDropdownOpen" class="dropdown-trigger" aria-haspopup="true" :aria-expanded="isHistoryDropdownOpen">
+                                <span>{{ activeChat ? activeChat.title : '选择对话' }}</span>
+                                <i class="ph-fill ph-caret-down"></i>
+                            </button>
+                            <transition name="dropdown-fade">
+                                <ul v-if="isHistoryDropdownOpen" class="dropdown-menu glass-effect" role="menu">
+                                    <li v-for="chat in chatHistories" :key="chat.id" @click="selectChat(chat.id)" class="dropdown-item" role="menuitem" :class="{ active: chat.id === activeChatId }">
+                                        {{ chat.title }}
+                                    </li>
+                                </ul>
+                            </transition>
+                        </div>
+                        <button @click="createNewChat" class="history-btn" aria-label="新建对话" title="新建对话">
+                            <i class="ph ph-plus"></i>
+                        </button>
+                        <button @click="deleteActiveChat" class="history-btn" aria-label="删除当前对话" title="删除当前对话">
+                            <i class="ph ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-window" ref="chatWindow">
+                <div v-if="activeChat">
+                    <div v-for="message in activeChat.messages" :key="message.id" class="message" :class="message.role">
+                        <div v-if="message.role !== 'system'" class="message-content">
+                            <div v-if="message.thinking" class="thinking-process-container">
+                                <button class="toggle-thinking-btn" @click="message.isThinkingVisible = !message.isThinkingVisible">
+                                    <i class="ph-fill" :class="message.isThinkingVisible ? 'ph-caret-down' : 'ph-caret-right'"></i>
+                                    <span>思考过程</span>
+                                </button>
+                                <div v-show="message.isThinkingVisible" class="thinking-process-content" v-html="renderMarkdown(message.thinking)"></div>
+                            </div>
+                            <div v-if="chatbot.isLoading && activeChat.messages[activeChat.messages.length - 1].id === message.id && !message.content && !message.thinking" style="display: flex; align-items: center; justify-content: center; height: 1.6em;">
+                                <span class="typing-cursor-hero" style="height: 1.2em; background-color: var(--text-color);"></span>
+                            </div>
+                            <div v-else v-html="renderMarkdown(message.content)"></div>
+                            <button v-if="message.content" @click="copyToClipboard(message.content, $event)" class="copy-button" aria-label="复制消息" title="复制">
+                                <i class="ph ph-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="chatbot.status" class="chat-status" aria-live="polite">
+                <i class="ph ph-spinner-gap animate-spin"></i>
+                <span>{{ chatbot.status }}</span>
+            </div>
+            <form @submit.prevent="sendMessage" class="chat-input-area">
+                <textarea v-model="chatbot.currentMessage" @keydown.enter.exact.prevent="sendMessage" placeholder="输入消息..." aria-label="聊天输入框"></textarea>
+                <button type="submit" class="send-button" :disabled="chatbot.isLoading || !chatbot.apiKey">
+                    发送
+                </button>
+            </form>
+        </article>
+    </div>
+
+    <!-- 外部 JS 库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.global.prod.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@phosphor-icons/web"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!window.Vue) {
+          console.error("Vue.js未能加载。应用无法启动。");
+          document.body.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 50px;">错误: 核心库 Vue.js 加载失败，请检查网络连接或浏览器设置。</h1>';
+          return;
+        }
+
+        const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
+
+        const useChatbot = (utils) => {
+          const chatbot = ref({
+            apiKey: "",
+            temperature: 1.3,
+            use_deep_thinking: false,
+            status: "",
+            currentMessage: "",
+            isLoading: false,
+          });
+          const chatHistories = ref([]),
+            activeChatId = ref(null),
+            isHistoryDropdownOpen = ref(false),
+            dropdownRef = ref(null),
+            chatWindow = ref(null);
+            
+          const activeChat = computed(() =>
+            chatHistories.value.find((c) => c.id === activeChatId.value)
+          );
+
+          const sendMessage = async () => {
+            const messageText = chatbot.value.currentMessage.trim();
+            if (!messageText || chatbot.value.isLoading || !chatbot.value.apiKey) return;
+            chatbot.value.isLoading = true;
+            chatbot.value.status = "正在准备请求...";
+            activeChat.value.messages.push({
+              id: `user-${Date.now()}`,
+              role: "user",
+              content: messageText,
+            });
+            if (activeChat.value.messages.length === 2)
+              activeChat.value.title = messageText.substring(0, 30) + (messageText.length > 30 ? "..." : "");
+            chatbot.value.currentMessage = "";
+            const assistantMsg = {
+              id: `assistant-${Date.now()}`,
+              role: "assistant",
+              content: "",
+              thinking: "",
+              isThinkingVisible: false,
+            };
+            activeChat.value.messages.push(assistantMsg);
+            await nextTick();
+            if (chatWindow.value) chatWindow.value.scrollTop = chatWindow.value.scrollHeight;
+            const messagesForApi = activeChat.value.messages
+              .slice(0, -1)
+              .map(({ role, content }) => ({ role, content }));
+            try {
+              chatbot.value.status = "正在与 DeepSeek 通信...";
+              const payload = {
+                messages: messagesForApi,
+                stream: true,
+                model: chatbot.value.use_deep_thinking ? "deepseek-reasoner" : "deepseek-chat",
+                max_tokens: chatbot.value.use_deep_thinking ? 65536 : 8192,
+              };
+              if (!chatbot.value.use_deep_thinking)
+                payload.temperature = parseFloat(chatbot.value.temperature);
+              const response = await fetch("https://api.deepseek.com/chat/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${chatbot.value.apiKey}`,
+                },
+                body: JSON.stringify(payload),
+              });
+              if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || `API 请求失败: ${response.status}`);
+              }
+              const reader = response.body.getReader(), decoder = new TextDecoder();
+              let buffer = "";
+              while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop();
+                for (const line of lines) {
+                  if (line.startsWith("data: ")) {
+                    const jsonStr = line.substring(6);
+                    if (jsonStr === "[DONE]") break;
+                    try {
+                      const chunk = JSON.parse(jsonStr),
+                        delta = chunk.choices[0]?.delta;
+                      if (delta) {
+                        if (delta.reasoning_content) assistantMsg.thinking += delta.reasoning_content;
+                        if (delta.content) assistantMsg.content += delta.content;
+                      }
+                    } catch (e) {
+                      console.error("解析流JSON错误:", e, jsonStr);
+                    }
+                  }
+                }
+              }
+            } catch (error) {
+              assistantMsg.content = `**错误:** ${error.message}`;
+            } finally {
+              chatbot.value.isLoading = false;
+              chatbot.value.status = "";
+            }
+          };
+
+          const saveChats = () => {
+            localStorage.setItem("deepseek_chat_histories_v2", JSON.stringify(chatHistories.value));
+            localStorage.setItem("deepseek_active_chat_id_v2", activeChatId.value);
+          };
+          
+          const loadChats = () => {
+            const saved = localStorage.getItem("deepseek_chat_histories_v2"),
+              savedId = localStorage.getItem("deepseek_active_chat_id_v2");
+            if (saved) {
+              chatHistories.value = JSON.parse(saved);
+              activeChatId.value = savedId ? parseInt(savedId) : chatHistories.value[0]?.id || null;
+            }
+            if (chatHistories.value.length === 0) createNewChat();
+          };
+          
+          const createNewChat = () => {
+            const newChat = {
+              id: Date.now(),
+              title: "新的对话",
+              messages: [
+                { id: "initial-message", role: "assistant", content: "你好！有什么可以帮助你的吗？" },
+              ],
+            };
+            chatHistories.value.push(newChat);
+            activeChatId.value = newChat.id;
+          };
+          
+          const deleteActiveChat = () => {
+            if (!activeChat.value) return;
+            const idx = chatHistories.value.findIndex((c) => c.id === activeChatId.value);
+            if (chatHistories.value.length <= 1) {
+              createNewChat();
+              chatHistories.value.splice(0, 1);
+              return;
+            }
+            chatHistories.value.splice(idx, 1);
+            activeChatId.value = chatHistories.value[idx > 0 ? idx - 1 : 0].id;
+          };
+
+          const selectChat = (id) => {
+            activeChatId.value = id;
+            isHistoryDropdownOpen.value = false;
+          };
+
+          const handleClickOutside = (e) => {
+            if (dropdownRef.value && !dropdownRef.value.contains(e.target))
+              isHistoryDropdownOpen.value = false;
+          };
+          
+          watch(chatHistories, saveChats, { deep: true });
+          watch(activeChatId, saveChats);
+          watch(() => chatbot.value.apiKey, (key) => localStorage.setItem("deepseek_api_key", key));
+          watch(() => activeChat.value?.messages, () => utils.triggerMathRendering(".message:last-child .message-content"), { deep: true });
+
+          return { chatbot, chatWindow, dropdownRef, chatHistories, activeChatId, activeChat, isHistoryDropdownOpen, sendMessage, createNewChat, deleteActiveChat, selectChat, loadChats, handleClickOutside };
+        };
+
+        createApp({
+          setup() {
+            const utils = {
+              renderMarkdown(content) {
+                if (!window.marked) return (content || "").replace(/\n/g, "<br>");
+                const mathPlaceholders = [];
+                let i = 0;
+                const text = (content || "").replace(/(\$\$[\s\S]*?\$\$|\$[^$]*?\$|\\\[[\s\S]*?\\\]|\\\(.*?\\\))/g, (match) => {
+                  const p = `<!--MATH_${i++}-->`;
+                  mathPlaceholders.push(match);
+                  return p;
+                });
+                let html = window.marked.parse(text, { gfm: true, breaks: true });
+                return html.replace(/<!--MATH_(\d+)-->/g, (m, idx) => mathPlaceholders[parseInt(idx)]);
+              },
+              triggerMathRendering(selector) {
+                nextTick(() => {
+                  if (window.renderMathInElement) {
+                    const el = document.querySelector(selector);
+                    if (el)
+                      try {
+                        window.renderMathInElement(el, {
+                          delimiters: [
+                            { left: "$$", right: "$$", display: true },
+                            { left: "$", right: "$", display: false },
+                            { left: "\\[", right: "\\]", display: true },
+                          ],
+                          throwOnError: false,
+                        });
+                      } catch (e) {
+                        console.error("KaTeX渲染错误", e);
+                      }
+                  }
+                });
+              },
+              copyToClipboard(text, event) {
+                  const tempTextArea = document.createElement('textarea');
+                  tempTextArea.value = text;
+                  document.body.appendChild(tempTextArea);
+                  tempTextArea.select();
+                  try {
+                      document.execCommand('copy');
+                      const button = event.currentTarget;
+                      const icon = button.querySelector('i');
+                      if (icon) {
+                        const originalClass = icon.className;
+                        icon.className = 'ph ph-check';
+                        setTimeout(() => {
+                           icon.className = originalClass;
+                        }, 1500);
+                      }
+                  } catch (err) {
+                      console.error('无法复制文本: ', err);
+                  }
+                  document.body.removeChild(tempTextArea);
+              }
+            };
+
+            const chatbot = useChatbot(utils);
+            
+            onMounted(() => {
+              chatbot.loadChats();
+              document.addEventListener("click", chatbot.handleClickOutside);
+              const savedApiKey = localStorage.getItem("deepseek_api_key");
+              if (savedApiKey) chatbot.chatbot.value.apiKey = savedApiKey;
+            });
+
+            onUnmounted(() => {
+              document.removeEventListener("click", chatbot.handleClickOutside);
+            });
+
+            return {
+              ...chatbot,
+              renderMarkdown: utils.renderMarkdown,
+              copyToClipboard: utils.copyToClipboard
+            };
+          },
+        }).mount("#app");
+      });
+    </script>
+</body>
+</html>
