@@ -1,5 +1,13 @@
 [
   {
+    "id": "reading",
+    "icon": "ph-fill ph-book",
+    "title": "收藏",
+    "mdFilePath": "./content/interests/collection.md",
+    "hasVideo": true,
+    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1Kj411g7Lu&page=1&as_wide=1&high_quality=1&danmaku=0"
+  },
+  {
     "id": "fitness",
     "icon": "ph-fill ph-barbell",
     "title": "健身",
@@ -8,18 +16,18 @@
     "videoUrl": ""
   },
   {
-    "id": "blender",
-    "icon": "ph-fill ph-cube",
-    "title": "Blender",
-    "mdFilePath": "./content/interests/blender.md",
-    "hasVideo": true,
-    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1Kj411g7Lu&page=1&as_wide=1&high_quality=1&danmaku=0"
-  },
-  {
     "id": "photography",
     "icon": "ph-fill ph-camera",
     "title": "摄影",
     "mdFilePath": "./content/interests/photography.md",
+    "hasVideo": false,
+    "videoUrl": ""
+  },
+  {
+    "id": "blender",
+    "icon": "ph-fill ph-cube",
+    "title": "Blender",
+    "mdFilePath": "./content/interests/blender.md",
     "hasVideo": false,
     "videoUrl": ""
   },
