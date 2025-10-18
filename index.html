@@ -1994,6 +1994,7 @@
       }
       .interest-markdown-content {
         line-height: 1.8;
+        overflow-wrap: break-word; /* 增加此行来处理长文本换行 */
       }
       .interest-markdown-content > *:first-child {
         margin-top: 0;
@@ -2036,6 +2037,15 @@
       .interest-markdown-content code {
         font-family: "Courier New", Courier, monospace;
       }
+      /* --- 新增：修复图片溢出问题 --- */
+      .interest-markdown-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin: 1.5em 0;
+        display: block; /* 确保图片为块级元素以便边距生效 */
+      }
+      /* --- 修复结束 --- */
       .fab-form-title {
         text-align: center;
         color: var(--text-color-white);
