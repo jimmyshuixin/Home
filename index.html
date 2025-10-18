@@ -1373,7 +1373,7 @@
         flex-direction: column;
         position: relative;
         border: 1px solid transparent;
-        overflow: hidden; /* 添加此行以裁剪缎带 */
+        overflow: hidden; 
       }
       .book-card {
         align-items: center;
@@ -1929,7 +1929,7 @@
         display: flex;
         gap: 1rem;
         overflow-x: auto;
-        padding: 0.5rem 1rem 1.5rem 1rem; /* 增加水平内边距以改善间距 */
+        padding: 0.5rem 1rem 1.5rem 1rem; 
         margin-bottom: 2rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -2247,7 +2247,7 @@
       @media (min-width: 900px) {
         .growth-grid {
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          align-items: stretch; /* Stretch cards to be same height */
+          align-items: stretch; 
         }
       }
       .growth-right-column {
@@ -2274,13 +2274,12 @@
         gap: 0.75rem;
         flex-shrink: 0;
       }
-      /* Make right-column cards share space, with activity feed being flexible */
       .growth-right-column .growth-card:last-child {
         flex-grow: 1;
       }
       .growth-card .activity-feed {
         flex-grow: 1;
-        min-height: 200px; /* Ensure it has some height even if content is short */
+        min-height: 200px; 
         max-height: 350px;
       }
 
@@ -3226,7 +3225,7 @@
                       :class="{ active: creationsTabActive === 'bookshelf' }"
                       @click="creationsTabActive = 'bookshelf'"
                     >
-                      <i class="ph-fill ph-books"></i><span>我的书架</span>
+                      <i class="ph-fill ph-books"></i><span>书架</span>
                     </button>
                     <button
                       class="tab-button"
@@ -3236,11 +3235,12 @@
                       <i class="ph-fill ph-trend-up"></i><span>成长与动态</span>
                     </button>
                     <button
-                        class="tab-button"
-                        :class="{ active: creationsTabActive === 'blog' }"
-                        @click="creationsTabActive = 'blog'"
+                      class="tab-button"
+                      :class="{ active: creationsTabActive === 'blog' }"
+                      @click="creationsTabActive = 'blog'"
                     >
-                        <i class="ph-fill ph-pencil-line"></i><span>我的文章</span>
+                      <i class="ph-fill ph-pencil-line"></i
+                      ><span>文章与感悟</span>
                     </button>
                   </div>
                   <div class="tab-content">
@@ -3555,52 +3555,52 @@
                       </div>
                       <div v-else-if="creationsTabActive === 'blog'" key="blog">
                         <div class="blog-panel-content">
-                            <div class="blog-sidebar">
+                          <div class="blog-sidebar">
                             <div class="blog-category-filter">
-                                <button
+                              <button
                                 v-for="category in blogCategories"
                                 :key="category"
                                 @click="activeCategory = category"
                                 :class="{ active: activeCategory === category }"
-                                >
+                              >
                                 {{ category }}
-                                </button>
+                              </button>
                             </div>
                             <div class="blog-post-list-container">
-                                <transition-group name="list-fade" tag="div"
+                              <transition-group name="list-fade" tag="div"
                                 ><div
-                                    v-for="post in filteredBlogPosts"
-                                    :key="post.id"
-                                    @click="activePostId = post.id"
-                                    class="blog-post-item"
-                                    :class="{ active: post.id === activePostId }"
-                                    tabindex="0"
-                                    @keydown.enter="activePostId = post.id"
+                                  v-for="post in filteredBlogPosts"
+                                  :key="post.id"
+                                  @click="activePostId = post.id"
+                                  class="blog-post-item"
+                                  :class="{ active: post.id === activePostId }"
+                                  tabindex="0"
+                                  @keydown.enter="activePostId = post.id"
                                 >
-                                    <h4>{{ post.title }}</h4>
-                                    <p>{{ post.date }}</p>
+                                  <h4>{{ post.title }}</h4>
+                                  <p>{{ post.date }}</p>
                                 </div></transition-group
-                                >
+                              >
                             </div>
-                            </div>
-                            <div class="blog-main">
+                          </div>
+                          <div class="blog-main">
                             <transition name="post-fade" mode="out-in"
-                                ><div
+                              ><div
                                 v-if="activePost"
                                 class="blog-post-content"
                                 :key="activePost.id"
-                                >
+                              >
                                 <h2>{{ activePost.title }}</h2>
                                 <p class="blog-post-meta">
-                                    发布于 {{ activePost.date }} | 分类: {{
-                                    activePost.category }}
+                                  发布于 {{ activePost.date }} | 分类: {{
+                                  activePost.category }}
                                 </p>
                                 <div
-                                    class="blog-post-body"
-                                    v-html="renderMarkdown(activePost.content)"
+                                  class="blog-post-body"
+                                  v-html="renderMarkdown(activePost.content)"
                                 ></div></div
                             ></transition>
-                            </div>
+                          </div>
                         </div>
                       </div>
                     </transition>
@@ -3621,7 +3621,7 @@
                   >
                     <i class="ph ph-x"></i>
                   </button>
-                  <h2>兴趣星系</h2>
+                  <h2>兴趣爱好</h2>
                   <div class="interest-pills-container">
                     <button
                       v-for="interest in interests"
@@ -4459,7 +4459,6 @@
             localPlaylistsManifest = ref([]);
           const loadResumeContent = async (path) => {
             if (!path) return;
-            // 开始加载时清空当前数据，以显示“加载中”状态
             const resumeContent = await dataLoaderService.fetchJSON(path);
             resumeData.value = resumeContent || { name: "简历加载失败" };
           };
@@ -4489,8 +4488,8 @@
             aboutContent.value = utils.renderMarkdown(aboutMd || "");
             if (resumeManifest && resumeManifest.length > 0) {
               resumesList.value = resumeManifest;
-              activeResumeId.value = resumeManifest[0].id; // 默认选中第一个
-              await loadResumeContent(resumeManifest[0].location); // 加载默认简历
+              activeResumeId.value = resumeManifest[0].id; 
+              await loadResumeContent(resumeManifest[0].location); 
             } else {
               resumeData.value = { name: "未找到简历清单" };
             }
@@ -4846,8 +4845,6 @@
                   });
                 return activities;
               });
-              // FIX: This is the section causing the error.
-              // We add a filter to ensure the event payload and commits array exist before mapping.
               const githubActivities = (github.value.events || [])
                 .filter(
                   (e) =>
@@ -4895,7 +4892,7 @@
                 id: "interests",
                 icon: "ph-fill ph-game-controller",
                 title: "个人兴趣",
-                text: "探索我工作之外的热情所在",
+                text: "探索我的热情所在",
               },
             ]);
             const allNavLinks = ref([
@@ -5181,7 +5178,6 @@
                   cancelAnimationFrame(animationFrameId);
                 }
 
-                // 1. Reset styles INSTANTLY
                 const timeline = panel.querySelector(".timeline");
                 const timelineItems = panel.querySelectorAll(".timeline-item");
                 const progressBars = panel.querySelectorAll(".progress-bar");
@@ -5200,10 +5196,9 @@
                   bar.style.width = "0%";
                 });
 
-                // 2. Force repaint and then start animations
                 requestAnimationFrame(() => {
                   requestAnimationFrame(() => {
-                    if (!panelRef.value) return; // Guard against component unmount
+                    if (!panelRef.value) return; 
 
                     timeline?.classList.add("is-visible");
                     timelineItems.forEach((item, index) => {
@@ -5348,8 +5343,8 @@
               await data.loadAllData();
 
               presetSonglists.value = [
-                { id: "9206816111", name: "「 BGM 」净尘拂人心" },
-                { id: "8886500589", name: "『纯音乐』美到窒息的旋律" },
+                { id: "9206816111", name: "净尘拂人心" },
+                { id: "9209348306", name: "入尘晓烟火" },
                 ...data.localPlaylistsManifest.value,
                 { id: "local_folder_picker", name: "📂 从本地文件夹播放" },
               ];
