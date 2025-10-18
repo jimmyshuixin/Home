@@ -2691,7 +2691,7 @@
       </div>
     </div>
     <canvas id="particle-canvas"></canvas>
-    <div id="app" @click="handleAppClick">
+    <div id="app">
       <header
         class="main-header glass-effect"
         :class="{ 'is-expanded': isHeaderExpanded, 'is-visible': isHeaderVisible }"
@@ -3133,7 +3133,7 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'resume'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef">
+                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -3294,7 +3294,7 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'creations'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef">
+                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -3704,7 +3704,7 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'interests'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef">
+                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -5040,7 +5040,8 @@
             // 新增: 应用全局点击事件处理器，用于图片点击
             const handleAppClick = (event) => {
                 if (event.target.tagName === 'IMG' && (event.target.closest('.blog-post-body') || event.target.closest('.interest-markdown-content'))) {
-                    openImageModal(event.target.src);
+                  event.preventDefault();  
+                  openImageModal(event.target.src);
                 }
             };
 
