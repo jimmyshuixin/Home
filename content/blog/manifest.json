@@ -3,21 +3,7 @@
     "id": 1,
     "title": "我的个人旅",
     "date": "2025-06-15",
-    "category": "技术分享",
-    "filePath": "./content/blog/post1.md"
-  },
-  {
-    "id": 2,
-    "title": "关于CSS的玻璃拟物效果",
-    "date": "2025-05-10",
-    "category": "前端开发",
-    "filePath": "./content/blog/post2.md"
-  },
-  {
-    "id": 3,
-    "title": "一篇生活随笔",
-    "date": "2025-04-20",
     "category": "生活",
-    "filePath": "./content/blog/post3.md"
+    "filePath": "./content/blog/mylife.md"
   }
 ]
