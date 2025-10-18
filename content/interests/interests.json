@@ -1,27 +1,34 @@
 [
   {
-    "id": "music",
-    "icon": "ph-fill ph-music-notes",
-    "title": "音乐影视",
-    "mdFilePath": "./content/interests/music.md",
+    "id": "fitness",
+    "icon": "ph-fill ph-barbell",
+    "title": "健身",
+    "mdFilePath": "./content/interests/fitness.md",
+    "hasVideo": false,
+    "videoUrl": ""
+  },
+  {
+    "id": "blender",
+    "icon": "ph-fill ph-cube",
+    "title": "Blender",
+    "mdFilePath": "./content/interests/blender.md",
     "hasVideo": true,
     "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1Kj411g7Lu&page=1&as_wide=1&high_quality=1&danmaku=0"
   },
   {
-    "id": "coding",
-    "icon": "ph-fill ph-code",
-    "title": "编程创造",
-    "mdFilePath": "./content/interests/music.md",
+    "id": "photography",
+    "icon": "ph-fill ph-camera",
+    "title": "摄影",
+    "mdFilePath": "./content/interests/photography.md",
     "hasVideo": false,
     "videoUrl": ""
   },
   {
-    "id": "gaming",
-    "icon": "ph-fill ph-game-controller",
-    "title": "电子游戏",
-    "mdFilePath": "./content/interests/music.md",
+    "id": "frontend",
+    "icon": "ph-fill ph-code",
+    "title": "前端",
+    "mdFilePath": "./content/interests/frontend.md",
     "hasVideo": false,
     "videoUrl": ""
   }
 ]
-
