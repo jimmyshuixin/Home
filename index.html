@@ -1777,6 +1777,7 @@
       .blog-post-body {
         line-height: 1.8;
         font-size: 1.05rem;
+        overflow-wrap: break-word;
       }
       .blog-post-body > *:first-child {
         margin-top: 0;
@@ -1819,6 +1820,15 @@
       .blog-post-body code {
         font-family: "Courier New", Courier, monospace;
       }
+      /* --- 新增：修复博客文章图片溢出问题 --- */
+      .blog-post-body img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin: 1.5em 0;
+        display: block;
+      }
+      /* --- 修复结束 --- */
       .timeline {
         position: relative;
         padding-left: 2rem;
