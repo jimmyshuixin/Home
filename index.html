@@ -2302,6 +2302,67 @@
         min-height: 200px; 
         max-height: 350px;
       }
+      
+      /* --- 新增: 图片灯箱/模态框样式 --- */
+      .image-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        cursor: zoom-out;
+      }
+      .image-modal-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .image-modal-content img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        cursor: default;
+      }
+      .close-image-modal-btn {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: white;
+        background: none;
+        border: none;
+        cursor: pointer;
+        line-height: 1;
+        text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        transition: transform 0.2s ease;
+      }
+      .close-image-modal-btn:hover {
+        transform: scale(1.2);
+      }
+      .blog-post-body img,
+      .interest-markdown-content img {
+        cursor: zoom-in;
+      }
+      .modal-fade-enter-active,
+      .modal-fade-leave-active {
+        transition: opacity 0.3s ease;
+      }
+      .modal-fade-enter-from,
+      .modal-fade-leave-to {
+        opacity: 0;
+      }
 
       /* --- 6. 动画效果 --- */
       @keyframes wave {
@@ -2630,7 +2691,7 @@
       </div>
     </div>
     <canvas id="particle-canvas"></canvas>
-    <div id="app">
+    <div id="app" @click="handleAppClick">
       <header
         class="main-header glass-effect"
         :class="{ 'is-expanded': isHeaderExpanded, 'is-visible': isHeaderVisible }"
@@ -2769,6 +2830,17 @@
           :style="{ transform: `translateY(calc(100vh * ${scrollProgress} - 50%))` }"
         ></div>
       </div>
+      
+      <!-- 新增: 图片预览模态框 -->
+      <transition name="modal-fade">
+        <div class="image-modal-overlay" v-if="isImageModalVisible" @click="closeImageModal">
+          <button @click.stop="closeImageModal" class="close-image-modal-btn" aria-label="关闭图片预览">&times;</button>
+          <div class="image-modal-content" @click.stop>
+            <img :src="imageModalSrc" alt="放大后的图片" />
+          </div>
+        </div>
+      </transition>
+
       <main class="main-content">
         <section
           class="initial-hero-section"
@@ -4806,6 +4878,10 @@
             const interestMarkdownContent = ref(""),
               creationsTabActive = ref("github"),
               bookshelf = ref({ activeCategory: "全部" });
+            
+            // 新增：图片预览模态框的状态
+            const isImageModalVisible = ref(false);
+            const imageModalSrc = ref('');
 
             const copyrightYear = computed(() => {
               const startYear = 2022;
@@ -4952,6 +5028,21 @@
                 (i) => i.id === openInterestId.value
               );
             });
+
+            // 新增: 打开和关闭图片模态框的方法
+            const openImageModal = (src) => {
+                imageModalSrc.value = src;
+                isImageModalVisible.value = true;
+            };
+            const closeImageModal = () => {
+                isImageModalVisible.value = false;
+            };
+            // 新增: 应用全局点击事件处理器，用于图片点击
+            const handleAppClick = (event) => {
+                if (event.target.tagName === 'IMG' && (event.target.closest('.blog-post-body') || event.target.closest('.interest-markdown-content'))) {
+                    openImageModal(event.target.src);
+                }
+            };
 
             const toggleLoginModal = () => {
               isLoginModalVisible.value = !isLoginModalVisible.value;
@@ -5555,6 +5646,11 @@
               removeCustomSonglist,
               onTabTransitionEnd,
               onTabTransitionStart,
+              // 新增：导出图片预览相关的功能
+              isImageModalVisible,
+              imageModalSrc,
+              closeImageModal,
+              handleAppClick,
             };
           },
         }).mount("#app");
