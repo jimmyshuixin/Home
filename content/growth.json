@@ -11,9 +11,8 @@
   ],
   "targets": [
     { "name": "个人网站基本完成，持续升级中", "current": 90, "total": 100 },
-    { "name": "健身第四年，身强体健，八块腹肌已成，增肌减脂中", "current": 60, "total": 100 },
-    { "name": "已经能用Blender做些不错的动画了，但被电脑限制", "current": 30, "total": 100 },
-    { "name": "摄影之路开启，另一角度看世界", "current": 5, "total": 100 },
-    { "name": "学竹笛：现在吹得太难听了，道阻且长", "current": 1, "total": 100 }
+    { "name": "健身第四年，目标：身强体健", "current": 60, "total": 100 },
+    { "name": "学竹笛：想吹一首曲子", "current": 1, "total": 100 }
   ]
+
 }
