@@ -7,7 +7,7 @@
     "category": "文学",
     "status": "read",
     "rating": 5,
-    "review": "看似言情而非言情。",
+    "review": "",
     "startDate": "2022-11-15",
     "finishDate": "2022-12-31"
   },
@@ -19,45 +19,9 @@
     "category": "文学",
     "status": "read",
     "rating": 5,
-    "review": "生命意义的启蒙之作。",
+    "review": "",
     "startDate": "2025-06-09",
     "finishDate": "2025-09-06"
-  },
-  {
-    "title": "月亮与六便士",
-    "author": "[英] 威廉·萨默塞特·毛姆",
-    "coverUrl": "./content/bookshelf/月亮与六便士.jpg",
-    "url": "https://book.douban.com/subject/25985021/",
-    "category": "文学",
-    "status": "read",
-    "rating": 4,
-    "review": "我不赞同书中那家伙的极端追求。",
-    "startDate": "2025-04-05",
-    "finishDate": "2025-05-01"
-  },
-  {
-    "title": "悉达多",
-    "author": "[德] 赫尔曼·黑塞 ",
-    "coverUrl": "./content/bookshelf/悉达多.jpg",
-    "url": "https://book.douban.com/subject/36914953/",
-    "category": "文学",
-    "status": "read",
-    "rating": 3,
-    "review": "从某一角度来说，我看他是吃饱了没事干。",
-    "startDate": "2024-06-10",
-    "finishDate": "2024-06-20"
-  },
-  {
-    "title": "城南旧事",
-    "author": "林海音",
-    "coverUrl": "./content/bookshelf/城南旧事.jpg",
-    "url": "https://book.douban.com/subject/27078375/",
-    "category": "文学",
-    "status": "read",
-    "rating": 5,
-    "review": "羡慕的童年。",
-    "startDate": "2024-05-15",
-    "finishDate": "2024-05-30"
   },
   {
     "title": "小王子",
@@ -67,21 +31,9 @@
     "category": "文学",
     "status": "read",
     "rating": 5,
-    "review": "看懂和玫瑰不能同时拥有。",
+    "review": "",
     "startDate": "2023-11-20",
     "finishDate": "2023-11-28"
-  },
-  {
-    "title": "雪国",
-    "author": "[日] 川端康成",
-    "coverUrl": "./content/bookshelf/雪国.jpg",
-    "url": "https://book.douban.com/subject/24736899/",
-    "category": "文学",
-    "status": "read",
-    "rating": 5,
-    "review": "看书不一定要看情节。",
-    "startDate": "2025-09-10",
-    "finishDate": "2025-09-11"
   },
   {
     "title": "乌合之众",
@@ -91,81 +43,9 @@
     "category": "心理学",
     "status": "read",
     "rating": 5,
-    "review": "研究饭圈与网络暴力的神作。",
+    "review": "",
     "startDate": "2024-12-01",
     "finishDate": "2024-12-15"
-  },
-  {
-    "title": "心理学导论",
-    "author": "Dennis Coon / John O. Mitterer",
-    "coverUrl": "./content/bookshelf/心理学导论.jpg",
-    "url": "https://book.douban.com/subject/2125973/",
-    "category": "心理学",
-    "status": "read",
-    "rating": 4,
-    "review": "心理学教科书。",
-    "startDate": "2025-06-10",
-    "finishDate": "2025-09-25"
-  },
-  {
-    "title": "性心理学",
-    "author": "[英] 哈夫洛克·霭理士",
-    "coverUrl": "./content/bookshelf/性心理学.jpg",
-    "url": "https://book.douban.com/subject/36688756/",
-    "category": "心理学",
-    "status": "read",
-    "rating": 5,
-    "review": "看晚了。",
-    "startDate": "2025-03-10",
-    "finishDate": "2025-03-25"
-  },
-    {
-    "title": "本草纲目",
-    "author": "李时珍",
-    "coverUrl": "./content/bookshelf/本草纲目.jpg",
-    "url": "https://book.douban.com/subject/2041978/",
-    "category": "药学",
-    "status": "reading",
-    "rating": 5,
-    "review": "为了养生。",
-    "startDate": "2022-03-10",
-    "finishDate": null
-  },
-  {
-    "title": "山海经",
-    "author": "林非 译注",
-    "coverUrl": "./content/bookshelf/山海经.jpg",
-    "url": "https://book.douban.com/subject/35922699/",
-    "category": "地理学",
-    "status": "reading",
-    "rating": 5,
-    "review": "很是抽象。",
-    "startDate": "2025-05-10",
-    "finishDate": null
-  },
-  {
-    "title": "时间简史",
-    "author": "[英] 斯蒂芬·霍金",
-    "coverUrl": "./content/bookshelf/时间简史.jpg",
-    "url": "https://book.douban.com/subject/1034282/",
-    "category": "物理学",
-    "status": "read",
-    "rating": 5,
-    "review": "看早了看不懂。",
-    "startDate": "2021-01-10",
-    "finishDate": "2021-02-10"
-  },
-  {
-    "title": "杀死一只知更鸟",
-    "author": "[美] 哈珀·李",
-    "coverUrl": "./content/bookshelf/杀死一只知更鸟.jpg",
-    "url": "https://book.douban.com/subject/26879778/",
-    "category": "文学",
-    "status": "reading",
-    "rating": 5,
-    "review": "",
-    "startDate": "2025-10-10",
-    "finishDate": null
   }
-
 ]
+
