@@ -1373,7 +1373,7 @@
         flex-direction: column;
         position: relative;
         border: 1px solid transparent;
-        overflow: hidden; 
+        overflow: hidden;
       }
       .book-card {
         align-items: center;
@@ -1939,7 +1939,7 @@
         display: flex;
         gap: 1rem;
         overflow-x: auto;
-        padding: 0.5rem 1rem 1.5rem 1rem; 
+        padding: 0.5rem 1rem 1.5rem 1rem;
         margin-bottom: 2rem;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
@@ -2267,7 +2267,7 @@
       @media (min-width: 900px) {
         .growth-grid {
           grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          align-items: stretch; 
+          align-items: stretch;
         }
       }
       .growth-right-column {
@@ -2299,10 +2299,10 @@
       }
       .growth-card .activity-feed {
         flex-grow: 1;
-        min-height: 200px; 
+        min-height: 200px;
         max-height: 350px;
       }
-      
+
       /* --- 新增: 图片灯箱/模态框样式 --- */
       .image-modal-overlay {
         position: fixed;
@@ -2331,7 +2331,7 @@
         max-height: 100%;
         object-fit: contain;
         border-radius: 12px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
         cursor: default;
       }
       .close-image-modal-btn {
@@ -2345,7 +2345,7 @@
         border: none;
         cursor: pointer;
         line-height: 1;
-        text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         transition: transform 0.2s ease;
       }
       .close-image-modal-btn:hover {
@@ -2830,11 +2830,21 @@
           :style="{ transform: `translateY(calc(100vh * ${scrollProgress} - 50%))` }"
         ></div>
       </div>
-      
+
       <!-- 新增: 图片预览模态框 -->
       <transition name="modal-fade">
-        <div class="image-modal-overlay" v-if="isImageModalVisible" @click="closeImageModal">
-          <button @click.stop="closeImageModal" class="close-image-modal-btn" aria-label="关闭图片预览">&times;</button>
+        <div
+          class="image-modal-overlay"
+          v-if="isImageModalVisible"
+          @click="closeImageModal"
+        >
+          <button
+            @click.stop="closeImageModal"
+            class="close-image-modal-btn"
+            aria-label="关闭图片预览"
+          >
+            &times;
+          </button>
           <div class="image-modal-content" @click.stop>
             <img :src="imageModalSrc" alt="放大后的图片" />
           </div>
@@ -3133,7 +3143,11 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'resume'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
+                <article
+                  class="content-card glass-effect"
+                  ref="activePanelRef"
+                  @click="handleAppClick"
+                >
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -3294,7 +3308,11 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'creations'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
+                <article
+                  class="content-card glass-effect"
+                  ref="activePanelRef"
+                  @click="handleAppClick"
+                >
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -3704,7 +3722,11 @@
                 class="journey-panel"
                 v-if="activeJourneyPanel === 'interests'"
               >
-                <article class="content-card glass-effect" ref="activePanelRef" @click="handleAppClick">
+                <article
+                  class="content-card glass-effect"
+                  ref="activePanelRef"
+                  @click="handleAppClick"
+                >
                   <button
                     @click="closeJourneyPanel"
                     class="close-panel-btn"
@@ -3848,7 +3870,15 @@
               >| 站点已运行 {{ siteUptime }}</span
             ><span class="site-info-item" v-if="icp"
               >|
-              <a href="https://beian.miit.gov.cn/" target="_blank"
+              <a
+                style="
+                  color: var(--accent-color);
+                  font-weight: 500;
+                  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+                  text-decoration: none;
+                "
+                href="https://beian.miit.gov.cn/"
+                target="_blank"
                 >{{ icp }}</a
               ></span
             >
@@ -4580,8 +4610,8 @@
             aboutContent.value = utils.renderMarkdown(aboutMd || "");
             if (resumeManifest && resumeManifest.length > 0) {
               resumesList.value = resumeManifest;
-              activeResumeId.value = resumeManifest[0].id; 
-              await loadResumeContent(resumeManifest[0].location); 
+              activeResumeId.value = resumeManifest[0].id;
+              await loadResumeContent(resumeManifest[0].location);
             } else {
               resumeData.value = { name: "未找到简历清单" };
             }
@@ -4878,10 +4908,10 @@
             const interestMarkdownContent = ref(""),
               creationsTabActive = ref("github"),
               bookshelf = ref({ activeCategory: "全部" });
-            
+
             // 新增：图片预览模态框的状态
             const isImageModalVisible = ref(false);
-            const imageModalSrc = ref('');
+            const imageModalSrc = ref("");
 
             const copyrightYear = computed(() => {
               const startYear = 2022;
@@ -5031,18 +5061,22 @@
 
             // 新增: 打开和关闭图片模态框的方法
             const openImageModal = (src) => {
-                imageModalSrc.value = src;
-                isImageModalVisible.value = true;
+              imageModalSrc.value = src;
+              isImageModalVisible.value = true;
             };
             const closeImageModal = () => {
-                isImageModalVisible.value = false;
+              isImageModalVisible.value = false;
             };
             // 新增: 应用全局点击事件处理器，用于图片点击
             const handleAppClick = (event) => {
-                if (event.target.tagName === 'IMG' && (event.target.closest('.blog-post-body') || event.target.closest('.interest-markdown-content'))) {
-                  event.preventDefault();  
-                  openImageModal(event.target.src);
-                }
+              if (
+                event.target.tagName === "IMG" &&
+                (event.target.closest(".blog-post-body") ||
+                  event.target.closest(".interest-markdown-content"))
+              ) {
+                event.preventDefault();
+                openImageModal(event.target.src);
+              }
             };
 
             const toggleLoginModal = () => {
@@ -5310,7 +5344,7 @@
 
                 requestAnimationFrame(() => {
                   requestAnimationFrame(() => {
-                    if (!panelRef.value) return; 
+                    if (!panelRef.value) return;
 
                     timeline?.classList.add("is-visible");
                     timelineItems.forEach((item, index) => {
@@ -5647,7 +5681,6 @@
               removeCustomSonglist,
               onTabTransitionEnd,
               onTabTransitionStart,
-              // 新增：导出图片预览相关的功能
               isImageModalVisible,
               imageModalSrc,
               closeImageModal,
