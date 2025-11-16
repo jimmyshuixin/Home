@@ -9,6 +9,12 @@
 <div class="rd-philosophy">
 <h3>爱好</h3>
 <p>
-健身 | Blender | 摄影 | 前端
+健身 | 摄影 | Blender | 前端
 </p>
 </div>
+
+<p style="text-align: right; margin-top: 1em;">
+  <a style="color: var(--accent-color); font-weight: 500; text-shadow: 1px 1px 3px rgba(0,0,0,0.15); text-decoration: none;" href="https://gallery.xvyin.com" target="_blank">
+    前往光隅 &raquo;
+  </a>
+</p>
