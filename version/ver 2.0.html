@@ -1,0 +1,2501 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="scroll-behavior: smooth;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="虚宁的个人主页 - 开发者、创造者、记录者">
+    <title>虚宁 | Xu Ning's Space</title>
+    <link rel="icon" href="./content/icon/32.png" />
+
+    <link rel="preconnect" href="https://source.xvyin.com" />
+    <link rel="preconnect" href="https://github.xvyin.com" />
+    
+    <!-- 字体 -->
+    <link
+      href="https://source.xvyin.com/?target=https%3A%2F%2Ffonts.loli.net%2Fcss2%3Ffamily%3DNoto%2BSerif%2BSC%3Awght%40300%3B500%3B700%3B800%26family%3DInter%3Awght%40300%3B400%3B500%3B600%26display%3Dswap"
+      rel="stylesheet"
+    />
+    <!-- APlayer CSS -->
+    <link
+      href="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* --- CSS 变量重构：支持深浅色模式切换 --- */
+      :root {
+        /* 浅色模式 (默认) */
+        --bg-body: #fdfdfd;
+        --bg-glass: rgba(255, 255, 255, 0.6);
+        --bg-glass-hover: rgba(255, 255, 255, 0.85);
+        --bg-nav: rgba(255, 255, 255, 0.7); 
+        
+        --text-primary: #1a202c;
+        --text-secondary: #718096;
+        --accent: #6b7280;
+        --accent-highlight: #3b82f6;
+        
+        --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
+        
+        --radius: 24px;
+        --container-width: 1200px;
+        --nav-height: 70px; 
+        
+        /* Loader Colors */
+        --loader-bg: var(--bg-body);
+        --loader-accent: var(--accent-highlight);
+        --loader-electron: var(--text-primary);
+
+        /* About Section Specific */
+        --about-quote-border: var(--accent-highlight);
+        
+        /* Honor Cards */
+        --honor-card-bg: rgba(255, 255, 255, 0.5);
+        --honor-card-border: rgba(255, 255, 255, 0.6);
+        --honor-card-hover: rgba(255, 255, 255, 0.9);
+      }
+
+      /* 深色模式类 */
+      html.dark-mode {
+        --bg-body: #0f0f11;
+        --bg-glass: rgba(30, 30, 35, 0.6);
+        --bg-glass-hover: rgba(45, 45, 50, 0.8);
+        --bg-nav: rgba(15, 15, 17, 0.7);
+        
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --accent: #a1a1aa;
+        
+        --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+        
+        --loader-electron: #ffffff;
+
+        --about-quote-border: #60a5fa;
+        
+        --honor-card-bg: rgba(255, 255, 255, 0.03);
+        --honor-card-border: rgba(255, 255, 255, 0.05);
+        --honor-card-hover: rgba(255, 255, 255, 0.08);
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      
+      body {
+        background-color: var(--bg-body);
+        color: var(--text-primary);
+        font-family: "Inter", "Noto Serif SC", sans-serif;
+        line-height: 1.8;
+        overflow-x: hidden;
+        transition: background-color 0.5s ease, color 0.5s ease;
+        padding-top: var(--nav-height); 
+      }
+
+      a { text-decoration: none; color: inherit; transition: all 0.3s; }
+      button { font-family: inherit; }
+
+      /* --- 顶部阅读进度条 --- */
+      .scroll-progress-container {
+        position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+        z-index: 1002; background: transparent; pointer-events: none;
+      }
+      .scroll-progress-bar {
+        height: 100%; background: var(--accent-highlight); width: 0%;
+        transition: width 0.1s linear;
+        box-shadow: 0 0 10px var(--accent-highlight);
+      }
+
+      /* --- 开屏 Loading 动画 --- */
+      #loader-wrapper {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: 9999; background-color: var(--loader-bg);
+        display: flex; justify-content: center; align-items: center;
+        transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        opacity: 1; visibility: visible;
+      }
+      #loader-wrapper.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+      .loader-container { position: relative; width: 100px; height: 100px; }
+      .loader-core {
+        position: absolute; top: 50%; left: 50%; width: 20px; height: 20px;
+        background-color: var(--loader-accent); border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 15px var(--loader-accent), 0 0 30px var(--loader-accent);
+        animation: pulse-core 2s infinite ease-in-out;
+      }
+      .loader-electron {
+        position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; margin: -4px;
+        background-color: var(--loader-electron); border-radius: 50%;
+        box-shadow: 0 0 5px var(--loader-electron);
+        animation-name: orbit; animation-duration: 4s;
+        animation-timing-function: linear; animation-iteration-count: infinite;
+      }
+      .loader-electron:nth-child(2) { animation-delay: -1.33s; animation-name: orbit-reverse; }
+      .loader-electron:nth-child(3) { animation-delay: -2.66s; animation-name: orbit-vertical; }
+      
+      @keyframes pulse-core {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 15px var(--loader-accent), 0 0 30px var(--loader-accent); }
+        50% { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 25px var(--loader-accent), 0 0 50px var(--loader-accent); }
+      }
+      @keyframes orbit { from { transform: rotate(0deg) translateX(45px) rotate(0deg); } to { transform: rotate(360deg) translateX(45px) rotate(-360deg); } }
+      @keyframes orbit-reverse { from { transform: rotate(0deg) translateX(35px) rotate(0deg) scale(0.8); } to { transform: rotate(-360deg) translateX(35px) rotate(360deg) scale(0.8); } }
+      @keyframes orbit-vertical { 0% { transform: rotate(90deg) translateX(55px) rotate(-90deg) scale(1.1); } 100% { transform: rotate(450deg) translateX(55px) rotate(-450deg) scale(1.1); } }
+
+      /* --- 背景动效 --- */
+      .ambient-light { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+      .orb {
+        position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.25;
+        animation: float 25s infinite alternate ease-in-out;
+      }
+      .orb-1 { top: -20%; right: -10%; width: 70vw; height: 70vw; background: #e0e7ff; }
+      .orb-2 { bottom: -20%; left: -20%; width: 60vw; height: 60vw; background: #f3e8ff; animation-delay: -8s; }
+      
+      /* 深色模式下的光球适配 */
+      html.dark-mode .orb-1 { background: #1e1b4b; opacity: 0.4; }
+      html.dark-mode .orb-2 { background: #312e81; opacity: 0.4; }
+
+      @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
+      
+      #particle-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.8; pointer-events: none; }
+
+      /* --- 弹幕相关样式 --- */
+      .danmaku-container {
+        position: absolute; top: 0; left: 0; width: 100%; height: 85%;
+        pointer-events: none; z-index: 1; overflow: hidden;
+      }
+      .danmaku-item {
+        position: absolute; right: 0; transform: translateX(100%);
+        white-space: nowrap; font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+        font-weight: 500; padding: 6px 16px; border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        animation-name: danmaku-scroll; animation-timing-function: linear; animation-iteration-count: 1;
+        color: var(--text-primary);
+      }
+      html.dark-mode .danmaku-item { background-color: rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+      
+      @keyframes danmaku-scroll {
+        from { transform: translateX(100vw); }
+        to { transform: translateX(-100vw); }
+      }
+      .danmaku-fade-enter-active, .danmaku-fade-leave-active { transition: opacity 0.5s ease; }
+      .danmaku-fade-enter-from, .danmaku-fade-leave-to { opacity: 0; }
+
+      /* --- 布局与导航 --- */
+      .main-container {
+        width: 100%; 
+        max-width: var(--container-width);
+        margin: 0 auto;
+        padding: 0 2rem 8rem;
+        position: relative; z-index: 1;
+        animation: fadeInContent 1s ease-out;
+      }
+      @keyframes fadeInContent { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+      .nav-container {
+        position: fixed; top: 0; left: 0; right: 0;
+        height: var(--nav-height);
+        background: var(--bg-nav);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: none;
+        z-index: 1000; 
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; 
+      }
+      .nav-container.nav-hidden {
+        transform: translateY(-100%); 
+        box-shadow: none;
+      }
+
+      .nav-header {
+        display: flex; justify-content: space-between; align-items: center;
+        height: 100%; 
+        width: 100%; 
+        max-width: 100%;
+        margin: 0 auto; 
+        padding: 0 2rem;
+      }
+      
+      .logo { 
+        font-family: "Noto Serif SC", serif; 
+        font-weight: 800; 
+        font-size: 1.6rem; 
+        letter-spacing: 0.02em; 
+        cursor: pointer;
+        background: linear-gradient(120deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 0.95;
+        transition: opacity 0.3s ease;
+      }
+      .logo:hover { opacity: 1; }
+      html.dark-mode .logo { background: linear-gradient(120deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      
+      .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+      .nav-links a { 
+        margin-left: 0;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem; 
+        font-weight: 500;
+        color: var(--text-secondary); 
+        border-radius: 50px; 
+        transition: all 0.3s ease; 
+      }
+      .nav-links a:hover { 
+        color: var(--text-primary);
+        background-color: rgba(0, 0, 0, 0.04); 
+      }
+      html.dark-mode .nav-links a:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+      /* 主题切换按钮 */
+      .theme-toggle-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 0.6rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        margin-left: 0.5rem;
+        font-size: 1.2rem;
+      }
+      .theme-toggle-btn:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+        color: var(--accent-highlight);
+        transform: rotate(15deg);
+      }
+      html.dark-mode .theme-toggle-btn:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+      }
+
+      .mobile-menu-btn { 
+        display: none; background: none; border: none; color: var(--text-primary); 
+        font-size: 1.6rem; cursor: pointer; padding: 0.6rem; border-radius: 50%;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+      .mobile-menu-btn:hover { background-color: rgba(0,0,0,0.04); }
+      html.dark-mode .mobile-menu-btn:hover { background-color: rgba(255,255,255,0.08); }
+      .mobile-menu-btn:active { transform: scale(0.9); }
+      
+      .mobile-menu-overlay {
+        position: fixed; inset: 0; background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        z-index: 999; display: flex; justify-content: center; align-items: center;
+      }
+      html.dark-mode .mobile-menu-overlay { background: rgba(15, 15, 17, 0.98); }
+      .mobile-links { display: flex; flex-direction: column; align-items: center; gap: 2.5rem; }
+      .mobile-links a {
+        font-family: "Noto Serif SC"; font-size: 1.5rem; font-weight: 500;
+        color: var(--text-primary); cursor: pointer; transition: all 0.3s;
+      }
+      .mobile-links a:hover { color: var(--accent-highlight); letter-spacing: 0.1em; }
+      .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+      .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+      /* --- 散落网格 (主布局) --- */
+      .scatter-grid {
+        display: grid; grid-template-columns: repeat(12, 1fr); gap: 3rem;
+        margin-bottom: 8rem; align-items: start; scroll-margin-top: 120px; 
+      }
+      .section-header {
+        grid-column: 1 / 4; position: sticky; top: 6rem; 
+        margin-bottom: 2rem; text-align: left; height: fit-content;
+      }
+      .section-label {
+        font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em;
+        color: var(--accent); margin-bottom: 0.5rem; display: block; font-weight: 600;
+      }
+      .section-title {
+        font-family: "Noto Serif SC"; font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+        font-weight: 300; line-height: 1.2; color: var(--text-primary);
+      }
+      .section-content {
+        grid-column: 5 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;
+      }
+
+      /* --- Hero --- */
+      .hero-wrapper {
+        min-height: 80vh; 
+        display: grid; grid-template-columns: 1.2fr 1fr; align-items: center;
+        margin: 0 auto 6rem; 
+        gap: 2rem; position: relative;
+        padding-top: 2rem;
+        width: 100%;
+      }
+      .hero-text { position: relative; z-index: 2; }
+      .hero-text h1 {
+        font-family: "Noto Serif SC"; font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 300; line-height: 1.1; margin-bottom: 2rem;
+        letter-spacing: -0.03em; min-height: 2.2em;
+        color: var(--text-primary);
+      }
+      .hero-text p { color: var(--text-secondary); font-size: 1.1rem; max-width: 450px; line-height: 1.8; margin-bottom: 2rem; }
+      
+      .hero-btns {
+        display: flex; gap: 10px; margin-top: 2rem; flex-wrap: wrap; align-items: center;
+        animation: fadeIn 1s ease-out;
+      }
+      
+      .hero-location {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 0.9rem; color: var(--text-primary); 
+        border: 1px solid rgba(127, 127, 127, 0.2); padding: 8px 20px; border-radius: 50px;
+        backdrop-filter: blur(10px); transition: all 0.3s ease;
+      }
+      .hero-location:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+      .hero-visual { position: relative; display: flex; justify-content: center; z-index: 2; }
+      .hero-img-box {
+        width: clamp(280px, 40vw, 400px); height: clamp(350px, 50vw, 500px);
+        border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%;
+        overflow: hidden; position: relative; box-shadow: var(--shadow-hover);
+        animation: morph 8s ease-in-out infinite alternate; background: var(--bg-glass);
+      }
+      @keyframes morph {
+        0% { border-radius: 50% 50% 40% 40% / 60% 60% 40% 40%; }
+        100% { border-radius: 40% 60% 50% 50% / 40% 50% 60% 60%; }
+      }
+      .hero-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s ease; }
+      .hero-img-box:hover img { transform: scale(1.05); }
+
+      /* --- 优化后的 About Section (Borderless V2) --- */
+      .about-card {
+        grid-column: 1 / -1;
+        /* 移除内边距，使其自然融入页面 */
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        /* 移除背景和阴影，实现“无边框” */
+        background: transparent;
+        box-shadow: none;
+        border: none;
+      }
+      
+      .about-content-wrapper {
+        font-size: 1.1rem;
+        line-height: 2;
+        color: var(--text-primary);
+      }
+
+      .about-quote {
+        margin-bottom: 2.5rem;
+        /* 只保留左侧强调线，移除背景框 */
+        padding: 0.5rem 0 0.5rem 2rem;
+        background: transparent;
+        border-left: 4px solid var(--accent-highlight);
+        
+        font-family: "Noto Serif SC", serif;
+        font-style: italic;
+        font-size: 1.5rem; /* 更大气的字体 */
+        color: var(--text-primary);
+        position: relative;
+        opacity: 0.9;
+      }
+      
+      /* 移除之前的伪元素引号，改用纯净的排版 */
+      .about-quote::before { display: none; }
+
+      .about-drop-cap {
+        font-size: 3.8rem;
+        float: left;
+        line-height: 0.8;
+        margin-right: 16px;
+        margin-top: 8px;
+        font-family: "Noto Serif SC";
+        font-weight: 900;
+        
+        color: transparent;
+        background: linear-gradient(135deg, var(--accent-highlight), var(--accent));
+        -webkit-background-clip: text;
+        opacity: 1;
+      }
+
+      .about-text {
+        margin-bottom: 3rem;
+        text-align: justify;
+      }
+      .about-text p {
+        margin-bottom: 1.5rem;
+      }
+
+      /* --- Resume Section --- */
+      .resume-subtitle {
+        grid-column: 1 / -1;
+        font-size: 1.1rem; font-weight: 600; color: var(--text-primary);
+        margin-top: 1rem; margin-bottom: 1.5rem;
+        display: flex; align-items: center; gap: 0.8rem;
+        font-family: "Noto Serif SC";
+      }
+      .resume-subtitle::after {
+        content: ''; flex: 1; height: 1px; background: rgba(127,127,127,0.1);
+      }
+
+      .edu-container {
+        grid-column: 1 / -1;
+        display: flex; flex-direction: column; gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      .edu-item {
+        display: flex; gap: 1.5rem;
+        padding: 1.5rem;
+        background: var(--bg-glass);
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.2);
+        backdrop-filter: blur(12px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .edu-item:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-soft);
+        border-color: rgba(59, 130, 246, 0.2);
+      }
+      .edu-icon {
+        width: 48px; height: 48px; border-radius: 12px;
+        background: rgba(59, 130, 246, 0.08); color: var(--accent-highlight);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 1.5rem; flex-shrink: 0;
+      }
+      .edu-content { flex: 1; }
+      .edu-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+      .edu-school { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+      .edu-time { 
+        font-size: 0.85rem; color: var(--text-secondary); 
+        padding: 4px 10px; background: rgba(0,0,0,0.03); border-radius: 4px; font-family: monospace;
+      }
+      .edu-major { font-size: 0.95rem; color: var(--accent); margin-bottom: 0.5rem; }
+      
+      .edu-stats-row {
+        display: flex; gap: 1.5rem; margin-top: 0.3rem; flex-wrap: wrap; align-items: center;
+      }
+      .edu-stat-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        opacity: 0.9;
+      }
+      .edu-stat-badge i {
+        color: #f59e0b;
+        font-size: 1.1rem;
+        opacity: 0.8;
+      }
+      html.dark-mode .edu-stat-badge i { color: #fbbf24; }
+
+      .project-grid {
+        grid-column: 1 / -1;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem; margin-bottom: 2rem;
+      }
+      .project-card {
+        background: var(--bg-glass);
+        border-radius: 20px; padding: 1.8rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        display: flex; flex-direction: column;
+        transition: all 0.3s ease;
+        position: relative; overflow: hidden;
+      }
+      .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+      .project-time-capsule {
+        align-self: flex-start;
+        font-size: 0.75rem; color: #d97706; background: rgba(251, 191, 36, 0.1);
+        padding: 4px 12px; border-radius: 50px; margin-bottom: 1rem;
+        font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
+      }
+      .project-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-primary); }
+      .project-role { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 500; }
+      .project-result { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; flex-grow: 1; }
+      
+      .exp-container { grid-column: 1 / -1; display: flex; flex-direction: column; overflow: hidden; }
+      .exp-group-header {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--accent-highlight);
+        background: rgba(59, 130, 246, 0.05);
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        font-family: "Noto Serif SC";
+      }
+      html.dark-mode .exp-group-header { background: rgba(59, 130, 246, 0.1); border-bottom-color: rgba(255,255,255,0.05); }
+      
+      .exp-item {
+        display: grid; grid-template-columns: 140px 1fr; gap: 2rem;
+        padding: 1.2rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.03);
+        align-items: center;
+      }
+      .exp-item:last-child { border-bottom: none; }
+      .exp-time { font-size: 0.85rem; color: var(--text-secondary); font-family: monospace; }
+      .exp-role { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; color: var(--text-primary); }
+      .exp-desc { font-size: 0.9rem; color: var(--text-secondary); }
+
+      html.dark-mode .edu-item, html.dark-mode .project-card { border-color: rgba(255,255,255,0.05); }
+      html.dark-mode .edu-time { background: rgba(255,255,255,0.05); color: #cbd5e1; }
+      html.dark-mode .exp-item { border-bottom-color: rgba(255,255,255,0.05); }
+
+      /* --- NEW: 荣誉列表 CSS --- */
+      .honors-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        width: 100%;
+      }
+      .honor-stage {
+        position: relative;
+      }
+      .honor-stage-title {
+        font-family: "Noto Serif SC";
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--text-primary);
+        border-left: 3px solid var(--accent-highlight);
+        padding-left: 0.8rem;
+      }
+      .honor-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+      .honor-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 1rem;
+        background: var(--honor-card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--honor-card-border);
+        transition: all 0.3s ease;
+      }
+      .honor-card:hover {
+        transform: translateY(-3px);
+        background: var(--honor-card-hover);
+        box-shadow: var(--shadow-soft);
+        border-color: var(--accent-highlight);
+      }
+      .honor-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+      .honor-text {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      /* 研究生阶段为空时的特殊样式 */
+      .honor-empty {
+        font-style: italic;
+        color: var(--accent);
+        opacity: 0.7;
+        font-size: 0.9rem;
+        padding-left: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        .edu-item { flex-direction: column; gap: 1rem; }
+        .edu-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+        .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+        .exp-time { color: var(--accent-highlight); opacity: 0.8; margin-bottom: 0.2rem; display: block; }
+        .honor-list { grid-template-columns: 1fr; }
+      }
+
+      .glass-card {
+        border-radius: var(--radius); background: var(--bg-glass);
+        backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+        box-shadow: var(--shadow-soft); transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border: none; overflow: hidden; display: flex; flex-direction: column;
+      }
+      .glass-card:hover { transform: translateY(-8px); background: var(--bg-glass-hover); box-shadow: var(--shadow-hover); }
+      .scatter-item { grid-column: span 1; }
+      .scatter-item-wide { grid-column: span 2; }
+      @media (min-width: 901px) { .section-content .scatter-item:nth-child(even) { margin-top: 4rem; } }
+      .card-cover {
+        width: 100%; height: 240px; object-fit: cover; border-radius: var(--radius);
+        margin-bottom: 1rem; box-shadow: var(--shadow-soft); transition: transform 0.4s ease;
+      }
+      .glass-card:hover .card-cover { transform: scale(1.02); }
+
+      /* --- GitHub --- */
+      .github-section-title {
+        grid-column: 1 / -1; font-size: 1.2rem; font-weight: 600; color: var(--text-primary);
+        margin-top: 2rem; margin-bottom: 1.5rem; padding-left: 1rem;
+        border-left: 3px solid var(--accent-highlight); font-family: "Noto Serif SC";
+      }
+      .github-stats-grid {
+        grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem; margin-bottom: 1rem;
+      }
+      .stat-item {
+        background: var(--bg-glass); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 24px; padding: 1.5rem; display: flex; flex-direction: column;
+        position: relative; overflow: hidden; transition: transform 0.3s;
+        backdrop-filter: blur(16px); box-shadow: var(--shadow-soft);
+      }
+      html.dark-mode .stat-item { border-color: rgba(255,255,255,0.05); }
+      .stat-item:hover { transform: translateY(-3px); background: var(--bg-glass-hover); }
+      .stat-item::after {
+        content: ''; position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.05; font-family: "Phosphor"; color: var(--text-primary); pointer-events: none;
+      }
+      .stat-item.contribs::after { content: ''; } .stat-item.repos::after { content: ''; }
+      .stat-item.stars::after { content: ''; } .stat-item.forks::after { content: ''; }
+      .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; margin-bottom: 0.5rem; }
+      .stat-label { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+      .repo-card {
+        background: var(--bg-glass); border: 1px solid rgba(226, 232, 240, 0.5);
+        border-radius: 24px; padding: 1.8rem; display: flex; flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; color: inherit; height: 100%; position: relative;
+      }
+      html.dark-mode .repo-card { border-color: rgba(255,255,255,0.05); }
+      .repo-card:hover {
+        border-color: var(--accent-highlight); box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.15);
+        transform: translateY(-5px); background: var(--bg-glass-hover);
+      }
+      .repo-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+      .repo-title { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); transition: color 0.2s; word-break: break-all; }
+      .repo-card:hover .repo-title { color: var(--accent-highlight); }
+      .repo-desc { 
+        font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; flex-grow: 1; margin-bottom: 1.5rem; 
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .repo-meta { display: flex; gap: 1.2rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+      .repo-meta span { display: flex; align-items: center; }
+      .lang-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+      .load-more-btn {
+        margin: 3rem auto 0; display: block; background: var(--bg-glass); padding: 1rem 3rem; border-radius: 50px;
+        border: 1px solid rgba(127,127,127,0.1); cursor: pointer; font-size: 1rem; color: var(--text-primary); font-weight: 600;
+        transition: all 0.3s; backdrop-filter: blur(10px);
+      }
+      .load-more-btn:hover { background: var(--bg-glass-hover); transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+
+      .book-card { background: transparent; box-shadow: none; align-items: center; text-align: center; padding: 1rem; }
+      .book-cover {
+        width: 120px; height: 180px; object-fit: cover; border-radius: 6px; box-shadow: 5px 8px 20px rgba(0,0,0,0.15);
+        transform: rotate(-2deg); transition: transform 0.3s ease; margin-bottom: 1rem; background: #f0f0f0;
+      }
+      .book-card:hover .book-cover { transform: rotate(0deg) scale(1.05) translateY(-5px); }
+
+      .tags-cloud { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+      .tag {
+        padding: 0.4rem 1rem; border-radius: 50px; background: var(--bg-glass); font-size: 0.85rem;
+        border: 1px solid rgba(0,0,0,0.05); color: var(--text-secondary); transition: all 0.3s;
+      }
+      .tag:hover { background: var(--text-primary); color: var(--bg-body); border-color: transparent; }
+
+      .game-tag:hover {
+        background: #8b5cf6; color: white;
+      }
+
+      /* --- Immersive Section --- */
+      .interests-container {
+        grid-column: 1 / -1;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+      }
+
+      .game-immersive-card {
+        position: relative;
+        background: radial-gradient(
+          circle at 70% 50%, 
+          var(--theme-bg) 0%, 
+          rgba(255, 255, 255, 0) 65%
+        );
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        min-height: 650px;
+        display: flex;
+        flex-direction: row;
+        overflow: visible;
+        transition: background 0.8s ease;
+        margin: 0 -4rem; 
+        width: calc(100% + 8rem);
+        padding: 0 4rem;
+      }
+      
+      .game-char-stage {
+        flex: 1;
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: var(--container-width);
+        margin: 0 auto;
+      }
+      
+      .char-info-block {
+        position: absolute;
+        top: 40%;
+        left: 5%;
+        transform: translateY(-50%);
+        z-index: 5;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        text-shadow: 0 10px 30px rgba(255,255,255,0.8);
+      }
+      
+      .char-name-display {
+        font-family: "Noto Serif SC";
+        font-size: 5rem;
+        font-weight: 900;
+        color: var(--theme-text);
+        line-height: 1;
+        margin-bottom: 1.5rem;
+        white-space: nowrap;
+        opacity: 0.9;
+      }
+      .char-tag-display {
+        display: inline-block;
+        padding: 0.6rem 1.8rem;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(5px);
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        border: 1px solid rgba(255,255,255,0.2);
+      }
+
+      .char-img-container {
+        position: absolute;
+        top: -5%; bottom: -5%; right: 0%;
+        width: 60%;
+        display: flex;
+        justify-content: center;
+        z-index: 2;
+        pointer-events: none;
+      }
+      
+      @keyframes breathe {
+        0%, 100% { transform: translate(-50%, 0) scale(1); }
+        50% { transform: translate(-50%, -10px) scale(1.015); }
+      }
+
+      .char-img-full {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 100%;
+        width: auto;
+        max-width: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 30px 30px rgba(0,0,0,0.15));
+        animation: breathe 6s ease-in-out infinite;
+        transition: opacity 0.6s ease;
+        will-change: opacity, transform;
+      }
+
+      .nav-arrow {
+        position: absolute;
+        top: 50%; transform: translateY(-50%);
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.3);
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer;
+        color: var(--text-primary);
+        transition: all 0.3s;
+        z-index: 10;
+      }
+      .nav-arrow:hover { 
+        background: white; 
+        color: var(--accent-highlight);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        transform: translateY(-50%) scale(1.1); 
+      }
+      .nav-left { left: 0; }
+      .nav-right { right: 0; }
+
+      .dock-wrapper {
+        position: absolute;
+        bottom: 3rem;
+        left: 5%;
+        z-index: 10;
+      }
+      .dock-container {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(15px);
+        padding: 6px;
+        border-radius: 20px;
+        display: flex;
+        gap: 8px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,0.4);
+      }
+      .dock-item {
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        display: flex; align-items: center; 
+        font-size: 0.95rem; font-weight: 700;
+        color: var(--text-secondary);
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .dock-item i { font-size: 1.2rem; flex-shrink: 0; }
+      
+      .dock-item span {
+        max-width: 0;
+        opacity: 0;
+        margin-left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        transition: all 0.4s ease;
+      }
+      
+      .dock-item.active {
+        background: #1a202c;
+        color: #ffffff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        padding-left: 20px; padding-right: 20px;
+      }
+      .dock-item.active span {
+        max-width: 300px;
+        opacity: 1;
+        margin-left: 8px;
+      }
+
+      .dock-item:hover:not(.active) { background: rgba(255,255,255,0.8); color: var(--text-primary); }
+
+      @media (max-width: 900px) {
+        .game-immersive-card { 
+            margin: 0 -2rem; 
+            width: calc(100% + 4rem); 
+            padding: 0 2rem;
+            flex-direction: column;
+            min-height: 600px;
+            background: radial-gradient(circle at 50% 80%, var(--theme-bg), transparent 70%);
+        }
+        .game-char-stage { flex-direction: column; }
+        .char-info-block { 
+            position: relative; top: 0; left: 0; transform: none; 
+            align-items: center; text-align: center; margin-top: 3rem;
+            width: 100%;
+        }
+        .char-name-display { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .char-img-container { 
+            position: relative; 
+            width: 100%; 
+            height: 400px;
+            max-height: 60vh;
+            top: auto; right: auto; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            margin-top: 1rem;
+            justify-content: center;
+        }
+        
+        .char-img-full { object-position: bottom center; }
+        .dock-wrapper { 
+            position: relative; bottom: 0; left: 0; 
+            margin-top: -2rem; margin-bottom: 2rem;
+            display: flex; justify-content: center; 
+        }
+        .dock-container { 
+            width: max-content;
+            max-width: 100%; 
+            overflow-x: auto; 
+        }
+        .nav-arrow { display: none; }
+        
+        .nav-links { display: none; } 
+        .mobile-menu-btn { display: block; }
+        .scatter-grid { display: block; }
+        .section-header { position: static; margin-bottom: 2rem; padding-top: 6rem; border-top: 1px solid rgba(0,0,0,0.05); }
+        .section-header:first-child { border-top: none; padding-top: 0; }
+        .section-content { display: grid; grid-template-columns: 1fr; gap: 2rem; } 
+        .scatter-item-wide { grid-column: span 1; }
+        .section-content .scatter-item:nth-child(even) { margin-top: 0; }
+        
+        .hero-wrapper { grid-template-columns: 1fr; text-align: center; gap: 3rem; min-height: auto; padding-top: 2rem; }
+        .hero-btns { justify-content: center; } 
+        
+        .hero-visual { justify-content: center; order: -1; }
+        .hero-text h1 { margin-bottom: 1rem; }
+        .hero-text p { margin: 0 auto 2rem; }
+        
+        .project-grid { grid-template-columns: 1fr; }
+        
+        .github-stats-grid { grid-template-columns: repeat(2, 1fr); }
+        .back-to-top { bottom: 5rem; right: 1rem; }
+      }
+
+      /* --- Contact Tab --- */
+      .contact-tabs {
+        display: flex; gap: 1rem; margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(127, 127, 127, 0.1); padding-bottom: 0.5rem;
+      }
+      .contact-tab-btn {
+        background: none; border: none; font-size: 1.1rem; font-weight: 600;
+        color: var(--text-secondary); cursor: pointer; padding: 0.5rem 1rem;
+        transition: all 0.3s ease; position: relative;
+      }
+      .contact-tab-btn.active { color: var(--text-primary); }
+      .contact-tab-btn.active::after {
+        content: ''; position: absolute; bottom: -0.6rem; left: 0; width: 100%; height: 2px;
+        background-color: var(--accent-highlight);
+      }
+      .contact-tab-btn.active:hover { color: var(--text-primary); }
+      .contact-tab-btn:hover { color: var(--text-primary); }
+
+      .switch-mode-enter-active,
+      .switch-mode-leave-active {
+        transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+      }
+      .switch-mode-enter-from,
+      .switch-mode-leave-to {
+        opacity: 0;
+        transform: translateY(5px);
+        filter: blur(4px);
+      }
+
+      .back-to-top {
+        position: fixed; bottom: 6rem; right: 2rem;
+        width: 3rem; height: 3rem; border-radius: 50%;
+        background: var(--bg-glass); backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: var(--shadow-soft);
+        color: var(--text-primary);
+        display: flex; justify-content: center; align-items: center;
+        cursor: pointer; transition: all 0.3s ease;
+        opacity: 0; pointer-events: none; transform: translateY(10px);
+        z-index: 90;
+      }
+      .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+      .back-to-top:hover { background: var(--accent-highlight); color: white; transform: translateY(-3px); }
+
+      @media (max-width: 1024px) { 
+        .main-container { padding: 0 2rem 6rem; } 
+        .hero-wrapper { gap: 1rem; } 
+      }
+
+      @media (max-width: 768px) {
+        .nav-header { padding: 0 1.5rem; }
+        .main-container { padding: 0 1.5rem 6rem; }
+      }
+      @media (max-width: 480px) {
+        .nav-header { padding: 0 1rem; }
+        .main-container { padding: 0 1rem 6rem; }
+      }
+
+      /* --- Music Bar --- */
+      .floating-bar {
+        position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+        z-index: 50; display: flex; align-items: center; gap: 1rem; width: auto; max-width: 90vw;
+      }
+      .music-pill {
+        background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 0.5rem 1.2rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 0.8rem;
+        transition: transform 0.3s; cursor: pointer;
+      }
+      @media (prefers-color-scheme: dark) { .music-pill { background: rgba(30,30,30,0.6); border-color: rgba(255,255,255,0.1); } }
+      .music-pill:active { transform: scale(0.98); }
+      .music-cover { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+      .music-info { display: flex; flex-direction: column; max-width: 120px; }
+      .music-title { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .music-artist { font-size: 0.7rem; opacity: 0.7; display: none; }
+      @media (min-width: 600px) { .music-artist { display: block; } }
+      .animate-spin { animation: spin 3s linear infinite; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .typing-cursor {
+        display: inline-block; width: 2px; height: 1em; background-color: var(--accent-highlight);
+        animation: blink 1s infinite; vertical-align: text-bottom; margin-left: 2px;
+      }
+      @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+      
+      .mobile-date-badge { display: none; }
+
+      /* --- Gallery Showcase --- */
+      .gallery-showcase {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+        border-radius: 30px;
+        padding: 3rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border: 1px solid rgba(255,255,255,0.3);
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        text-decoration: none;
+        box-shadow: var(--shadow-soft);
+      }
+      html.dark-mode .gallery-showcase { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-color: rgba(255,255,255,0.05); }
+      
+      .gallery-showcase:hover {
+        background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+      }
+      
+      .gallery-text {
+        flex: 1; z-index: 2; max-width: 350px; margin-right: 2rem;
+      }
+      .gallery-heading {
+        font-family: "Noto Serif SC"; font-size: 2.5rem; font-weight: 300;
+        color: var(--text-primary); margin-bottom: 1rem; line-height: 1.1;
+      }
+      .gallery-desc {
+        font-size: 1rem; color: var(--text-secondary); margin-bottom: 2rem;
+        line-height: 1.7;
+      }
+      .gallery-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        font-weight: 600; color: var(--accent-highlight);
+        font-size: 1rem; transition: gap 0.3s;
+      }
+      .gallery-showcase:hover .gallery-btn,
+      .gallery-showcase.is-animating .gallery-btn { gap: 12px; }
+
+      .gallery-visuals {
+        flex: 1.2; position: relative; height: 320px; 
+        display: flex; align-items: center; justify-content: center;
+        perspective: 1000px;
+      }
+      .polaroid {
+        background: white; padding: 12px 12px 35px 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        position: absolute; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        width: 200px; transform-origin: center 80%;
+        border-radius: 4px;
+      }
+      .polaroid img { 
+        width: 100%; height: 200px; object-fit: cover; 
+        background: #f0f0f0; filter: grayscale(20%);
+        transition: filter 0.5s;
+      }
+      
+      .gallery-showcase:hover .polaroid img,
+      .gallery-showcase.is-animating .polaroid img { filter: grayscale(0%); }
+      
+      .p1 { transform: rotate(-8deg) translate(-40px, 10px) scale(0.9); z-index: 1; }
+      .p2 { transform: rotate(4deg) translate(0px, -10px) scale(0.95); z-index: 2; }
+      .p3 { transform: rotate(-2deg) translate(40px, 20px) scale(1); z-index: 3; box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+
+      .gallery-showcase:hover .p1, .gallery-showcase.is-animating .p1 { transform: rotate(-15deg) translate(-90px, 0px) scale(1); z-index: 3; }
+      .gallery-showcase:hover .p2, .gallery-showcase.is-animating .p2 { transform: rotate(0deg) translate(0px, -40px) scale(1.05); z-index: 4; }
+      .gallery-showcase:hover .p3, .gallery-showcase.is-animating .p3 { transform: rotate(12deg) translate(90px, 10px) scale(1.05); z-index: 5; }
+
+      @media (max-width: 480px) {
+        .gallery-showcase.is-animating .p1 { transform: rotate(-12deg) translate(-60px, 0px) scale(1); }
+        .gallery-showcase.is-animating .p3 { transform: rotate(10deg) translate(60px, 10px) scale(1.05); }
+      }
+
+      @media (max-width: 900px) {
+        .gallery-showcase { flex-direction: column; padding: 2.5rem 2rem; text-align: center; }
+        .gallery-text { margin-right: 0; margin-bottom: 2rem; max-width: 100%; }
+        .gallery-heading { font-size: 2rem; }
+        .gallery-visuals { width: 100%; height: 260px; }
+        .polaroid { width: 160px; padding: 10px 10px 25px 10px; }
+        .polaroid img { height: 160px; }
+      }
+
+      /* --- Plans Section --- */
+      .plans-grid {
+        grid-column: 1 / -1;
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+      }
+      .plan-card {
+        background: var(--bg-glass);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px; padding: 2rem;
+        display: flex; flex-direction: column;
+        transition: all 0.3s ease;
+        position: relative; overflow: hidden;
+      }
+      html.dark-mode .plan-card { border-color: rgba(255,255,255,0.05); }
+      .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+      
+      .plan-card.is-active::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, transparent, var(--accent-highlight), transparent);
+        opacity: 0.6; animation: shimmer 3s infinite;
+      }
+      @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+      .plan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+      .plan-icon-box {
+        width: 48px; height: 48px; border-radius: 12px;
+        background: rgba(59, 130, 246, 0.08); color: var(--accent-highlight);
+        display: flex; justify-content: center; align-items: center; font-size: 1.5rem;
+      }
+      .plan-status-badge {
+        font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 50px;
+        text-transform: uppercase; letter-spacing: 0.05em;
+      }
+      .status-planning { background: rgba(127,127,127,0.1); color: var(--text-secondary); border: 1px dashed rgba(127,127,127,0.3); }
+      .status-ing { background: rgba(59, 130, 246, 0.1); color: var(--accent-highlight); border: 1px solid rgba(59, 130, 246, 0.2); }
+      .status-done { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+      .plan-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; font-family: "Noto Serif SC"; }
+      .plan-desc { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; min-height: 3em; }
+
+      .milestone-list { list-style: none; padding: 0; margin-bottom: 2rem; flex: 1; }
+      .milestone-item {
+        display: flex; align-items: center; gap: 10px; font-size: 0.85rem;
+        color: var(--text-secondary); margin-bottom: 0.6rem;
+        transition: opacity 0.2s;
+      }
+      .milestone-item.done { color: var(--text-primary); text-decoration: none; }
+      .milestone-item.done i { color: #10b981; }
+      .milestone-item i { font-size: 1rem; color: var(--accent); opacity: 0.5; }
+
+      .plan-progress-container { margin-top: auto; }
+      .plan-progress-label {
+        display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600;
+        color: var(--text-secondary); margin-bottom: 6px;
+      }
+      .dna-bar { display: flex; gap: 4px; height: 6px; width: 100%; }
+      .dna-segment {
+        flex: 1; border-radius: 2px; background: rgba(0,0,0,0.05); transition: background 0.3s;
+      }
+      html.dark-mode .dna-segment { background: rgba(255,255,255,0.1); }
+      .dna-segment.filled { background: var(--accent-highlight); box-shadow: 0 0 8px rgba(59,130,246,0.4); }
+      .dna-segment.filled-done { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- 开屏 Loader -->
+    <div id="loader-wrapper">
+      <div class="loader-container">
+        <div class="loader-core"></div>
+        <div class="loader-electron"></div>
+        <div class="loader-electron"></div>
+        <div class="loader-electron"></div>
+      </div>
+    </div>
+
+    <!-- 顶部阅读进度条 -->
+    <div class="scroll-progress-container">
+        <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+    </div>
+
+    <div class="ambient-light"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="app">
+      <!-- 固定导航栏 (绑定 nav-hidden class 实现自动隐藏) -->
+      <div class="nav-container" :class="{ 'nav-hidden': isNavHidden }">
+        <nav class="nav-header">
+            <!-- 这里是“水印”/Logo，已改为“虚宁” -->
+            <div class="logo" @click="scrollTo('app')">虚宁</div>
+            <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Toggle Menu">
+            <i :class="isMobileMenuOpen ? 'ph ph-x' : 'ph ph-list'"></i>
+            </button>
+            <div class="nav-links">
+            <a href="#about" @click.prevent="scrollTo('about')">关于</a>
+            <a href="#resume" @click.prevent="scrollTo('resume')">轨迹</a>
+            <a href="#creations" @click.prevent="scrollTo('creations')">创造</a>
+            <a href="#interests" @click.prevent="scrollTo('interests')">娱乐</a>
+            <a href="#gallery" @click.prevent="scrollTo('gallery')">光隅</a>
+            <a href="#plans" @click.prevent="scrollTo('plans')">未来</a>
+            <a href="#contact" @click.prevent="scrollTo('contact')">联系</a>
+            <!-- 主题切换按钮 -->
+            <button class="theme-toggle-btn" @click="toggleTheme" :aria-label="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+            </button>
+            </div>
+        </nav>
+      </div>
+
+      <!-- 移动端全屏菜单 -->
+      <transition name="fade">
+        <div v-if="isMobileMenuOpen" class="mobile-menu-overlay" @click.self="toggleMobileMenu">
+        <div class="mobile-links">
+            <a href="#about" @click.prevent="handleMobileClick('about')">关于</a>
+            <a href="#resume" @click.prevent="handleMobileClick('resume')">轨迹</a>
+            <a href="#creations" @click.prevent="handleMobileClick('creations')">创造</a>
+            <a href="#interests" @click.prevent="handleMobileClick('interests')">娱乐</a>
+            <a href="#gallery" @click.prevent="handleMobileClick('gallery')">光隅</a>
+            <a href="#plans" @click.prevent="handleMobileClick('plans')">未来</a>
+            <a href="#contact" @click.prevent="handleMobileClick('contact')">联系</a>
+            <!-- 移动端主题切换 -->
+            <button class="theme-toggle-btn" @click="toggleTheme" style="font-size: 1.5rem; margin: 0;">
+                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+            </button>
+        </div>
+        </div>
+      </transition>
+
+      <main class="main-container">
+        <!-- Hero with Danmaku -->
+        <section class="hero-wrapper" id="hero">
+          <!-- 弹幕层 -->
+          <div class="danmaku-container" aria-hidden="true">
+            <transition-group name="danmaku-fade">
+              <div v-for="item in activeDanmaku" :key="item.id" class="danmaku-item" :style="item.style">
+                {{ item.name }}: {{ item.message }}
+              </div>
+            </transition-group>
+          </div>
+
+          <div class="hero-text">
+            <h1>
+              <span>{{ heroLine1 }}</span><span v-if="activeLine === 1" class="typing-cursor"></span><br>
+              <span>{{ heroLine2 }}</span><span v-if="activeLine === 2" class="typing-cursor"></span><br>
+              <span style="font-size: 0.5em; color: var(--text-secondary); line-height: 1.5; display: block; margin-top: 10px;">
+                <span>{{ heroLine3 }}</span><span v-if="activeLine === 3" class="typing-cursor"></span><br>
+                <span>{{ heroLine4 }}</span><span v-if="activeLine === 4" class="typing-cursor"></span>
+              </span>
+            </h1>
+            <div v-if="showHeroButtons" class="hero-btns">
+                <div class="hero-location"><i class="ph-fill ph-map-pin"></i> {{ resumeData.location }}</div>
+                <div class="hero-location"><i class="ph-fill ph-star"></i> 水瓶座 <span style="opacity: 0.4; margin: 0 4px;">|</span> INFP</div>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <div class="hero-img-box">
+              <img src="./content/icon/512.png" alt="Avatar" loading="lazy" onerror="this.src='https://placehold.co/400x600/e2e8f0/64748b?text=Xu'">
+            </div>
+          </div>
+        </section>
+
+        <!-- 优化后的“故事 & 扉页”板块 (Borderless V2) -->
+        <div id="about" class="scatter-grid">
+          <div class="section-header">
+            <span class="section-label">01</span>
+            <h2 class="section-title">故事<br>& 扉页</h2>
+          </div>
+          <div class="section-content"> 
+            <!-- Removed glass-card class for borderless design -->
+            <div class="about-card">
+              <div class="about-content-wrapper">
+                <!-- Redesigned Quote -->
+                <div class="about-quote">
+                  “在路上，我便是世上的美好，永远闪耀。”
+                </div>
+                <div class="about-text">
+                  <p>
+                    <span class="about-drop-cap">你</span>
+                    好！屏幕前的你。无论是重逢还是初遇，欢迎来到我的小天地。我是虚宁。在这里，我留下了一些“关于我”的信息，记录了我的成长与热爱。希望你能通过这些文字，了解一个真实的我。
+                  </p>
+                </div>
+                <div class="tags-cloud">
+                  <span class="tag">健身</span>
+                  <span class="tag">摄影</span>
+                  <span class="tag">做动画</span>
+                  <span class="tag">全栈开发</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="resume" class="scatter-grid">
+          <div class="section-header">
+            <span class="section-label">02</span>
+            <h2 class="section-title">成长<br>& 轨迹</h2>
+          </div>
+          <div class="section-content" style="display: block;">
+            
+            <div class="resume-subtitle"><i class="ph-fill ph-graduation-cap" style="color: var(--accent-highlight);"></i> 教育背景</div>
+            <div class="edu-container">
+               <div v-for="(edu, i) in resumeData.education" :key="'edu'+i" class="edu-item">
+                  <div class="edu-icon"><i class="ph-bold ph-student"></i></div>
+                  <div class="edu-content">
+                    <div class="edu-header">
+                       <span class="edu-school">{{ edu.institution }}</span>
+                       <span class="edu-time">{{ edu.duration }}</span>
+                    </div>
+                    <div class="edu-major">{{ edu.major }} <span v-if="edu.minor">/ {{ edu.minor }}</span></div>
+                    
+                    <div class="edu-stats-row" v-if="edu.gpa">
+                        <div class="edu-stat-badge">
+                            <i class="ph-bold ph-exam"></i> GPA: {{ edu.gpa }}
+                        </div>
+                        <div class="edu-stat-badge" v-if="edu.ranking">
+                            <i class="ph-bold ph-ranking"></i> Rank: {{ edu.ranking }}
+                        </div>
+                    </div>
+
+                  </div>
+               </div>
+            </div>
+
+            <div class="resume-subtitle"><i class="ph-fill ph-rocket-launch" style="color: #f59e0b;"></i> 项目与科研</div>
+            <div class="project-grid">
+               <div v-for="(proj, i) in resumeData.projects" :key="'proj'+i" class="project-card">
+                  <div class="project-time-capsule"><i class="ph-bold ph-clock"></i> {{ proj.duration }}</div>
+                  <div class="project-title">{{ proj.name }}</div>
+                  <div class="project-role">{{ proj.role }}</div>
+                  <div class="project-result">{{ proj.result }}</div>
+               </div>
+            </div>
+
+            <div class="resume-subtitle"><i class="ph-fill ph-users-three" style="color: #10b981;"></i> 校园历练</div>
+            <div class="exp-container glass-card" style="padding: 0;"> 
+               
+               <div class="exp-group-header">研究生阶段</div>
+               <div v-for="(exp, i) in resumeData.campusExperience.graduate" :key="'grad'+i" class="exp-item">
+                  <div class="exp-time">USTC</div>
+                  <div>
+                    <div class="exp-role">{{ exp.role }}</div>
+                    <div class="exp-desc">{{ exp.description }}</div>
+                  </div>
+               </div>
+
+               <div class="exp-group-header" style="border-top: 1px solid rgba(0,0,0,0.05);">本科生阶段</div>
+               <div v-for="(exp, i) in resumeData.campusExperience.undergraduate" :key="'und'+i" class="exp-item">
+                  <div class="exp-time">NJUST</div>
+                  <div>
+                    <div class="exp-role">{{ exp.role }}</div>
+                    <div class="exp-desc">{{ exp.description }}</div>
+                  </div>
+               </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <div id="creations" class="scatter-grid">
+          <div class="section-header">
+            <span class="section-label">03</span>
+            <h2 class="section-title">创造<br>& 阅读</h2>
+          </div>
+          <div class="section-content">
+            <div style="grid-column: 1 / -1; margin-top: 4rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+               <h3 style="font-family:'Noto Serif SC'; font-size:1.5rem;">Github</h3>
+               <span style="height: 1px; flex: 1; background: var(--text-secondary); opacity: 0.2;"></span>
+            </div>
+            <!-- Github Stats -->
+            <div style="grid-column: 1 / -1;">
+               <h4 class="github-section-title">数据概览</h4>
+               <div class="github-stats-grid">
+                <div class="stat-item contribs"><span class="stat-value">{{ github.stats.contributions || '-' }}</span><span class="stat-label">提交贡献</span></div>
+                <div class="stat-item repos"><span class="stat-value">{{ github.stats.repos || '-' }}</span><span class="stat-label">开源仓库</span></div>
+                <div class="stat-item stars"><span class="stat-value">{{ github.stats.stars || '-' }}</span><span class="stat-label">获得星标</span></div>
+                <div class="stat-item forks"><span class="stat-value">{{ github.stats.forks || '-' }}</span><span class="stat-label">派生总数</span></div>
+              </div>
+            </div>
+            <div class="github-section-title" style="grid-column: 1 / -1;">精选项目</div>
+            <div class="scatter-item" v-for="repo in github.pinnedRepos" :key="'pinned-'+repo.name">
+              <a :href="repo.link" target="_blank" rel="noopener noreferrer" class="repo-card" style="border-color: rgba(251, 191, 36, 0.4); background: linear-gradient(to bottom right, var(--bg-glass), rgba(251, 191, 36, 0.05));">
+                 <div class="repo-header">
+                    <span class="repo-title" style="font-size: 1.1rem;">{{ repo.repo }}</span>
+                    <i class="ph-fill ph-push-pin" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                 </div>
+                 <p class="repo-desc">{{ repo.description || '暂无描述' }}</p>
+                 <div class="repo-meta">
+                    <span style="font-weight: 600;"><span class="lang-dot" :style="{background: getLanguageColor(repo.language)}"></span> {{ repo.language }}</span>
+                    <span><i class="ph-fill ph-star" style="color: #fbbf24;"></i> {{ repo.stars }}</span>
+                    <span><i class="ph-fill ph-git-fork" style="color: var(--text-secondary);"></i> {{ repo.forks }}</span>
+                 </div>
+              </a>
+            </div>
+            <div class="github-section-title" style="grid-column: 1 / -1;">全部仓库</div>
+            <div class="scatter-item" v-for="repo in filteredAndSortedRepos.slice(0, 4)" :key="repo.id">
+               <a :href="repo.html_url" target="_blank" rel="noopener noreferrer" class="repo-card">
+                 <div class="repo-header">
+                    <span class="repo-title">{{ repo.name }}</span>
+                    <i class="ph ph-arrow-up-right" style="font-size: 1.1rem; opacity: 0.5;"></i>
+                 </div>
+                 <p class="repo-desc">{{ repo.description || '暂无描述。' }}</p>
+                 <div class="repo-meta">
+                    <span><span class="lang-dot" :style="{background: getLanguageColor(repo.language)}"></span> {{ repo.language || '纯文本' }}</span>
+                    <span><i class="ph-fill ph-star" style="color: #fbbf24;"></i> {{ repo.stargazers_count }}</span>
+                 </div>
+               </a>
+            </div>
+            <div style="grid-column: 1 / -1; text-align: center;">
+                <a href="https://github.com/jimmyshuixin" target="_blank" rel="noopener noreferrer" class="load-more-btn">查看更多 Github 项目</a>
+            </div>
+            <div style="grid-column: 1 / -1; margin-top: 4rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+               <h3 style="font-family:'Noto Serif SC'; font-size:1.5rem;">阅读清单</h3>
+               <span style="height: 1px; flex: 1; background: var(--text-secondary); opacity: 0.2;"></span>
+            </div>
+            <div class="book-grid" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 2rem;">
+                <div v-for="(book, i) in bookshelf" :key="i" class="book-card">
+                  <img :src="book.coverUrl" class="book-cover" loading="lazy" :alt="book.title" @error="handleImgError">
+                  <h4 style="font-family: 'Noto Serif SC'; font-size: 0.9rem; margin-bottom: 0.3rem;">{{ book.title }}</h4>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);">{{ book.author }}</span>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="skills" class="scatter-grid">
+          <div class="section-header">
+            <span class="section-label">04</span>
+            <h2 class="section-title">技能<br>& 荣誉</h2>
+          </div>
+          <div class="section-content" style="display: block;">
+            <div class="tags-cloud" style="margin-bottom: 3rem;">
+              <div v-for="(cat, i) in resumeData.skills" :key="i" style="margin-right: 2rem; margin-bottom: 2rem;">
+                <h4 style="margin-bottom: 1rem; color: var(--accent); font-size: 0.9rem; text-transform: uppercase;">{{ cat.category }}</h4>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                  <span v-for="item in cat.items" :key="item" class="tag">{{ item }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- 优化后的荣誉列表 -->
+            <div class="glass-card" style="padding: 2.5rem;">
+              <div class="honors-container">
+                <!-- 研究生阶段 -->
+                <div class="honor-stage">
+                  <div class="honor-stage-title">
+                    研究生阶段 (USTC)
+                  </div>
+                  <div class="honor-list">
+                     <div v-if="resumeData.honors.graduate.length === 0 || (resumeData.honors.graduate.length === 1 && resumeData.honors.graduate[0] === '（待解锁）')" class="honor-empty">
+                        <i class="ph ph-hourglass"></i> 更多精彩，敬请期待...
+                     </div>
+                     <div v-else v-for="h in resumeData.honors.graduate" class="honor-card">
+                        <i class="ph-fill ph-star honor-icon" style="color: #8b5cf6;"></i>
+                        <span class="honor-text">{{ h }}</span>
+                     </div>
+                  </div>
+                </div>
+                
+                <!-- 本科生阶段 -->
+                <div class="honor-stage">
+                  <div class="honor-stage-title">
+                    本科生阶段 (NJUST)
+                  </div>
+                  <div class="honor-list">
+                     <div v-for="h in resumeData.honors.undergraduate" class="honor-card">
+                        <i class="ph-fill ph-medal honor-icon" style="color: #f59e0b;"></i>
+                        <span class="honor-text">{{ h }}</span>
+                     </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 游戏 & 娱乐 -->
+        <div id="interests" class="scatter-grid">
+          <div class="section-header">
+            <span class="section-label">05</span>
+            <h2 class="section-title">游戏<br>& 娱乐</h2>
+          </div>
+          
+          <div class="interests-container">
+            <div class="game-immersive-card" :style="{ '--theme-bg': currentCharacter.color, '--theme-text': currentCharacter.textColor }">
+                <div class="game-char-stage">
+                    <div class="char-info-block">
+                        <transition name="fade" mode="out-in">
+                            <div :key="currentCharacter.name">
+                                <h3 class="char-name-display">{{ currentCharacter.name }}</h3>
+                                <span class="char-tag-display">{{ currentCharacter.desc }}</span>
+                            </div>
+                        </transition>
+                    </div>
+
+                    <div class="char-img-container">
+                        <transition name="fade">
+                            <img 
+                                :key="currentCharacter.name" 
+                                :src="currentCharacter.img" 
+                                class="char-img-full" 
+                                :alt="currentCharacter.name"
+                                @error="handleImgError"
+                            >
+                        </transition>
+                    </div>
+
+                    <button class="nav-arrow nav-left" @click="prevChar" v-if="currentGame.characters.length > 1"><i class="ph-bold ph-caret-left"></i></button>
+                    <button class="nav-arrow nav-right" @click="nextChar" v-if="currentGame.characters.length > 1"><i class="ph-bold ph-caret-right"></i></button>
+                </div>
+
+                <div class="dock-wrapper">
+                    <div class="dock-container">
+                        <button 
+                            v-for="(gameInfo, key) in gamesData" 
+                            :key="key"
+                            class="dock-item"
+                            :class="{ active: activeGameKey === key }"
+                            @click="switchGame(key)"
+                        >
+                            <i :class="gameInfo.icon"></i> 
+                            <span>{{ gameInfo.name }}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 光隅 & 生活 -->
+        <div id="gallery" class="scatter-grid">
+            <div class="section-header">
+              <span class="section-label">06</span>
+              <h2 class="section-title">光隅<br>& 生活</h2>
+            </div>
+            <div class="section-content">
+                <a href="https://gallery.xvyin.com" target="_blank" rel="noopener noreferrer" class="gallery-showcase">
+                    <!-- 左侧：文案区 -->
+                    <div class="gallery-text">
+                        <h3 class="gallery-heading">Light<br>Corner</h3>
+                        <p class="gallery-desc">捕捉光影的瞬息，记录生活的美好。<br>欢迎来到我的摄影与图文社区。</p>
+                        <span class="gallery-btn">
+                            前往光隅 <i class="ph-bold ph-arrow-right"></i>
+                        </span>
+                    </div>
+                    
+                    <!-- 右侧：拍立得堆叠效果 -->
+                    <div class="gallery-visuals">
+                        <div class="polaroid p1">
+                            <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview" loading="lazy">
+                        </div>
+                        <div class="polaroid p2">
+                            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview" loading="lazy">
+                        </div>
+                        <div class="polaroid p3">
+                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview" loading="lazy">
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- NEW: 未来 & 计划 (Section 07) -->
+        <div id="plans" class="scatter-grid">
+            <div class="section-header">
+              <span class="section-label">07</span>
+              <h2 class="section-title">未来<br>& 蓝图</h2>
+            </div>
+            <div class="section-content" style="display: block;">
+                
+                <!-- 分类1: 进行中 -->
+                <h3 class="resume-subtitle" style="margin-top: 0;">
+                    <i class="ph-fill ph-fire" style="color: var(--accent-highlight);"></i> 进行中
+                </h3>
+                <div class="plans-grid" style="margin-bottom: 3rem;">
+                    <div 
+                        v-for="(plan, idx) in plansInProgress" 
+                        :key="'ing-'+idx" 
+                        class="plan-card is-active"
+                    >
+                        <div class="plan-header">
+                            <div class="plan-icon-box">
+                                <i :class="plan.icon"></i>
+                            </div>
+                            <span class="plan-status-badge status-ing">
+                                {{ getStatusLabel(plan.status) }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="plan-title">{{ plan.title }}</h3>
+                        <p class="plan-desc">{{ plan.desc }}</p>
+                        
+                        <ul class="milestone-list">
+                            <li 
+                                v-for="(ms, mIdx) in plan.milestones" 
+                                :key="mIdx" 
+                                class="milestone-item" 
+                                :class="{ done: ms.done }"
+                            >
+                                <i :class="ms.done ? 'ph-fill ph-check-circle' : 'ph ph-circle'"></i>
+                                {{ ms.label }}
+                            </li>
+                        </ul>
+
+                        <div class="plan-progress-container">
+                            <div class="plan-progress-label">
+                                <span>Progress</span>
+                                <span>{{ plan.progress }}%</span>
+                            </div>
+                            <div class="dna-bar">
+                                <div 
+                                    v-for="n in 10" 
+                                    :key="n" 
+                                    class="dna-segment"
+                                    :class="{ 
+                                        'filled': (n * 10) <= plan.progress
+                                    }"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 分类2: 筹备中 -->
+                <h3 class="resume-subtitle">
+                    <i class="ph-fill ph-hourglass" style="color: var(--accent);"></i> 筹备中
+                </h3>
+                <div class="plans-grid">
+                    <div 
+                        v-for="(plan, idx) in plansPlanning" 
+                        :key="'plan-'+idx" 
+                        class="plan-card"
+                    >
+                        <div class="plan-header">
+                            <div class="plan-icon-box">
+                                <i :class="plan.icon"></i>
+                            </div>
+                            <span class="plan-status-badge status-planning">
+                                {{ getStatusLabel(plan.status) }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="plan-title">{{ plan.title }}</h3>
+                        <p class="plan-desc">{{ plan.desc }}</p>
+                        
+                        <ul class="milestone-list">
+                            <li 
+                                v-for="(ms, mIdx) in plan.milestones" 
+                                :key="mIdx" 
+                                class="milestone-item" 
+                                :class="{ done: ms.done }"
+                            >
+                                <i :class="ms.done ? 'ph-fill ph-check-circle' : 'ph ph-circle'"></i>
+                                {{ ms.label }}
+                            </li>
+                        </ul>
+
+                        <div class="plan-progress-container">
+                            <div class="plan-progress-label">
+                                <span>Progress</span>
+                                <span>{{ plan.progress }}%</span>
+                            </div>
+                            <div class="dna-bar">
+                                <div 
+                                    v-for="n in 10" 
+                                    :key="n" 
+                                    class="dna-segment"
+                                    :class="{ 
+                                        'filled': (n * 10) <= plan.progress
+                                    }"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 联系 (Renumbered to 08) -->
+        <div id="contact" class="scatter-grid" style="margin-bottom: 4rem;">
+          <div class="section-header">
+            <span class="section-label">08</span>
+            <h2 class="section-title">故事<br>& 尾声</h2>
+          </div>
+          <div class="section-content" style="display: block; max-width: 600px;">
+            <div class="contact-tabs">
+              <button class="contact-tab-btn" :class="{active: contactMode === 'email'}" @click="contactMode = 'email'">写私信</button>
+              <button class="contact-tab-btn" :class="{active: contactMode === 'danmaku'}" @click="contactMode = 'danmaku'">发弹幕</button>
+            </div>
+
+            <!-- 添加过渡动画包裹器 -->
+            <transition name="switch-mode" mode="out-in">
+                <!-- 模式1: 发送邮件 -->
+                <div v-if="contactMode === 'email'" key="email">
+                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">有任何想法？直接给我发邮件吧。（私信）</p>
+                    <form @submit.prevent="submitContact">
+                        <div style="margin-bottom: 1.5rem;">
+                        <input type="text" v-model="contact.name" required placeholder="你的称呼" 
+                                style="width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1px solid var(--text-secondary); font-size: 1rem; color: var(--text-primary); outline: none; border-radius: 0;">
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                        <input type="email" v-model="contact.email" required placeholder="你的邮箱" 
+                                style="width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1px solid var(--text-secondary); font-size: 1rem; color: var(--text-primary); outline: none; border-radius: 0;">
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                        <textarea v-model="contact.message" rows="3" required placeholder="想说的话..." 
+                                    style="width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1px solid var(--text-secondary); font-size: 1rem; color: var(--text-primary); outline: none; resize: none; border-radius: 0;"></textarea>
+                        </div>
+                        <button type="submit" :disabled="contact.sending"
+                                style="padding: 12px 35px; background: var(--text-primary); color: var(--bg-body); border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                        {{ contact.sending ? '发送中...' : '发送邮件' }} <i class="ph-bold ph-arrow-right" style="vertical-align: middle;"></i>
+                        </button>
+                        <p v-if="contact.status" style="margin-top: 1rem; color: var(--accent-highlight);">{{ contact.status }}</p>
+                    </form>
+                </div>
+
+                <!-- 模式2: 发送弹幕 -->
+                <div v-else key="danmaku">
+                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">发射一条弹幕，让它飘过我的主页！（所有人可见）</p>
+                    <form @submit.prevent="submitGuestbookMessage">
+                        <div style="margin-bottom: 1.5rem;">
+                        <input type="text" v-model="guestbook.newName" required maxlength="20" placeholder="怎么称呼？(限20字)"
+                                style="width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1px solid var(--text-secondary); font-size: 1rem; color: var(--text-primary); outline: none; border-radius: 0;">
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                        <textarea v-model="guestbook.newMessage" rows="2" required maxlength="100" placeholder="写点什么... (限100字)"
+                                    style="width: 100%; padding: 15px 0; background: transparent; border: none; border-bottom: 1px solid var(--text-secondary); font-size: 1rem; color: var(--text-primary); outline: none; resize: none; border-radius: 0;"></textarea>
+                        </div>
+                        <button type="submit" :disabled="guestbook.isSubmitting"
+                                style="padding: 12px 35px; background: var(--accent-highlight); color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                        <i v-if="guestbook.isSubmitting" class="ph ph-spinner-gap animate-spin"></i>
+                        {{ guestbook.isSubmitting ? '发射中...' : '发射弹幕' }} <i class="ph-bold ph-paper-plane-tilt" style="vertical-align: middle;"></i>
+                        </button>
+                        <p v-if="guestbook.status.message" :style="{ color: guestbook.status.type === 'error' ? 'red' : 'var(--accent-highlight)' }" style="margin-top: 1rem;">
+                        {{ guestbook.status.message }}
+                        </p>
+                    </form>
+                </div>
+            </transition>
+
+          </div>
+        </div>
+
+        <footer style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; padding: 2rem 0;">
+          <p>© 2025 虚宁 | May you always shine.</p>
+        </footer>
+      </main>
+
+      <div class="floating-bar" v-if="music.currentSong.name">
+        <div class="music-pill" @click="music.togglePlay">
+          <img :src="music.currentSong.cover" class="music-cover" :class="{ 'animate-spin': music.isPlaying }" @error="handleImgError">
+          <div class="music-info">
+            <div class="music-title">{{ music.currentSong.name }}</div>
+            <div class="music-artist">{{ music.currentSong.artist }}</div>
+          </div>
+          <!-- Loading 状态显示逻辑 -->
+          <i v-if="music.isLoading" class="ph ph-spinner-gap animate-spin" style="font-size: 1.2rem; color: var(--text-primary);"></i>
+          <i v-else :class="music.isPlaying ? 'ph-fill ph-pause' : 'ph-fill ph-play'" style="font-size: 1.2rem; color: var(--text-primary);"></i>
+        </div>
+      </div>
+      <div id="aplayer-hidden" style="display: none;"></div>
+      
+      <!-- 回到顶部按钮 -->
+      <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop">
+        <i class="ph-bold ph-arrow-up"></i>
+      </button>
+    </div>
+
+    <!-- CDN -->
+    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fvue%2F3.2.47%2Fvue.global.prod.js"></script>
+    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fmarked%2F4.3.0%2Fmarked.min.js"></script>
+    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.js"></script>
+    <!-- 核心修复：将 Phosphor Icons 脚本移至 body 底部，并添加 defer 属性，避免阻塞渲染和网络问题 -->
+    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40phosphor-icons%2Fweb" defer></script>
+
+    <script>
+      const { createApp, ref, reactive, onMounted, onUnmounted, nextTick, computed } = Vue;
+
+      const GAMES_DATA = {
+        genshin: {
+          name: "原神",
+          icon: "ph-fill ph-sparkle",
+          characters: [
+            { name: "芙宁娜", desc: "众水女王", img: "./content/game/Furina1.png", color: "rgba(59, 130, 246, 0.15)", textColor: "#1e40af" },
+            { name: "胡桃", desc: "往生堂堂主", img: "./content/game/Hutao.png", color: "rgba(220, 38, 38, 0.1)", textColor: "#991b1b" }
+          ]
+        },
+        starrail: {
+          name: "崩坏：星穹铁道",
+          icon: "ph-fill ph-train",
+          characters: [
+            { name: "流萤", desc: "格拉默铁骑", img: "./content/game/Firefly.png", color: "rgba(16, 185, 129, 0.15)", textColor: "#047857" },
+            { name: "三月七", desc: "列车元气少女", img: "./content/game/March7th.png", color: "rgba(236, 72, 153, 0.15)", textColor: "#be185d" }
+          ]
+        },
+        zzz: {
+          name: "绝区零",
+          icon: "ph-fill ph-television",
+          characters: [
+            { name: "薇薇安", desc: "反舌鸟", img: "./content/game/Vivian.png", color: "rgba(236, 72, 153, 0.25)", textColor: "#CC6CE7" },
+            { name: "仪玄", desc: "Q宗师", img: "./content/game/YiXuan2.png", color: "rgba(254, 153, 0, 0.25)", textColor: "#FE9900" }
+          ]
+        }
+      };
+      
+      const PLANS_DATA = [
+        {
+          title: "个人网站搭建",
+          icon: "ph-fill ph-code",
+          desc: "使用 Vue.js 和现代前端技术栈打造个人主页，展示项目与技能。",
+          status: "ing", // planning, ing, done
+          progress: 80,
+          milestones: [
+            { label: "前端三大件学习", done: true },
+            { label: "Vue3、express框架学习", done: true },
+            { label: "项目部署与优化", done: true },
+            { label: "内容更新与维护", done: false }
+          ]
+        },
+        {
+          title: "开源项目贡献",
+          icon: "ph-fill ph-git-branch",
+          desc: "积极参与开源社区，贡献代码和文档，提升编程技能和协作能力。",
+          status: "ing", // planning, ing, done
+          progress: 50,
+          milestones: [
+            { label: "寻找合适的项目", done: true },
+            { label: "提交首个 PR", done: true },
+            { label: "持续贡献与维护", done: false }
+          ]
+        },
+        {
+          title: "南理工星空摄影",
+          icon: "ph-fill ph-camera",
+          desc: "利用业余时间拍摄银河动态照片，记录美丽的夜空景象。",
+          status: "planning", // planning, ing, done
+          progress: 20,
+          milestones: [
+            { label: "地点选取", done: true },
+            { label: "摄影学习", done: false },
+            { label: "拍摄与后期处理", done: false }
+          ]
+        },
+        {
+          title: "Blender CG动画创作",
+          icon: "ph-fill ph-cube",
+          desc: "学习并使用Blender制作CG动画，提升三维建模与动画制作技能。",
+          status: "ing", // planning, ing, done
+          progress: 50,
+          milestones: [
+            { label: "Blender基础学习", done: true },
+            { label: "模型制作与动画", done: false },
+            { label: "渲染与后期处理", done: false }
+          ]
+        }
+      ];
+
+      const STATIC_RESUME = {
+        name: "虚宁",
+        location: "南京",
+        education: [
+          { institution: "中国科学技术大学", major: "加速器", minor: "", duration: "2026.09 - 2029.06", gpa: "", ranking: "" },
+          { institution: "南京理工大学", major: "辐射防护与核安全", minor: "人工智能", duration: "2022.09 - 2026.06", gpa: "3.62/4.0", ranking: "3/30" }
+        ],
+        projects: [
+          { name: "液闪放射性测量系统的光收集系统改进", role: "项目负责人", duration: "2024.06 - 2025.09", result: "江苏省颗粒大赛特等奖" },
+          { name: "基于LSTM/Transformer的空气质量(AQI)预测系统", role: "建模大赛作品", duration: "2024.03 - 2025.06", result: "全国大学生统计建模大赛三等奖。" },
+          { name: "基于Vue.js的个人网站", role: "项目负责人", duration: "2022.05 - 2025.01", result: "成功部署上线。" }
+        ],
+        campusExperience: {
+          graduate: [
+             { role: "科研项目/助教", description: "（未来即将开启的旅程...）" } 
+          ],
+          undergraduate: [
+            { role: "学习委员", description: "建立帮扶机制，班级获“零挂科”称号。" },
+            { role: "校级学习导师", description: "负责全校工程制图课程的学业指导。" },
+            { role: "学院行政/年级助理", description: "负责年级文书处理与沟通协调。" }
+          ]
+        },
+        skills: [
+          { category: "电路设计", items: ["嘉立创EDA", "Multisim"] },
+          { category: "编程开发", items: ["Python", "LSTM", "Transformer", "Web全栈", "Linux"] },
+          { category: "多媒体", items: ["Blender", "UE", "Pr", "Ps"] },
+          { category: "办公软件", items: ["Office三件套", "WPS"] }
+        ],
+        // 优化：将荣誉列表拆分为研究生和本科生
+        honors: {
+          graduate: [], // 暂无内容
+          undergraduate: [
+            "国家励志奖学金（两次）",
+            "全国大学生统计建模大赛三等奖",
+            "“互联网+”创新创业大赛三等奖",
+            "“核+X”创意大赛二等奖",
+            "一、二等奖学金（六次）",
+            "“三好学生”",
+            "“社会活动积极分子”"
+          ]
+        }
+      };
+
+      const STATIC_BOOKSHELF = [
+        { title: "白色橄榄树", author: "玖月晞", coverUrl: "./content/bookshelf/白色橄榄树.jpg" },
+        { title: "天蓝色的彼岸", author: "亚历克斯·希勒", coverUrl: "./content/bookshelf/天蓝色的彼岸.jpg" },
+        { title: "小王子", author: "圣埃克苏佩里", coverUrl: "./content/bookshelf/小王子.jpg" },
+        { title: "乌合之众", author: "古斯塔夫·勒庞", coverUrl: "./content/bookshelf/乌合之众.jpg" }
+      ];
+
+      const config = {
+        github: { username: "jimmyshuixin" },
+        music: { api: "https://music.xvyin.com/", server: "tencent", type: "playlist" },
+        guestbookApiUrl: "https://firebase.xvyin.com/messages" // 弹幕 API
+      };
+
+      const apiService = {
+        cache: {
+            get(key) {
+              const itemStr = sessionStorage.getItem(key);
+              if (!itemStr) return null;
+              try {
+                const item = JSON.parse(itemStr);
+                const isExpired = new Date().getTime() > item.expiry;
+                if (isExpired) {
+                  sessionStorage.removeItem(key);
+                  return null;
+                }
+                return item.value;
+              } catch (e) {
+                sessionStorage.removeItem(key);
+                return null;
+              }
+            },
+            set(key, value, ttlMinutes = 15) {
+              const now = new Date();
+              const item = {
+                value: value,
+                expiry: now.getTime() + ttlMinutes * 60 * 1000,
+              };
+              try {
+                sessionStorage.setItem(key, JSON.stringify(item));
+              } catch (e) {
+                console.error("设置缓存失败:", e);
+              }
+            },
+        },
+        async getGithubData(endpoint, params = {}) {
+            const workerUrl = "https://github.xvyin.com/";
+            const url = new URL(workerUrl);
+            url.searchParams.append("endpoint", endpoint);
+            url.searchParams.append("username", config.github.username);
+            for (const key in params) {
+              if (params.hasOwnProperty(key)) {
+                url.searchParams.append(key, params[key]);
+              }
+            }
+
+            const cacheKey = `github_${endpoint}_${JSON.stringify(params)}`;
+            const cachedData = this.cache.get(cacheKey);
+
+            if (cachedData) {
+              return cachedData;
+            }
+
+            try {
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`获取 GitHub 数据失败 (${endpoint}): ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                this.cache.set(cacheKey, data);
+                return data;
+            } catch (e) {
+                console.warn("GitHub API Fetch Error:", e);
+                throw e;
+            }
+        },
+        async getMusicPlaylist(songId) {
+          const apiUrl = `${config.music.api}?server=${config.music.server}&type=${config.music.type}&id=${songId}`;
+          try {
+            const response = await fetch(apiUrl);
+            return await response.json();
+          } catch (e) { return []; }
+        }
+      };
+
+      const useGuestbook = () => {
+          const guestbook = reactive({
+            isReady: false,
+            error: null,
+            isSubmitting: false,
+            newName: "",
+            newMessage: "",
+            messages: [],
+            status: { message: "", type: "" },
+          });
+          const activeDanmaku = ref([]);
+          let danmakuQueue = [], pollInterval = null, animationFrameId = null;
+          let lastDanmakuTime = 0;
+          const danmakuIntervalMs = 2500;
+
+          const fetchMessages = async () => {
+            try {
+              const response = await fetch(config.guestbookApiUrl);
+              if (!response.ok) throw new Error(`Error: ${response.status}`);
+              const freshMessages = await response.json();
+              guestbook.messages = freshMessages;
+              danmakuQueue = [...freshMessages].reverse(); 
+              guestbook.isReady = true;
+            } catch (err) {
+              console.error("Fetch messages failed:", err);
+            }
+          };
+
+          const submitMessage = async () => {
+            if (guestbook.isSubmitting) return;
+            const name = guestbook.newName.trim();
+            const message = guestbook.newMessage.trim();
+            if (!name || !message) {
+              guestbook.status = { message: "昵称和内容不能为空。", type: "error" };
+              return;
+            }
+            guestbook.isSubmitting = true;
+            guestbook.status = { message: "", type: "" };
+            try {
+              const response = await fetch(config.guestbookApiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, message }),
+              });
+              if (!response.ok) throw new Error("Submit failed");
+              
+              guestbook.status = { message: "发射成功！感谢你的留言。", type: "success" };
+              guestbook.newName = "";
+              guestbook.newMessage = "";
+              
+              const newMsg = { name, message };
+              danmakuQueue.push(newMsg);
+              
+              setTimeout(() => { guestbook.status = { message: "", type: "" }; }, 3000);
+            } catch (e) {
+              guestbook.status = { message: "发射失败，请稍后再试。", type: "error" };
+            } finally {
+              guestbook.isSubmitting = false;
+            }
+          };
+
+          const danmakuLoop = (timestamp) => {
+            if (!lastDanmakuTime) lastDanmakuTime = timestamp;
+            const elapsed = timestamp - lastDanmakuTime;
+            if (elapsed > danmakuIntervalMs) {
+              lastDanmakuTime = timestamp;
+              if (danmakuQueue.length > 0 && activeDanmaku.value.length <= 15) {
+                const msg = danmakuQueue.shift();
+                danmakuQueue.push(msg);
+                const duration = Math.random() * 8 + 12;
+                const danmaku = {
+                  id: Date.now() + Math.random(),
+                  name: msg.name,
+                  message: msg.message,
+                  style: {
+                    top: `${Math.random() * 80 + 5}%`,
+                    animationDuration: `${duration}s`,
+                  },
+                };
+                activeDanmaku.value.push(danmaku);
+                setTimeout(() => { 
+                  const index = activeDanmaku.value.findIndex(d => d.id === danmaku.id);
+                  if (index > -1) activeDanmaku.value.splice(index, 1);
+                }, duration * 1000 + 100);
+              }
+            }
+            animationFrameId = requestAnimationFrame(danmakuLoop);
+          };
+
+          const init = async () => {
+            await fetchMessages();
+            animationFrameId = requestAnimationFrame(danmakuLoop);
+            pollInterval = setInterval(fetchMessages, 60000);
+          };
+
+          onUnmounted(() => {
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            if (pollInterval) clearInterval(pollInterval);
+          });
+
+          return { guestbook, activeDanmaku, init, submitMessage };
+      };
+
+      const useMusicPlayer = () => {
+        const player = reactive({
+          aplayer: null,
+          isPlaying: false,
+          isLoading: false,
+          currentSong: { name: 'Music', artist: 'Click to play', cover: './content/icon/32.png' },
+        });
+
+        const initPlayer = (audioList) => {
+           if (!audioList || audioList.length === 0) return;
+           const container = document.getElementById('aplayer-hidden');
+           if (!container) return;
+           if (player.aplayer) player.aplayer.destroy();
+           player.aplayer = new APlayer({
+            container: container, audio: audioList, lrcType: 3, loop: 'all', volume: 0.7
+          });
+          player.currentSong = audioList[0];
+          player.aplayer.on('play', () => (player.isPlaying = true));
+          player.aplayer.on('pause', () => (player.isPlaying = false));
+          player.aplayer.on('listswitch', (data) => { player.currentSong = player.aplayer.list.audios[data.index]; });
+          player.aplayer.play();
+        };
+
+        const togglePlay = async () => {
+          if (player.isLoading) return; 
+
+          if (player.aplayer) { 
+            player.aplayer.toggle(); 
+          } else {
+            player.isLoading = true;
+            try {
+                const list = await apiService.getMusicPlaylist('9206816111');
+                if (list && list.length > 0) {
+                    initPlayer(list);
+                }
+            } catch (e) {
+                console.error("Music Load Error:", e);
+            } finally {
+                player.isLoading = false;
+            }
+          }
+        };
+        return { player, togglePlay };
+      };
+
+      // --- 主题管理 Hook ---
+      const useTheme = () => {
+        const isDark = ref(false);
+
+        const toggleTheme = () => {
+          isDark.value = !isDark.value;
+          updateThemeClass();
+          localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+        };
+
+        const updateThemeClass = () => {
+          if (isDark.value) {
+            document.documentElement.classList.add('dark-mode');
+          } else {
+            document.documentElement.classList.remove('dark-mode');
+          }
+        };
+
+        const initTheme = () => {
+          const savedTheme = localStorage.getItem('theme');
+          if (savedTheme) {
+            isDark.value = savedTheme === 'dark';
+          } else {
+            // 默认跟随系统
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            isDark.value = systemPrefersDark;
+          }
+          updateThemeClass();
+        };
+
+        return { isDark, toggleTheme, initTheme };
+      };
+
+      createApp({
+        setup() {
+          const resumeData = reactive(STATIC_RESUME);
+          const bookshelf = ref(STATIC_BOOKSHELF);
+          const contact = reactive({ name: '', email: '', message: '', sending: false, status: '' });
+          const contactMode = ref('email'); 
+          
+          const activeGameKey = ref('genshin'); 
+          const charIndex = ref(0);
+          const gamesData = reactive(GAMES_DATA);
+          const plansData = reactive(PLANS_DATA);
+          
+          // 核心逻辑：使用计算属性将 Plans 数据分组
+          const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing'));
+          const plansPlanning = computed(() => plansData.filter(p => p.status !== 'ing'));
+
+          const imageCache = new Map();
+          let autoRotateInterval = null;
+
+          const currentGame = computed(() => gamesData[activeGameKey.value]);
+          
+          const currentCharacter = computed(() => {
+             const chars = currentGame.value.characters;
+             if (!chars || chars.length === 0) return { name: '', img: '' };
+             return chars[charIndex.value] || chars[0];
+          });
+          
+          const preloadAllImages = () => {
+             for (const gKey in gamesData) {
+                 const game = gamesData[gKey];
+                 if (game && game.characters) {
+                     game.characters.forEach(char => {
+                         if (!imageCache.has(char.img)) {
+                             const img = new Image();
+                             img.src = char.img;
+                             imageCache.set(char.img, img);
+                         }
+                     });
+                 }
+             }
+          };
+
+          const switchGame = (key) => {
+            activeGameKey.value = key;
+            charIndex.value = 0;
+            resetAutoRotate(); 
+          };
+          const nextChar = () => {
+            const len = currentGame.value.characters.length;
+            charIndex.value = (charIndex.value + 1) % len;
+            resetAutoRotate();
+          };
+          const prevChar = () => {
+            const len = currentGame.value.characters.length;
+            charIndex.value = (charIndex.value - 1 + len) % len;
+            resetAutoRotate();
+          };
+
+          const startAutoRotate = () => {
+            if (autoRotateInterval) clearInterval(autoRotateInterval);
+            autoRotateInterval = setInterval(() => {
+                const chars = currentGame.value.characters;
+                if (chars && chars.length > 1) {
+                    charIndex.value = (charIndex.value + 1) % chars.length;
+                }
+            }, 5000);
+          };
+
+          const stopAutoRotate = () => {
+            if (autoRotateInterval) clearInterval(autoRotateInterval);
+          };
+
+          const resetAutoRotate = () => {
+            stopAutoRotate();
+            startAutoRotate();
+          };
+
+          const github = reactive({ 
+             stats: { stars: 0, forks: 0, repos: 0, contributions: 0 }, 
+             repos: [], 
+             pinnedRepos: [], 
+             isLoadingMore: false 
+          });
+
+          const isMobileMenuOpen = ref(false);
+          const showBackToTop = ref(false);
+          const isNavHidden = ref(false);
+          
+          const { guestbook, activeDanmaku, init: initGuestbook, submitMessage: submitGuestbookMessage } = useGuestbook();
+          const { isDark, toggleTheme, initTheme } = useTheme(); // 使用主题 Hook
+
+          const toggleMobileMenu = () => {
+            isMobileMenuOpen.value = !isMobileMenuOpen.value;
+            document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : '';
+          };
+          const handleMobileClick = (id) => {
+            toggleMobileMenu();
+            setTimeout(() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }, 350);
+          };
+
+          const heroLine1 = ref(""); const heroLine2 = ref(""); const heroLine3 = ref(""); const heroLine4 = ref(""); 
+          const activeLine = ref(1); const showHeroButtons = ref(false);
+
+          const { player, togglePlay } = useMusicPlayer();
+          const music = reactive({ 
+              get isPlaying() { return player.isPlaying }, 
+              get currentSong() { return player.currentSong }, 
+              get isLoading() { return player.isLoading },
+              togglePlay 
+          });
+
+          const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+          const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+          const handleImgError = (e) => e.target.src = 'https://placehold.co/300x450/e2e8f0/64748b?text=Cover';
+          
+          const languageColors = {
+            JavaScript: '#f1e05a', TypeScript: '#2b7489', Vue: '#41b883', Python: '#3572A5', HTML: '#e34c26', CSS: '#563d7c', Java: '#b07219', C: '#555555', 'C++': '#f34b7d', 'C#': '#178600', Go: '#00ADD8', Ruby: '#701516', PHP: '#4F5D95', Swift: '#ffac45', Rust: '#dea584', Kotlin: '#A97BFF', Dart: '#00B4AB', Shell: '#89e051', Jupyter: '#DA5B0B'
+          };
+          const getLanguageColor = (lang) => (lang === 'Jupyter Notebook' ? languageColors['Jupyter'] : (languageColors[lang] || '#8b9bb4'));
+
+          const getStatusLabel = (status) => {
+            const map = { 'planning': '筹备中', 'ing': '进行中', 'done': '已达成' };
+            return map[status] || status;
+          };
+
+          const filteredAndSortedRepos = computed(() => {
+             if (!github.repos || !github.repos.length) return [];
+             const pinnedNames = (github.pinnedRepos || []).map(p => (p.repo || '').toLowerCase());
+             let normalRepos = github.repos.filter(repo => !pinnedNames.includes((repo.name || '').toLowerCase()));
+             return normalRepos.slice().sort((a, b) => {
+                 const dateA = a.pushed_at ? new Date(a.pushed_at) : new Date(0);
+                 const dateB = b.pushed_at ? new Date(b.pushed_at) : new Date(0);
+                 return dateB - dateA;
+             });
+          });
+
+          const loadMoreRepos = async () => { window.open('https://github.com/jimmyshuixin', '_blank'); };
+
+          const submitContact = async () => {
+            contact.sending = true;
+            try {
+                const res = await fetch('https://email.xvyin.com', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: contact.name, contact_value: contact.email, contact_method: 'email', message: contact.message })
+                });
+                if(res.ok) { contact.status = '已发送，谢谢！'; contact.name=''; contact.email=''; contact.message=''; setTimeout(()=>contact.status='', 3000); } 
+                else throw new Error();
+            } catch(e) { contact.status = '发送失败，请重试。'; } 
+            finally { contact.sending = false; }
+          };
+
+          const typeLine = (targetRef, text) => {
+            return new Promise((resolve) => {
+              let i = 0; targetRef.value = "";
+              const interval = setInterval(() => {
+                if (i < text.length) { targetRef.value += text.charAt(i); i++; } 
+                else { clearInterval(interval); resolve(); }
+              }, 80);
+            });
+          };
+
+          const startTypewriter = async () => {
+            activeLine.value = 1; await typeLine(heroLine1, "Hi! "); 
+            activeLine.value = 2; await typeLine(heroLine2, "I'm 虚宁"); 
+            activeLine.value = 3; await typeLine(heroLine3, "路漫漫其修远兮"); 
+            activeLine.value = 4; await typeLine(heroLine4, "吾将上下而求索"); 
+            showHeroButtons.value = true;
+          };
+
+          let lastScrollTop = 0;
+          const handleScroll = () => {
+             const scrollTop = window.scrollY;
+             const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+             const scrollPercent = (scrollTop / docHeight) * 100;
+             
+             const progressBar = document.getElementById('scrollProgressBar');
+             if(progressBar) progressBar.style.width = scrollPercent + '%';
+
+             if (scrollTop > lastScrollTop && scrollTop > 100) {
+                 isNavHidden.value = true; 
+             } else {
+                 isNavHidden.value = false;
+             }
+             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+
+             showBackToTop.value = scrollTop > 300;
+          };
+
+          onMounted(async () => {
+            initTheme(); // 初始化主题
+            window.addEventListener('scroll', handleScroll);
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-animating');
+                    } else {
+                        entry.target.classList.remove('is-animating');
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            const galleryCard = document.querySelector('.gallery-showcase');
+            if(galleryCard) observer.observe(galleryCard);
+
+            preloadAllImages();
+            startAutoRotate();
+
+            // 核心修复：Loader 逻辑优化，确保在 window.onload 后再隐藏，避免资源未加载完就显示
+            const finishLoading = () => {
+                const loader = document.getElementById("loader-wrapper");
+                if(loader) {
+                   loader.classList.add("is-hidden");
+                   setTimeout(() => { loader.style.display = 'none'; }, 800);
+                }
+                startTypewriter();
+            };
+
+            if (document.readyState === 'complete') {
+                finishLoading();
+            } else {
+                window.addEventListener('load', finishLoading);
+                // 增加超时保底，防止资源加载卡死导致一直白屏 (8秒)
+                setTimeout(finishLoading, 8000);
+            }
+
+            initGuestbook();
+
+            const canvas = document.getElementById("particle-canvas");
+            if(canvas) {
+                const ctx = canvas.getContext("2d");
+                let particles = [];
+                const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                class P { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5} update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1} draw(){const d=document.documentElement.classList.contains('dark-mode');ctx.fillStyle=d?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.3)";ctx.beginPath();ctx.arc(this.x,this.y,1.8,0,Math.PI*2);ctx.fill()}}
+                
+                const init = () => { particles = Array.from({length: 60}, () => new P()); };
+                const animate = () => {
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
+                    particles.forEach(p => {
+                        p.update(); p.draw();
+                        particles.forEach(p2 => {
+                            const dx = p.x-p2.x, dy = p.y-p2.y, d = Math.sqrt(dx*dx+dy*dy);
+                            if(d<120) { 
+                                const isDark = document.documentElement.classList.contains('dark-mode');
+                                ctx.strokeStyle = isDark ? `rgba(255,255,255,${0.08*(1-d/120)})` : `rgba(0,0,0,${0.08*(1-d/120)})`;
+                                ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
+                            }
+                        });
+                    });
+                    requestAnimationFrame(animate);
+                };
+                window.addEventListener('resize', () => { resize(); init(); });
+                resize(); init(); animate();
+            }
+
+            github.isLoadingMore = true;
+            try {
+                const results = await Promise.allSettled([
+                   apiService.getGithubData('stats'),
+                   apiService.getGithubData('repos', { page: 1, per_page: 30 }),
+                   apiService.getGithubData('pinned')
+                ]);
+
+                const [statsResult, reposResult, pinnedResult] = results;
+
+                if (statsResult.status === "fulfilled" && statsResult.value) {
+                    const statsData = statsResult.value;
+                    github.stats.repos = statsData.publicRepos || 0;
+                    github.stats.contributions = statsData.contributions || 0;
+                } else {
+                    console.error("GitHub stats failed:", statsResult.reason);
+                }
+
+                if (reposResult.status === "fulfilled" && reposResult.value) {
+                    const reposData = reposResult.value;
+                    github.repos = reposData;
+                    github.stats.stars = reposData.reduce((acc, r) => acc + (r.stargazers_count || 0), 0);
+                    github.stats.forks = reposData.reduce((acc, r) => acc + (r.forks_count || 0), 0);
+                } else {
+                    console.error("GitHub repos failed:", reposResult.reason);
+                }
+
+                if (pinnedResult.status === "fulfilled" && pinnedResult.value) {
+                    github.pinnedRepos = pinnedResult.value;
+                }
+            } catch (err) { 
+                console.log("Error loading GitHub data:", err); 
+            } finally {
+                github.isLoadingMore = false;
+            }
+          });
+
+          onUnmounted(() => {
+             window.removeEventListener('scroll', handleScroll);
+             stopAutoRotate();
+          });
+
+          return { 
+            scrollTo, handleImgError, scrollToTop, showBackToTop, isNavHidden,
+            resumeData, bookshelf, github, music, 
+            contact, submitContact, filteredAndSortedRepos,
+            heroLine1, heroLine2, heroLine3, heroLine4, activeLine, showHeroButtons,
+            loadMoreRepos, getLanguageColor,
+            isMobileMenuOpen, toggleMobileMenu, handleMobileClick,
+            contactMode, guestbook, activeDanmaku, submitGuestbookMessage,
+            activeGameKey, gamesData, currentGame, currentCharacter, switchGame, nextChar, prevChar,
+            plansData, getStatusLabel,
+            plansInProgress, plansPlanning, // 导出新的计算属性
+            isDark, toggleTheme // 导出主题状态和切换函数
+          };
+        }
+      }).mount('#app');
+    </script>
+  </body>
+</html>
