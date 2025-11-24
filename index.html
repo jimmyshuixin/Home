@@ -1762,7 +1762,12 @@
         </div>
 
         <footer style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; padding: 2rem 0;">
-          <p>© 2025 虚宁 | May you always shine.</p>
+          <p>
+            Copyright&copy;{{ copyrightYear }} 虚宁
+            <span v-if="siteUptime">| 站点已运行 {{ siteUptime }}</span>
+            <span v-if="icp">| <a href="https://beian.miit.gov.cn/" target="_blank" style="color: inherit; text-decoration: none;">{{ icp }}</a></span>
+          </p>
+          <p style="margin-top: 0.5rem; opacity: 0.8;">May you always shine.</p>
         </footer>
       </main>
 
@@ -1929,7 +1934,9 @@
       const config = {
         github: { username: "jimmyshuixin" },
         music: { api: "https://music.xvyin.com/", server: "tencent", type: "playlist" },
-        guestbookApiUrl: "https://firebase.xvyin.com/messages" // 弹幕 API
+        guestbookApiUrl: "https://firebase.xvyin.com/messages", // 弹幕 API
+        siteStartDate: "2024-03-02",
+        icpNumber: "渝ICP备2025053763号-1",
       };
 
       const apiService = {
@@ -2373,10 +2380,25 @@
              showBackToTop.value = scrollTop > 300;
           };
 
+          // Footer logic integration
+          const siteUptime = ref("");
+          const icp = ref(config.icpNumber);
+          
+          const copyrightYear = computed(() => {
+              const startYear = 2022;
+              const currentYear = new Date().getFullYear();
+              return currentYear > startYear ? `${startYear}-${currentYear}` : startYear;
+          });
+
           onMounted(async () => {
             initTheme(); // 初始化主题
             window.addEventListener('scroll', handleScroll);
             
+            // Calculate uptime
+            siteUptime.value = `${Math.ceil(
+              Math.abs(new Date() - new Date(config.siteStartDate)) / 864e5
+            )} 天`;
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2493,7 +2515,8 @@
             activeGameKey, gamesData, currentGame, currentCharacter, switchGame, nextChar, prevChar,
             plansData, getStatusLabel,
             plansInProgress, plansPlanning, // 导出新的计算属性
-            isDark, toggleTheme // 导出主题状态和切换函数
+            isDark, toggleTheme, // 导出主题状态和切换函数
+            copyrightYear, siteUptime, icp // 导出 Footer 数据
           };
         }
       }).mount('#app');
