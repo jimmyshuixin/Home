@@ -1,10 +1,14 @@
 # 虚静以宁 - 个人主页全栈项目
-
+## 当前index.html中的代码为ver 2.0版本，喜欢ver 1.0可以在version中找到
 这是一个高度可定制、功能丰富的现代化个人主页项目。前端基于原生 HTML/CSS/JavaScript 和 **Vue.js 3** 构建，后端完全由 **Cloudflare Workers** 驱动，构成了一套完整、安全、高性能的 **Serverless** 架构。
 
 -----
 ### ✨ [在线演示 (Live Demo)](https://xvyin.com/)
+### ver 1.0
 <img width="3199" height="1719" alt="图片" src="https://github.com/user-attachments/assets/b15cf6db-fc46-4bcf-9248-0f2f11d053a9" />
+### ver 2.0
+<img width="3199" height="1739" alt="图片" src="https://github.com/user-attachments/assets/02b68fc1-46f9-45ec-9874-ea2bed140258" />
+
 
 ## 核心功能
 
