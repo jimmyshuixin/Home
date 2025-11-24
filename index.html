@@ -1884,7 +1884,7 @@
         ],
         projects: [
           { name: "液闪放射性测量系统的光收集系统改进", role: "项目负责人", duration: "2024.06 - 2025.09", result: "江苏省颗粒大赛特等奖" },
-          { name: "基于LSTM/Transformer的空气质量(AQI)预测系统", role: "建模大赛作品", duration: "2024.03 - 2025.06", result: "全国大学生统计建模大赛三等奖。" },
+          { name: "基于LSTM/Transformer的空气质量(AQI)预测系统", role: "项目负责人", duration: "2024.03 - 2025.06", result: "全国大学生统计建模大赛三等奖。" },
           { name: "基于Vue.js的个人网站", role: "项目负责人", duration: "2022.05 - 2025.01", result: "成功部署上线。" }
         ],
         campusExperience: {
@@ -1892,8 +1892,8 @@
              { role: "科研项目/助教", description: "（未来即将开启的旅程...）" } 
           ],
           undergraduate: [
-            { role: "学习委员", description: "建立帮扶机制，班级获“零挂科”称号。" },
-            { role: "校级学习导师", description: "负责全校工程制图课程的学业指导。" },
+            { role: "学习委员", description: "建立帮扶机制，班级获“零挂科”、“先进班集体”称号。" },
+            { role: "校级学习导师", description: "负责全院工程制图课程的学业指导。" },
             { role: "学院行政/年级助理", description: "负责年级文书处理与沟通协调。" }
           ]
         },
@@ -1908,6 +1908,7 @@
           graduate: [], // 暂无内容
           undergraduate: [
             "国家励志奖学金（两次）",
+            "江苏省颗粒大赛特等奖",
             "全国大学生统计建模大赛三等奖",
             "“互联网+”创新创业大赛三等奖",
             "“核+X”创意大赛二等奖",
@@ -2049,7 +2050,7 @@
               });
               if (!response.ok) throw new Error("Submit failed");
               
-              guestbook.status = { message: "发射成功！感谢你的留言。", type: "success" };
+              guestbook.status = { message: "发射成功！感谢留言。", type: "success" };
               guestbook.newName = "";
               guestbook.newMessage = "";
               
@@ -2329,7 +2330,7 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: contact.name, contact_value: contact.email, contact_method: 'email', message: contact.message })
                 });
-                if(res.ok) { contact.status = '已发送，谢谢！'; contact.name=''; contact.email=''; contact.message=''; setTimeout(()=>contact.status='', 3000); } 
+                if(res.ok) { contact.status = '已发送，期待我们的下一次相遇。'; contact.name=''; contact.email=''; contact.message=''; setTimeout(()=>contact.status='', 3000); } 
                 else throw new Error();
             } catch(e) { contact.status = '发送失败，请重试。'; } 
             finally { contact.sending = false; }
