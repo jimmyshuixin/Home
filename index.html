@@ -2430,8 +2430,14 @@
             preloadAllImages();
             startAutoRotate();
 
-            // 核心修复：Loader 逻辑优化，确保在 window.onload 后再隐藏，避免资源未加载完就显示
+            // --- 核心 BUG 修复开始 ---
+            // 增加一个标志位，确保 startTypewriter 只会被调用一次
+            let isLoaderFinished = false;
+
             const finishLoading = () => {
+                if (isLoaderFinished) return; // 如果已经执行过，直接返回
+                isLoaderFinished = true;      // 标记为已执行
+
                 const loader = document.getElementById("loader-wrapper");
                 if(loader) {
                    loader.classList.add("is-hidden");
@@ -2439,12 +2445,14 @@
                 }
                 startTypewriter();
             };
+            // --- 核心 BUG 修复结束 ---
 
             if (document.readyState === 'complete') {
                 finishLoading();
             } else {
                 window.addEventListener('load', finishLoading);
                 // 增加超时保底，防止资源加载卡死导致一直白屏 (8秒)
+                // 现在 finishLoading 内部有防护，setTimeout 触发也不怕了
                 setTimeout(finishLoading, 8000);
             }
 
