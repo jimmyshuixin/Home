@@ -20,8 +20,6 @@
       href="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.css"
       rel="stylesheet"
     />
-    <!-- Icons -->
-    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40phosphor-icons%2Fweb"></script>
 
     <style>
       :root {
@@ -138,7 +136,6 @@
       }
       @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
       
-      /* 修改：将 opacity 从 1 降低到 0.8，整体更柔和 */
       #particle-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.8; pointer-events: none; }
 
       /* --- 弹幕相关样式 --- */
@@ -168,7 +165,7 @@
       /* --- 布局与导航 --- */
       .main-container {
         width: 100%; 
-        max-width: var(--container-width); /* 限制内容宽度为 1200px */
+        max-width: var(--container-width);
         margin: 0 auto;
         padding: 0 2rem 8rem;
         position: relative; z-index: 1;
@@ -176,7 +173,6 @@
       }
       @keyframes fadeInContent { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-      /* 固定的导航栏容器 - 透明风格 */
       .nav-container {
         position: fixed; top: 0; left: 0; right: 0;
         height: var(--nav-height);
@@ -196,19 +192,17 @@
         display: flex; justify-content: space-between; align-items: center;
         height: 100%; 
         width: 100%; 
-        max-width: 100%; /* 导航栏宽度自适应，铺满屏幕 */
+        max-width: 100%;
         margin: 0 auto; 
         padding: 0 2rem;
       }
       
-      /* Logo 美化 */
       .logo { 
         font-family: "Noto Serif SC", serif; 
         font-weight: 800; 
         font-size: 1.6rem; 
         letter-spacing: 0.02em; 
         cursor: pointer;
-        /* 渐变文字 */
         background: linear-gradient(120deg, var(--text-primary) 0%, var(--text-secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -217,7 +211,6 @@
       }
       .logo:hover { opacity: 1; }
       
-      /* 导航链接 - 胶囊式悬浮 */
       .nav-links { display: flex; align-items: center; gap: 0.5rem; }
       .nav-links a { 
         margin-left: 0;
@@ -232,13 +225,11 @@
         color: var(--text-primary);
         background-color: rgba(0, 0, 0, 0.04); 
       }
-      /* 暗黑模式适配 */
       @media (prefers-color-scheme: dark) {
         .logo { background: linear-gradient(120deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .nav-links a:hover { background-color: rgba(255, 255, 255, 0.08); }
       }
 
-      /* 移动端菜单按钮 */
       .mobile-menu-btn { 
         display: none; background: none; border: none; color: var(--text-primary); 
         font-size: 1.6rem; cursor: pointer; padding: 0.6rem; border-radius: 50%;
@@ -284,7 +275,7 @@
         grid-column: 5 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;
       }
 
-      /* --- Hero (继承 main-container 宽度限制) --- */
+      /* --- Hero --- */
       .hero-wrapper {
         min-height: 80vh; 
         display: grid; grid-template-columns: 1.2fr 1fr; align-items: center;
@@ -301,7 +292,6 @@
       }
       .hero-text p { color: var(--text-secondary); font-size: 1.1rem; max-width: 450px; line-height: 1.8; margin-bottom: 2rem; }
       
-      /* 统一的 Hero 按钮容器 */
       .hero-btns {
         display: flex; gap: 10px; margin-top: 2rem; flex-wrap: wrap; align-items: center;
         animation: fadeIn 1s ease-out;
@@ -328,9 +318,7 @@
       .hero-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s ease; }
       .hero-img-box:hover img { transform: scale(1.05); }
 
-      /* --- 重构 V3：分块展示 + 强调时间段 (Block Layout) --- */
-
-      /* 通用子标题样式 */
+      /* --- Resume Section --- */
       .resume-subtitle {
         grid-column: 1 / -1;
         font-size: 1.1rem; font-weight: 600; color: var(--text-primary);
@@ -342,7 +330,6 @@
         content: ''; flex: 1; height: 1px; background: rgba(127,127,127,0.1);
       }
 
-      /* 1. 教育：垂直堆叠列表 (Minimal List) */
       .edu-container {
         grid-column: 1 / -1;
         display: flex; flex-direction: column; gap: 1.5rem;
@@ -377,19 +364,18 @@
       }
       .edu-major { font-size: 0.95rem; color: var(--accent); margin-bottom: 0.5rem; }
       
-      /* 修正：GPA/排名 显示改为低调风格 (Minimalist Style) */
       .edu-stats-row {
         display: flex; gap: 1.5rem; margin-top: 0.3rem; flex-wrap: wrap; align-items: center;
       }
       .edu-stat-badge {
         display: inline-flex; align-items: center; gap: 6px;
-        color: var(--text-secondary); /* 回归次级文本颜色，不抢眼 */
+        color: var(--text-secondary);
         font-size: 0.9rem;
         font-weight: 500;
         opacity: 0.9;
       }
       .edu-stat-badge i {
-        color: #f59e0b; /* 仅图标保留颜色，作为点缀 */
+        color: #f59e0b;
         font-size: 1.1rem;
         opacity: 0.8;
       }
@@ -397,7 +383,6 @@
         .edu-stat-badge i { color: #fbbf24; }
       }
 
-      /* 2. 项目：Grid 网格 (Project Cards) */
       .project-grid {
         grid-column: 1 / -1;
         display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -414,9 +399,8 @@
       .project-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--shadow-hover);
-        border-color: rgba(245, 158, 11, 0.3); /* Amber highlight */
+        border-color: rgba(245, 158, 11, 0.3);
       }
-      /* 项目时间胶囊 */
       .project-time-capsule {
         align-self: flex-start;
         font-size: 0.75rem; color: #d97706; background: rgba(251, 191, 36, 0.1);
@@ -427,7 +411,6 @@
       .project-role { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 500; }
       .project-result { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; flex-grow: 1; }
       
-      /* 3. 校园经历：紧凑列表 (Compact List) */
       .exp-container { grid-column: 1 / -1; display: flex; flex-direction: column; overflow: hidden; }
       .exp-group-header {
         padding: 0.8rem 1.5rem;
@@ -451,14 +434,12 @@
       .exp-role { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; color: var(--text-primary); }
       .exp-desc { font-size: 0.9rem; color: var(--text-secondary); }
 
-      /* Dark Mode Adjustments */
       @media (prefers-color-scheme: dark) {
         .edu-item, .project-card { border-color: rgba(255,255,255,0.05); }
         .edu-time { background: rgba(255,255,255,0.05); color: #cbd5e1; }
         .exp-item { border-bottom-color: rgba(255,255,255,0.05); }
       }
 
-      /* Mobile 适配 */
       @media (max-width: 768px) {
         .edu-item { flex-direction: column; gap: 1rem; }
         .edu-icon { width: 40px; height: 40px; font-size: 1.2rem; }
@@ -482,7 +463,7 @@
       }
       .glass-card:hover .card-cover { transform: scale(1.02); }
 
-      /* --- GitHub / 技能 / 书单 --- */
+      /* --- GitHub --- */
       .github-section-title {
         grid-column: 1 / -1; font-size: 1.2rem; font-weight: 600; color: var(--text-primary);
         margin-top: 2rem; margin-bottom: 1.5rem; padding-left: 1rem;
@@ -549,14 +530,11 @@
       }
       .tag:hover { background: var(--text-primary); color: var(--bg-body); border-color: transparent; }
 
-      /* 新增：娱乐板块的特殊 Tag 样式 */
       .game-tag:hover {
         background: #8b5cf6; color: white;
       }
-      /* 移除体育相关样式 */
 
-      /* --- 复刻版沉浸式布局 (Immersive Layout V5 - Pure Atmosphere) --- */
-      /* 1. 主容器 */
+      /* --- Immersive Section --- */
       .interests-container {
         grid-column: 1 / -1;
         width: 100%;
@@ -564,34 +542,26 @@
         z-index: 1;
       }
 
-      /* 2. 游戏舞台 (彻底去边框，改为光晕) */
       .game-immersive-card {
         position: relative;
-        /* 核心改变：使用径向渐变代替纯色背景块 */
-        /* 光晕中心定位在右侧角色身后，边缘淡出为透明 */
         background: radial-gradient(
           circle at 70% 50%, 
           var(--theme-bg) 0%, 
           rgba(255, 255, 255, 0) 65%
         );
-        /* 移除所有边界属性 */
         border-radius: 0;
         border: none;
         box-shadow: none;
-        
-        min-height: 650px; /* 增加高度，让空间更开阔 */
+        min-height: 650px;
         display: flex;
         flex-direction: row;
-        overflow: visible; /* 允许光晕和立绘自然延伸 */
-        transition: background 0.8s ease; /* 更慢的过渡，更柔和 */
-        
-        /* 负边距技巧：让光晕左右延伸，打破容器限制 */
+        overflow: visible;
+        transition: background 0.8s ease;
         margin: 0 -4rem; 
         width: calc(100% + 8rem);
-        padding: 0 4rem; /* 补偿内容内边距 */
+        padding: 0 4rem;
       }
       
-      /* 角色区域 */
       .game-char-stage {
         flex: 1;
         position: relative;
@@ -602,35 +572,31 @@
         margin: 0 auto;
       }
       
-      /* 角色信息 (左侧) */
       .char-info-block {
         position: absolute;
-        top: 40%; /* 稍微下移 */
+        top: 40%;
         left: 5%;
         transform: translateY(-50%);
         z-index: 5;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-        /* 增加文字阴影，防止在浅色背景上看不清 */
         text-shadow: 0 10px 30px rgba(255,255,255,0.8);
       }
       
       .char-name-display {
         font-family: "Noto Serif SC";
-        font-size: 5rem; /* 更大气的字体 */
+        font-size: 5rem;
         font-weight: 900;
         color: var(--theme-text);
         line-height: 1;
         margin-bottom: 1.5rem;
         white-space: nowrap;
-        /* 增加一点透明度变化 */
         opacity: 0.9;
       }
       .char-tag-display {
         display: inline-block;
         padding: 0.6rem 1.8rem;
-        /* 背景改为极淡的白色，增加一点模糊 */
         background: rgba(255, 255, 255, 0.4);
         backdrop-filter: blur(5px);
         border-radius: 50px;
@@ -641,56 +607,42 @@
         border: 1px solid rgba(255,255,255,0.2);
       }
 
-      /* 角色立绘 (右侧) */
-      /* 修复：将容器改为 relative，以支持内部图片的 absolute 定位 */
       .char-img-container {
         position: absolute;
-        top: -5%; bottom: -5%; right: 0%; /* 允许立绘上下轻微溢出 */
+        top: -5%; bottom: -5%; right: 0%;
         width: 60%;
-        /* flex 用于旧布局，现在改为 absolute 布局，但保留 flex 不影响 */
         display: flex;
         justify-content: center;
         z-index: 2;
-        pointer-events: none; /* 让鼠标事件穿透到下方背景 */
+        pointer-events: none;
       }
       
-      /* 呼吸动画关键帧 */
       @keyframes breathe {
         0%, 100% { transform: translate(-50%, 0) scale(1); }
         50% { transform: translate(-50%, -10px) scale(1.015); }
       }
 
       .char-img-full {
-        /* 核心修复：绝对定位，确保新旧图片重叠，从而实现 Cross-fade */
         position: absolute;
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        
         height: 100%;
         width: auto;
         max-width: 100%;
         object-fit: contain;
-        /* 更自然的投影：模拟环境光遮蔽，而非生硬的黑影 */
         filter: drop-shadow(0 30px 30px rgba(0,0,0,0.15));
-        
-        /* 呼吸动画 (注意这里的动画会覆盖上面的 transform，需合并) */
         animation: breathe 6s ease-in-out infinite;
-        /* 基础过渡 */
         transition: opacity 0.6s ease;
-        /* 性能优化：提示浏览器可能会发生变化 */
         will-change: opacity, transform;
       }
-      /* 稍微互动的视差感 - 与动画叠加可能冲突，简化为仅透明度 */
-      /* .game-immersive-card:hover .char-img-full { transform: scale(1.02) translateX(-10px); } */
 
-      /* 导航箭头 */
       .nav-arrow {
         position: absolute;
         top: 50%; transform: translateY(-50%);
         width: 56px; height: 56px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2); /* 极简透明 */
+        background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255,255,255,0.3);
         display: flex; justify-content: center; align-items: center;
@@ -708,11 +660,10 @@
       .nav-left { left: 0; }
       .nav-right { right: 0; }
 
-      /* 底部 Dock (修复：优化宽度切换动画) */
       .dock-wrapper {
         position: absolute;
         bottom: 3rem;
-        left: 5%; /* 与信息对齐 */
+        left: 5%;
         z-index: 10;
       }
       .dock-container {
@@ -726,7 +677,7 @@
         border: 1px solid rgba(255,255,255,0.4);
       }
       .dock-item {
-        padding: 10px 14px; /* 稍微减少 padding 以配合展开动画 */
+        padding: 10px 14px;
         border-radius: 14px;
         border: none;
         background: transparent;
@@ -735,12 +686,11 @@
         font-size: 0.95rem; font-weight: 700;
         color: var(--text-secondary);
         transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        overflow: hidden; /* 必须：防止内容溢出 */
-        flex-shrink: 0; /* 核心修复：防止在小屏被挤压 */
+        overflow: hidden;
+        flex-shrink: 0;
       }
-      .dock-item i { font-size: 1.2rem; flex-shrink: 0; /* 防止图标被压缩 */ }
+      .dock-item i { font-size: 1.2rem; flex-shrink: 0; }
       
-      /* 平滑展开文字 */
       .dock-item span {
         max-width: 0;
         opacity: 0;
@@ -754,18 +704,16 @@
         background: #1a202c;
         color: #ffffff;
         box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        padding-left: 20px; padding-right: 20px; /* 展开时增加内边距 */
+        padding-left: 20px; padding-right: 20px;
       }
-      /* 激活时展开文字 */
       .dock-item.active span {
-        max-width: 300px; /* 核心修复：由 150px 增至 300px，防止文字截断 */
+        max-width: 300px;
         opacity: 1;
         margin-left: 8px;
       }
 
       .dock-item:hover:not(.active) { background: rgba(255,255,255,0.8); color: var(--text-primary); }
 
-      /* --- 移动端适配 (核心修复区域) --- */
       @media (max-width: 900px) {
         .game-immersive-card { 
             margin: 0 -2rem; 
@@ -773,7 +721,6 @@
             padding: 0 2rem;
             flex-direction: column;
             min-height: 600px;
-            /* 移动端光晕改为底部发光 */
             background: radial-gradient(circle at 50% 80%, var(--theme-bg), transparent 70%);
         }
         .game-char-stage { flex-direction: column; }
@@ -784,12 +731,11 @@
         }
         .char-name-display { font-size: 3.5rem; margin-bottom: 1rem; }
         
-        /* 修复：使用 left:50% + transform 绝对居中，并指定固定高度避免 60% 导致的高度塌陷 */
         .char-img-container { 
             position: relative; 
             width: 100%; 
-            height: 400px; /* 固定高度，确保在手机端图片有空间显示 */
-            max-height: 60vh; /* 防止在极小屏幕溢出 */
+            height: 400px;
+            max-height: 60vh;
             top: auto; right: auto; bottom: 0; left: 50%;
             transform: translateX(-50%);
             margin-top: 1rem;
@@ -803,13 +749,12 @@
             display: flex; justify-content: center; 
         }
         .dock-container { 
-            width: max-content; /* 允许内容自然撑开，但配合max-width限制 */
+            width: max-content;
             max-width: 100%; 
             overflow-x: auto; 
         }
         .nav-arrow { display: none; }
         
-        /* 隐藏导航栏链接，显示汉堡菜单 */
         .nav-links { display: none; } 
         .mobile-menu-btn { display: block; }
         .scatter-grid { display: block; }
@@ -819,7 +764,6 @@
         .scatter-item-wide { grid-column: span 1; }
         .section-content .scatter-item:nth-child(even) { margin-top: 0; }
         
-        /* Mobile Hero Alignment */
         .hero-wrapper { grid-template-columns: 1fr; text-align: center; gap: 3rem; min-height: auto; padding-top: 2rem; }
         .hero-btns { justify-content: center; } 
         
@@ -827,14 +771,13 @@
         .hero-text h1 { margin-bottom: 1rem; }
         .hero-text p { margin: 0 auto 2rem; }
         
-        /* Grid Adjustments */
         .project-grid { grid-template-columns: 1fr; }
         
         .github-stats-grid { grid-template-columns: repeat(2, 1fr); }
         .back-to-top { bottom: 5rem; right: 1rem; }
       }
 
-      /* --- 联系 Tab 样式 --- */
+      /* --- Contact Tab --- */
       .contact-tabs {
         display: flex; gap: 1rem; margin-bottom: 2rem;
         border-bottom: 1px solid rgba(127, 127, 127, 0.1); padding-bottom: 0.5rem;
@@ -849,10 +792,9 @@
         content: ''; position: absolute; bottom: -0.6rem; left: 0; width: 100%; height: 2px;
         background-color: var(--accent-highlight);
       }
-      .contact-tab-btn.active:hover { color: var(--text-primary); } /* 修复：激活状态hover保持 */
+      .contact-tab-btn.active:hover { color: var(--text-primary); }
       .contact-tab-btn:hover { color: var(--text-primary); }
 
-      /* --- Tab 内容切换动画 (新增) --- */
       .switch-mode-enter-active,
       .switch-mode-leave-active {
         transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
@@ -860,11 +802,10 @@
       .switch-mode-enter-from,
       .switch-mode-leave-to {
         opacity: 0;
-        transform: translateY(5px); /* 轻微位移 */
-        filter: blur(4px); /* 模糊滤镜增加优雅感 */
+        transform: translateY(5px);
+        filter: blur(4px);
       }
 
-      /* --- 回到顶部按钮 --- */
       .back-to-top {
         position: fixed; bottom: 6rem; right: 2rem;
         width: 3rem; height: 3rem; border-radius: 50%;
@@ -880,23 +821,21 @@
       .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
       .back-to-top:hover { background: var(--accent-highlight); color: white; transform: translateY(-3px); }
 
-      /* --- 响应式 (深度优化导航适配) --- */
       @media (max-width: 1024px) { 
         .main-container { padding: 0 2rem 6rem; } 
         .hero-wrapper { gap: 1rem; } 
       }
-      /* 注意：这里删除了重复的 max-width: 900px 块，已将其内容合并到上面的块中 */
 
       @media (max-width: 768px) {
-        .nav-header { padding: 0 1.5rem; } /* 平板适配 */
+        .nav-header { padding: 0 1.5rem; }
         .main-container { padding: 0 1.5rem 6rem; }
       }
       @media (max-width: 480px) {
-        .nav-header { padding: 0 1rem; } /* 手机适配 */
+        .nav-header { padding: 0 1rem; }
         .main-container { padding: 0 1rem 6rem; }
       }
 
-      /* --- 悬浮音乐栏 --- */
+      /* --- Music Bar --- */
       .floating-bar {
         position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
         z-index: 50; display: flex; align-items: center; gap: 1rem; width: auto; max-width: 90vw;
@@ -923,9 +862,9 @@
       }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
       
-      .mobile-date-badge { display: none; } /* 默认隐藏移动端时间标签 */
+      .mobile-date-badge { display: none; }
 
-      /* --- 新增：光隅 Gallery 特别设计 (Photo Table Style) --- */
+      /* --- Gallery Showcase --- */
       .gallery-showcase {
         grid-column: 1 / -1;
         background: linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
@@ -951,7 +890,6 @@
         box-shadow: 0 20px 50px rgba(0,0,0,0.08);
       }
       
-      /* 左侧文字区 */
       .gallery-text {
         flex: 1; z-index: 2; max-width: 350px; margin-right: 2rem;
       }
@@ -971,11 +909,10 @@
       .gallery-showcase:hover .gallery-btn,
       .gallery-showcase.is-animating .gallery-btn { gap: 12px; }
 
-      /* 右侧拍立得相片堆叠 */
       .gallery-visuals {
         flex: 1.2; position: relative; height: 320px; 
         display: flex; align-items: center; justify-content: center;
-        perspective: 1000px; /* 3D 透视 */
+        perspective: 1000px;
       }
       .polaroid {
         background: white; padding: 12px 12px 35px 12px;
@@ -990,21 +927,17 @@
         transition: filter 0.5s;
       }
       
-      /* 悬停/滚动可见时 去色复原 */
       .gallery-showcase:hover .polaroid img,
       .gallery-showcase.is-animating .polaroid img { filter: grayscale(0%); }
       
-      /* 堆叠动效：初始状态乱中有序 */
       .p1 { transform: rotate(-8deg) translate(-40px, 10px) scale(0.9); z-index: 1; }
       .p2 { transform: rotate(4deg) translate(0px, -10px) scale(0.95); z-index: 2; }
       .p3 { transform: rotate(-2deg) translate(40px, 20px) scale(1); z-index: 3; box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
 
-      /* 悬停/滚动可见时 散开动效 */
       .gallery-showcase:hover .p1, .gallery-showcase.is-animating .p1 { transform: rotate(-15deg) translate(-90px, 0px) scale(1); z-index: 3; }
       .gallery-showcase:hover .p2, .gallery-showcase.is-animating .p2 { transform: rotate(0deg) translate(0px, -40px) scale(1.05); z-index: 4; }
       .gallery-showcase:hover .p3, .gallery-showcase.is-animating .p3 { transform: rotate(12deg) translate(90px, 10px) scale(1.05); z-index: 5; }
 
-      /* 移动端特殊调整：防止散开过宽超出屏幕 */
       @media (max-width: 480px) {
         .gallery-showcase.is-animating .p1 { transform: rotate(-12deg) translate(-60px, 0px) scale(1); }
         .gallery-showcase.is-animating .p3 { transform: rotate(10deg) translate(60px, 10px) scale(1.05); }
@@ -1019,7 +952,7 @@
         .polaroid img { height: 160px; }
       }
 
-      /* --- 新增：未来&计划 (Plans) 板块样式 --- */
+      /* --- Plans Section --- */
       .plans-grid {
         grid-column: 1 / -1;
         display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -1040,7 +973,6 @@
         border-color: rgba(59, 130, 246, 0.3);
       }
       
-      /* 状态呼吸灯效果 */
       .plan-card.is-active::before {
         content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
         background: linear-gradient(90deg, transparent, var(--accent-highlight), transparent);
@@ -1065,7 +997,6 @@
       .plan-title { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; font-family: "Noto Serif SC"; }
       .plan-desc { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6; min-height: 3em; }
 
-      /* 里程碑列表 (Key Results) */
       .milestone-list { list-style: none; padding: 0; margin-bottom: 2rem; flex: 1; }
       .milestone-item {
         display: flex; align-items: center; gap: 10px; font-size: 0.85rem;
@@ -1076,7 +1007,6 @@
       .milestone-item.done i { color: #10b981; }
       .milestone-item i { font-size: 1rem; color: var(--accent); opacity: 0.5; }
 
-      /* DNA 进度条 (Segmented) */
       .plan-progress-container { margin-top: auto; }
       .plan-progress-label {
         display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600;
@@ -1127,7 +1057,6 @@
             <a href="#creations" @click.prevent="scrollTo('creations')">创造</a>
             <a href="#interests" @click.prevent="scrollTo('interests')">娱乐</a>
             <a href="#gallery" @click.prevent="scrollTo('gallery')">光隅</a>
-            <!-- 新增导航入口 -->
             <a href="#plans" @click.prevent="scrollTo('plans')">未来</a>
             <a href="#contact" @click.prevent="scrollTo('contact')">联系</a>
             </div>
@@ -1143,7 +1072,6 @@
             <a href="#creations" @click.prevent="handleMobileClick('creations')">创造</a>
             <a href="#interests" @click.prevent="handleMobileClick('interests')">娱乐</a>
             <a href="#gallery" @click.prevent="handleMobileClick('gallery')">光隅</a>
-            <!-- 新增移动端导航 -->
             <a href="#plans" @click.prevent="handleMobileClick('plans')">未来</a>
             <a href="#contact" @click.prevent="handleMobileClick('contact')">联系</a>
         </div>
@@ -1216,7 +1144,6 @@
           </div>
           <div class="section-content" style="display: block;">
             
-            <!-- 1. Education Section -->
             <div class="resume-subtitle"><i class="ph-fill ph-graduation-cap" style="color: var(--accent-highlight);"></i> 教育背景</div>
             <div class="edu-container">
                <div v-for="(edu, i) in resumeData.education" :key="'edu'+i" class="edu-item">
@@ -1228,7 +1155,6 @@
                     </div>
                     <div class="edu-major">{{ edu.major }} <span v-if="edu.minor">/ {{ edu.minor }}</span></div>
                     
-                    <!-- 新增：高亮 GPA/Rank 显示 -->
                     <div class="edu-stats-row" v-if="edu.gpa">
                         <div class="edu-stat-badge">
                             <i class="ph-bold ph-exam"></i> GPA: {{ edu.gpa }}
@@ -1242,7 +1168,6 @@
                </div>
             </div>
 
-            <!-- 2. Projects Section -->
             <div class="resume-subtitle"><i class="ph-fill ph-rocket-launch" style="color: #f59e0b;"></i> 项目与科研</div>
             <div class="project-grid">
                <div v-for="(proj, i) in resumeData.projects" :key="'proj'+i" class="project-card">
@@ -1253,11 +1178,9 @@
                </div>
             </div>
 
-            <!-- 3. Experience Section -->
             <div class="resume-subtitle"><i class="ph-fill ph-users-three" style="color: #10b981;"></i> 校园历练</div>
-            <div class="exp-container glass-card" style="padding: 0;"> <!-- 移除 padding 以便 header 贴边 -->
+            <div class="exp-container glass-card" style="padding: 0;"> 
                
-               <!-- 研究生阶段 -->
                <div class="exp-group-header">研究生阶段</div>
                <div v-for="(exp, i) in resumeData.campusExperience.graduate" :key="'grad'+i" class="exp-item">
                   <div class="exp-time">USTC</div>
@@ -1267,7 +1190,6 @@
                   </div>
                </div>
 
-               <!-- 本科生阶段 -->
                <div class="exp-group-header" style="border-top: 1px solid rgba(0,0,0,0.05);">本科生阶段</div>
                <div v-for="(exp, i) in resumeData.campusExperience.undergraduate" :key="'und'+i" class="exp-item">
                   <div class="exp-time">NJUST</div>
@@ -1292,7 +1214,7 @@
                <h3 style="font-family:'Noto Serif SC'; font-size:1.5rem;">Github</h3>
                <span style="height: 1px; flex: 1; background: var(--text-secondary); opacity: 0.2;"></span>
             </div>
-            <!-- Github Stats 改为中文 -->
+            <!-- Github Stats -->
             <div style="grid-column: 1 / -1;">
                <h4 class="github-section-title">数据概览</h4>
                <div class="github-stats-grid">
@@ -1616,13 +1538,12 @@
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fvue%2F3.2.47%2Fvue.global.prod.js"></script>
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fmarked%2F4.3.0%2Fmarked.min.js"></script>
     <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.js"></script>
+    <!-- 核心修复：将 Phosphor Icons 脚本移至 body 底部，并添加 defer 属性，避免阻塞渲染和网络问题 -->
+    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40phosphor-icons%2Fweb" defer></script>
 
     <script>
       const { createApp, ref, reactive, onMounted, onUnmounted, nextTick, computed } = Vue;
 
-      // 新增：游戏与角色数据
-      // color: 背景色块颜色 (要淡雅，接近白色但带有倾向)
-      // textColor: 角色名字颜色 (要深色，形成对比)
       const GAMES_DATA = {
         genshin: {
           name: "原神",
@@ -1644,14 +1565,12 @@
           name: "绝区零",
           icon: "ph-fill ph-television",
           characters: [
-            // 修复：颜色已调整为更符合 ZZZ 风格的洋红与深蓝
             { name: "薇薇安", desc: "狡兔屋", img: "./content/game/Vivian.png", color: "rgba(236, 72, 153, 0.25)", textColor: "#831843" },
             { name: "仪玄", desc: "刑侦特勤组", img: "./content/game/YiXuan.png", color: "rgba(59, 130, 246, 0.25)", textColor: "#1e40af" }
           ]
         }
       };
       
-      // 新增：计划与未来数据 (Mock Data)
       const PLANS_DATA = [
         {
           title: "SaaS 产品开发",
@@ -1708,18 +1627,15 @@
       const STATIC_RESUME = {
         name: "虚宁",
         location: "南京",
-        // 调整顺序：最新的（未来）在上面
         education: [
           { institution: "中国科学技术大学", major: "加速器", minor: "", duration: "2026.09 - 2029.06", gpa: "", ranking: "" },
           { institution: "南京理工大学", major: "辐射防护与核安全", minor: "人工智能", duration: "2022.09 - 2026.06", gpa: "3.62/4.0", ranking: "3/30" }
         ],
-        // 项目顺序无需大改，已经是倒序（最新在最前）
         projects: [
           { name: "液闪放射性测量系统的光收集系统改进", role: "项目负责人", duration: "2024.06 - 2025.09", result: "显著提高了探测效率。" },
           { name: "基于LSTM/Transformer的空气质量(AQI)预测系统", role: "建模大赛作品", duration: "2024.03 - 2025.06", result: "全国大学生统计建模大赛三等奖。" },
           { name: "基于Vue.js的个人网站", role: "项目负责人", duration: "2022.05 - 2025.01", result: "成功上线。" }
         ],
-        // 修改数据结构为分组形式
         campusExperience: {
           graduate: [
              { role: "科研项目/助教", description: "（未来即将开启的旅程...）" } 
@@ -1753,16 +1669,67 @@
       };
 
       const apiService = {
+        cache: {
+            get(key) {
+              const itemStr = sessionStorage.getItem(key);
+              if (!itemStr) return null;
+              try {
+                const item = JSON.parse(itemStr);
+                const isExpired = new Date().getTime() > item.expiry;
+                if (isExpired) {
+                  sessionStorage.removeItem(key);
+                  return null;
+                }
+                return item.value;
+              } catch (e) {
+                sessionStorage.removeItem(key);
+                return null;
+              }
+            },
+            set(key, value, ttlMinutes = 15) {
+              const now = new Date();
+              const item = {
+                value: value,
+                expiry: now.getTime() + ttlMinutes * 60 * 1000,
+              };
+              try {
+                sessionStorage.setItem(key, JSON.stringify(item));
+              } catch (e) {
+                console.error("设置缓存失败:", e);
+              }
+            },
+        },
         async getGithubData(endpoint, params = {}) {
-          const url = new URL("https://github.xvyin.com/");
-          url.searchParams.append("endpoint", endpoint);
-          url.searchParams.append("username", config.github.username);
-          for (const key in params) url.searchParams.append(key, params[key]);
-          try {
-            const response = await fetch(url.toString());
-            if (!response.ok) return null;
-            return await response.json();
-          } catch (e) { console.warn("GitHub API Fetch Error:", e); return null; }
+            const workerUrl = "https://github.xvyin.com/";
+            const url = new URL(workerUrl);
+            url.searchParams.append("endpoint", endpoint);
+            url.searchParams.append("username", config.github.username);
+            for (const key in params) {
+              if (params.hasOwnProperty(key)) {
+                url.searchParams.append(key, params[key]);
+              }
+            }
+
+            const cacheKey = `github_${endpoint}_${JSON.stringify(params)}`;
+            const cachedData = this.cache.get(cacheKey);
+
+            if (cachedData) {
+              return cachedData;
+            }
+
+            try {
+                const response = await fetch(url.toString());
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`获取 GitHub 数据失败 (${endpoint}): ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                this.cache.set(cacheKey, data);
+                return data;
+            } catch (e) {
+                console.warn("GitHub API Fetch Error:", e);
+                throw e;
+            }
         },
         async getMusicPlaylist(songId) {
           const apiUrl = `${config.music.api}?server=${config.music.server}&type=${config.music.type}&id=${songId}`;
@@ -1773,7 +1740,6 @@
         }
       };
 
-      // 弹幕功能 Hook
       const useGuestbook = () => {
           const guestbook = reactive({
             isReady: false,
@@ -1787,7 +1753,7 @@
           const activeDanmaku = ref([]);
           let danmakuQueue = [], pollInterval = null, animationFrameId = null;
           let lastDanmakuTime = 0;
-          const danmakuIntervalMs = 2500; // 弹幕发射间隔
+          const danmakuIntervalMs = 2500;
 
           const fetchMessages = async () => {
             try {
@@ -1795,7 +1761,7 @@
               if (!response.ok) throw new Error(`Error: ${response.status}`);
               const freshMessages = await response.json();
               guestbook.messages = freshMessages;
-              danmakuQueue = [...freshMessages].reverse(); // 最新的排后面
+              danmakuQueue = [...freshMessages].reverse(); 
               guestbook.isReady = true;
             } catch (err) {
               console.error("Fetch messages failed:", err);
@@ -1820,12 +1786,10 @@
               });
               if (!response.ok) throw new Error("Submit failed");
               
-              // 乐观更新 UI
               guestbook.status = { message: "发射成功！感谢你的留言。", type: "success" };
               guestbook.newName = "";
               guestbook.newMessage = "";
               
-              // 立即将新弹幕加入队列，让用户马上看到
               const newMsg = { name, message };
               danmakuQueue.push(newMsg);
               
@@ -1844,19 +1808,19 @@
               lastDanmakuTime = timestamp;
               if (danmakuQueue.length > 0 && activeDanmaku.value.length <= 15) {
                 const msg = danmakuQueue.shift();
-                danmakuQueue.push(msg); // 循环播放
-                const duration = Math.random() * 8 + 12; // 12-20秒飘过
+                danmakuQueue.push(msg);
+                const duration = Math.random() * 8 + 12;
                 const danmaku = {
                   id: Date.now() + Math.random(),
                   name: msg.name,
                   message: msg.message,
                   style: {
-                    top: `${Math.random() * 80 + 5}%`, // 随机高度
+                    top: `${Math.random() * 80 + 5}%`,
                     animationDuration: `${duration}s`,
                   },
                 };
                 activeDanmaku.value.push(danmaku);
-                setTimeout(() => { // 动画结束后移除 DOM
+                setTimeout(() => { 
                   const index = activeDanmaku.value.findIndex(d => d.id === danmaku.id);
                   if (index > -1) activeDanmaku.value.splice(index, 1);
                 }, duration * 1000 + 100);
@@ -1868,7 +1832,6 @@
           const init = async () => {
             await fetchMessages();
             animationFrameId = requestAnimationFrame(danmakuLoop);
-            // 每分钟轮询一次新消息
             pollInterval = setInterval(fetchMessages, 60000);
           };
 
@@ -1880,12 +1843,11 @@
           return { guestbook, activeDanmaku, init, submitMessage };
       };
 
-      // 音乐播放器 Hook (已更新 Loading 逻辑)
       const useMusicPlayer = () => {
         const player = reactive({
           aplayer: null,
           isPlaying: false,
-          isLoading: false, // 新增 Loading 状态
+          isLoading: false,
           currentSong: { name: 'Music', artist: 'Click to play', cover: './content/icon/32.png' },
         });
 
@@ -1905,12 +1867,12 @@
         };
 
         const togglePlay = async () => {
-          if (player.isLoading) return; // 防止重复点击
+          if (player.isLoading) return; 
 
           if (player.aplayer) { 
             player.aplayer.toggle(); 
           } else {
-            player.isLoading = true; // 开始加载
+            player.isLoading = true;
             try {
                 const list = await apiService.getMusicPlaylist('9206816111');
                 if (list && list.length > 0) {
@@ -1919,7 +1881,7 @@
             } catch (e) {
                 console.error("Music Load Error:", e);
             } finally {
-                player.isLoading = false; // 加载结束（无论成功失败）
+                player.isLoading = false;
             }
           }
         };
@@ -1931,32 +1893,24 @@
           const resumeData = reactive(STATIC_RESUME);
           const bookshelf = ref(STATIC_BOOKSHELF);
           const contact = reactive({ name: '', email: '', message: '', sending: false, status: '' });
-          const contactMode = ref('email'); // 控制联系 Tab: 'email' | 'danmaku'
+          const contactMode = ref('email'); 
           
-          // --- 游戏板块逻辑 ---
-          // 修复：默认游戏改为原神
           const activeGameKey = ref('genshin'); 
           const charIndex = ref(0);
           const gamesData = reactive(GAMES_DATA);
           const plansData = reactive(PLANS_DATA);
           
-          // 图像缓存池，防止GC
           const imageCache = new Map();
           let autoRotateInterval = null;
 
-          // 计算当前游戏信息
           const currentGame = computed(() => gamesData[activeGameKey.value]);
           
-          // 计算当前展示的角色 (增加安全性检查，防止索引越界)
           const currentCharacter = computed(() => {
              const chars = currentGame.value.characters;
              if (!chars || chars.length === 0) return { name: '', img: '' };
-             // 确保索引安全
              return chars[charIndex.value] || chars[0];
           });
           
-          // **核心修复：深度预加载图片函数**
-          // 改为加载所有游戏的所有图片，并存入 cache 防止 GC
           const preloadAllImages = () => {
              for (const gKey in gamesData) {
                  const game = gamesData[gKey];
@@ -1965,21 +1919,18 @@
                          if (!imageCache.has(char.img)) {
                              const img = new Image();
                              img.src = char.img;
-                             imageCache.set(char.img, img); // 保持引用
+                             imageCache.set(char.img, img);
                          }
                      });
                  }
              }
           };
 
-          // 切换游戏时重置角色索引
           const switchGame = (key) => {
             activeGameKey.value = key;
             charIndex.value = 0;
-            // 切换时不再需要临时预加载，因为 preloadAllImages 已经处理了全局
-            resetAutoRotate(); // 重置自动轮播
+            resetAutoRotate(); 
           };
-          // 切换角色
           const nextChar = () => {
             const len = currentGame.value.characters.length;
             charIndex.value = (charIndex.value + 1) % len;
@@ -1991,7 +1942,6 @@
             resetAutoRotate();
           };
 
-          // 自动轮播逻辑
           const startAutoRotate = () => {
             if (autoRotateInterval) clearInterval(autoRotateInterval);
             autoRotateInterval = setInterval(() => {
@@ -1999,7 +1949,7 @@
                 if (chars && chars.length > 1) {
                     charIndex.value = (charIndex.value + 1) % chars.length;
                 }
-            }, 5000); // 每5秒切换一次
+            }, 5000);
           };
 
           const stopAutoRotate = () => {
@@ -2011,12 +1961,17 @@
             startAutoRotate();
           };
 
-          const github = reactive({ stats: {}, repos: [], pinnedRepos: [], isLoadingMore: false });
+          const github = reactive({ 
+             stats: { stars: 0, forks: 0, repos: 0, contributions: 0 }, 
+             repos: [], 
+             pinnedRepos: [], 
+             isLoadingMore: false 
+          });
+
           const isMobileMenuOpen = ref(false);
           const showBackToTop = ref(false);
-          const isNavHidden = ref(false); // 新增：控制导航栏显隐状态
+          const isNavHidden = ref(false);
           
-          // Danmaku Logic
           const { guestbook, activeDanmaku, init: initGuestbook, submitMessage: submitGuestbookMessage } = useGuestbook();
 
           const toggleMobileMenu = () => {
@@ -2035,7 +1990,7 @@
           const music = reactive({ 
               get isPlaying() { return player.isPlaying }, 
               get currentSong() { return player.currentSong }, 
-              get isLoading() { return player.isLoading }, // 暴露给模板
+              get isLoading() { return player.isLoading },
               togglePlay 
           });
 
@@ -2097,7 +2052,6 @@
             showHeroButtons.value = true;
           };
 
-          // 滚动监听逻辑 (升级版)
           let lastScrollTop = 0;
           const handleScroll = () => {
              const scrollTop = window.scrollY;
@@ -2107,14 +2061,12 @@
              const progressBar = document.getElementById('scrollProgressBar');
              if(progressBar) progressBar.style.width = scrollPercent + '%';
 
-             // 导航栏智能隐藏逻辑
-             // 向下滚动且距离顶部超过100px时隐藏，向上滚动时显示
              if (scrollTop > lastScrollTop && scrollTop > 100) {
                  isNavHidden.value = true; 
              } else {
                  isNavHidden.value = false;
              }
-             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // 防止移动端回弹导致负值
+             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
 
              showBackToTop.value = scrollTop > 300;
           };
@@ -2122,7 +2074,6 @@
           onMounted(async () => {
             window.addEventListener('scroll', handleScroll);
             
-            // 移动端/滚动触发 Gallery 动画
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2131,37 +2082,41 @@
                         entry.target.classList.remove('is-animating');
                     }
                 });
-            }, { threshold: 0.5 }); // 50% 可见时触发
+            }, { threshold: 0.5 });
 
             const galleryCard = document.querySelector('.gallery-showcase');
             if(galleryCard) observer.observe(galleryCard);
 
-            // 修复：启动时预加载*所有*图片，并存入内存
             preloadAllImages();
-            startAutoRotate(); // 启动自动轮播
+            startAutoRotate();
 
-            const loader = document.getElementById("loader-wrapper");
-            setTimeout(() => {
+            // 核心修复：Loader 逻辑优化，确保在 window.onload 后再隐藏，避免资源未加载完就显示
+            const finishLoading = () => {
+                const loader = document.getElementById("loader-wrapper");
                 if(loader) {
                    loader.classList.add("is-hidden");
                    setTimeout(() => { loader.style.display = 'none'; }, 800);
                 }
                 startTypewriter();
-            }, 800);
+            };
 
-            // 启动弹幕
+            if (document.readyState === 'complete') {
+                finishLoading();
+            } else {
+                window.addEventListener('load', finishLoading);
+                // 增加超时保底，防止资源加载卡死导致一直白屏 (8秒)
+                setTimeout(finishLoading, 8000);
+            }
+
             initGuestbook();
 
-            // 粒子背景
             const canvas = document.getElementById("particle-canvas");
             if(canvas) {
                 const ctx = canvas.getContext("2d");
                 let particles = [];
                 const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-                // 粒子类：半径调整为 1.8，颜色更淡
                 class P { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5} update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1} draw(){const d=window.matchMedia('(prefers-color-scheme: dark)').matches;ctx.fillStyle=d?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.3)";ctx.beginPath();ctx.arc(this.x,this.y,1.8,0,Math.PI*2);ctx.fill()}}
                 
-                // 数量调整为 60
                 const init = () => { particles = Array.from({length: 60}, () => new P()); };
                 const animate = () => {
                     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -2171,7 +2126,6 @@
                             const dx = p.x-p2.x, dy = p.y-p2.y, d = Math.sqrt(dx*dx+dy*dy);
                             if(d<120) { 
                                 const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                                // 连线更细更淡
                                 ctx.strokeStyle = isDark ? `rgba(255,255,255,${0.08*(1-d/120)})` : `rgba(0,0,0,${0.08*(1-d/120)})`;
                                 ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
                             }
@@ -2183,20 +2137,41 @@
                 resize(); init(); animate();
             }
 
+            github.isLoadingMore = true;
             try {
-                const [stats, repos, pinned] = await Promise.all([
+                const results = await Promise.allSettled([
                    apiService.getGithubData('stats'),
-                   apiService.getGithubData('repos', { per_page: 30 }),
+                   apiService.getGithubData('repos', { page: 1, per_page: 30 }),
                    apiService.getGithubData('pinned')
                 ]);
-                if(stats) {
-                    github.stats = stats;
-                    if(!stats.forks && repos) github.stats.forks = repos.reduce((acc, r) => acc + (r.forks_count || 0), 0);
-                    if(!stats.stars && repos) github.stats.stars = repos.reduce((acc, r) => acc + (r.stargazers_count || 0), 0);
+
+                const [statsResult, reposResult, pinnedResult] = results;
+
+                if (statsResult.status === "fulfilled" && statsResult.value) {
+                    const statsData = statsResult.value;
+                    github.stats.repos = statsData.publicRepos || 0;
+                    github.stats.contributions = statsData.contributions || 0;
+                } else {
+                    console.error("GitHub stats failed:", statsResult.reason);
                 }
-                if(repos) github.repos = repos;
-                if(pinned) github.pinnedRepos = pinned;
-            } catch (err) { console.log("Error loading GitHub data, using defaults."); }
+
+                if (reposResult.status === "fulfilled" && reposResult.value) {
+                    const reposData = reposResult.value;
+                    github.repos = reposData;
+                    github.stats.stars = reposData.reduce((acc, r) => acc + (r.stargazers_count || 0), 0);
+                    github.stats.forks = reposData.reduce((acc, r) => acc + (r.forks_count || 0), 0);
+                } else {
+                    console.error("GitHub repos failed:", reposResult.reason);
+                }
+
+                if (pinnedResult.status === "fulfilled" && pinnedResult.value) {
+                    github.pinnedRepos = pinnedResult.value;
+                }
+            } catch (err) { 
+                console.log("Error loading GitHub data:", err); 
+            } finally {
+                github.isLoadingMore = false;
+            }
           });
 
           onUnmounted(() => {
@@ -2213,7 +2188,6 @@
             isMobileMenuOpen, toggleMobileMenu, handleMobileClick,
             contactMode, guestbook, activeDanmaku, submitGuestbookMessage,
             activeGameKey, gamesData, currentGame, currentCharacter, switchGame, nextChar, prevChar,
-            // 导出新增的数据与方法
             plansData, getStatusLabel
           };
         }
