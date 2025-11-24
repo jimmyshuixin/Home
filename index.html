@@ -22,21 +22,23 @@
     />
 
     <style>
+      /* --- CSS 变量重构：支持深浅色模式切换 --- */
       :root {
+        /* 浅色模式 (默认) */
         --bg-body: #fdfdfd;
         --bg-glass: rgba(255, 255, 255, 0.6);
         --bg-glass-hover: rgba(255, 255, 255, 0.85);
-        
-        --bg-nav: transparent;
+        --bg-nav: rgba(255, 255, 255, 0.7); 
         
         --text-primary: #1a202c;
         --text-secondary: #718096;
         --accent: #6b7280;
         --accent-highlight: #3b82f6;
+        
         --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
         --shadow-hover: 0 20px 40px -12px rgba(0, 0, 0, 0.12);
-        --radius: 24px;
         
+        --radius: 24px;
         --container-width: 1200px;
         --nav-height: 70px; 
         
@@ -44,21 +46,37 @@
         --loader-bg: var(--bg-body);
         --loader-accent: var(--accent-highlight);
         --loader-electron: var(--text-primary);
+
+        /* About Section Specific */
+        --about-quote-border: var(--accent-highlight);
+        
+        /* Honor Cards */
+        --honor-card-bg: rgba(255, 255, 255, 0.5);
+        --honor-card-border: rgba(255, 255, 255, 0.6);
+        --honor-card-hover: rgba(255, 255, 255, 0.9);
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg-body: #0f0f11;
-          --bg-glass: rgba(30, 30, 35, 0.6);
-          --bg-glass-hover: rgba(45, 45, 50, 0.8);
-          --bg-nav: transparent;
-          --text-primary: #f1f5f9;
-          --text-secondary: #94a3b8;
-          --accent: #a1a1aa;
-          --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
-          --shadow-hover: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
-          --loader-electron: #ffffff;
-        }
+      /* 深色模式类 */
+      html.dark-mode {
+        --bg-body: #0f0f11;
+        --bg-glass: rgba(30, 30, 35, 0.6);
+        --bg-glass-hover: rgba(45, 45, 50, 0.8);
+        --bg-nav: rgba(15, 15, 17, 0.7);
+        
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --accent: #a1a1aa;
+        
+        --shadow-soft: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
+        --shadow-hover: 0 30px 60px -12px rgba(0, 0, 0, 0.5);
+        
+        --loader-electron: #ffffff;
+
+        --about-quote-border: #60a5fa;
+        
+        --honor-card-bg: rgba(255, 255, 255, 0.03);
+        --honor-card-border: rgba(255, 255, 255, 0.05);
+        --honor-card-hover: rgba(255, 255, 255, 0.08);
       }
 
       * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -69,7 +87,7 @@
         font-family: "Inter", "Noto Serif SC", sans-serif;
         line-height: 1.8;
         overflow-x: hidden;
-        transition: background-color 0.5s ease;
+        transition: background-color 0.5s ease, color 0.5s ease;
         padding-top: var(--nav-height); 
       }
 
@@ -130,10 +148,11 @@
       }
       .orb-1 { top: -20%; right: -10%; width: 70vw; height: 70vw; background: #e0e7ff; }
       .orb-2 { bottom: -20%; left: -20%; width: 60vw; height: 60vw; background: #f3e8ff; animation-delay: -8s; }
-      @media (prefers-color-scheme: dark) {
-        .orb-1 { background: #1e1b4b; opacity: 0.4; }
-        .orb-2 { background: #312e81; opacity: 0.4; }
-      }
+      
+      /* 深色模式下的光球适配 */
+      html.dark-mode .orb-1 { background: #1e1b4b; opacity: 0.4; }
+      html.dark-mode .orb-2 { background: #312e81; opacity: 0.4; }
+
       @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(30px, 50px) scale(1.1); } }
       
       #particle-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; opacity: 0.8; pointer-events: none; }
@@ -151,10 +170,10 @@
         backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         animation-name: danmaku-scroll; animation-timing-function: linear; animation-iteration-count: 1;
+        color: var(--text-primary);
       }
-      @media (prefers-color-scheme: dark) {
-        .danmaku-item { background-color: rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
-      }
+      html.dark-mode .danmaku-item { background-color: rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+      
       @keyframes danmaku-scroll {
         from { transform: translateX(100vw); }
         to { transform: translateX(-100vw); }
@@ -210,6 +229,7 @@
         transition: opacity 0.3s ease;
       }
       .logo:hover { opacity: 1; }
+      html.dark-mode .logo { background: linear-gradient(120deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
       
       .nav-links { display: flex; align-items: center; gap: 0.5rem; }
       .nav-links a { 
@@ -225,9 +245,30 @@
         color: var(--text-primary);
         background-color: rgba(0, 0, 0, 0.04); 
       }
-      @media (prefers-color-scheme: dark) {
-        .logo { background: linear-gradient(120deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-links a:hover { background-color: rgba(255, 255, 255, 0.08); }
+      html.dark-mode .nav-links a:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+      /* 主题切换按钮 */
+      .theme-toggle-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 0.6rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        margin-left: 0.5rem;
+        font-size: 1.2rem;
+      }
+      .theme-toggle-btn:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+        color: var(--accent-highlight);
+        transform: rotate(15deg);
+      }
+      html.dark-mode .theme-toggle-btn:hover {
+        background-color: rgba(255, 255, 255, 0.08);
       }
 
       .mobile-menu-btn { 
@@ -236,7 +277,7 @@
         transition: background-color 0.3s ease, transform 0.3s ease;
       }
       .mobile-menu-btn:hover { background-color: rgba(0,0,0,0.04); }
-      @media (prefers-color-scheme: dark) { .mobile-menu-btn:hover { background-color: rgba(255,255,255,0.08); } }
+      html.dark-mode .mobile-menu-btn:hover { background-color: rgba(255,255,255,0.08); }
       .mobile-menu-btn:active { transform: scale(0.9); }
       
       .mobile-menu-overlay {
@@ -244,8 +285,8 @@
         backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         z-index: 999; display: flex; justify-content: center; align-items: center;
       }
-      @media (prefers-color-scheme: dark) { .mobile-menu-overlay { background: rgba(15, 15, 17, 0.98); } }
-      .mobile-links { display: flex; flex-direction: column; align-items: center; gap: 3rem; }
+      html.dark-mode .mobile-menu-overlay { background: rgba(15, 15, 17, 0.98); }
+      .mobile-links { display: flex; flex-direction: column; align-items: center; gap: 2.5rem; }
       .mobile-links a {
         font-family: "Noto Serif SC"; font-size: 1.5rem; font-weight: 500;
         color: var(--text-primary); cursor: pointer; transition: all 0.3s;
@@ -289,6 +330,7 @@
         font-family: "Noto Serif SC"; font-size: clamp(2.5rem, 5vw, 4.5rem);
         font-weight: 300; line-height: 1.1; margin-bottom: 2rem;
         letter-spacing: -0.03em; min-height: 2.2em;
+        color: var(--text-primary);
       }
       .hero-text p { color: var(--text-secondary); font-size: 1.1rem; max-width: 450px; line-height: 1.8; margin-bottom: 2rem; }
       
@@ -317,6 +359,67 @@
       }
       .hero-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s ease; }
       .hero-img-box:hover img { transform: scale(1.05); }
+
+      /* --- 优化后的 About Section (Borderless V2) --- */
+      .about-card {
+        grid-column: 1 / -1;
+        /* 移除内边距，使其自然融入页面 */
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        /* 移除背景和阴影，实现“无边框” */
+        background: transparent;
+        box-shadow: none;
+        border: none;
+      }
+      
+      .about-content-wrapper {
+        font-size: 1.1rem;
+        line-height: 2;
+        color: var(--text-primary);
+      }
+
+      .about-quote {
+        margin-bottom: 2.5rem;
+        /* 只保留左侧强调线，移除背景框 */
+        padding: 0.5rem 0 0.5rem 2rem;
+        background: transparent;
+        border-left: 4px solid var(--accent-highlight);
+        
+        font-family: "Noto Serif SC", serif;
+        font-style: italic;
+        font-size: 1.5rem; /* 更大气的字体 */
+        color: var(--text-primary);
+        position: relative;
+        opacity: 0.9;
+      }
+      
+      /* 移除之前的伪元素引号，改用纯净的排版 */
+      .about-quote::before { display: none; }
+
+      .about-drop-cap {
+        font-size: 3.8rem;
+        float: left;
+        line-height: 0.8;
+        margin-right: 16px;
+        margin-top: 8px;
+        font-family: "Noto Serif SC";
+        font-weight: 900;
+        
+        color: transparent;
+        background: linear-gradient(135deg, var(--accent-highlight), var(--accent));
+        -webkit-background-clip: text;
+        opacity: 1;
+      }
+
+      .about-text {
+        margin-bottom: 3rem;
+        text-align: justify;
+      }
+      .about-text p {
+        margin-bottom: 1.5rem;
+      }
 
       /* --- Resume Section --- */
       .resume-subtitle {
@@ -379,9 +482,7 @@
         font-size: 1.1rem;
         opacity: 0.8;
       }
-      @media (prefers-color-scheme: dark) {
-        .edu-stat-badge i { color: #fbbf24; }
-      }
+      html.dark-mode .edu-stat-badge i { color: #fbbf24; }
 
       .project-grid {
         grid-column: 1 / -1;
@@ -407,7 +508,7 @@
         padding: 4px 12px; border-radius: 50px; margin-bottom: 1rem;
         font-weight: 600; display: inline-flex; align-items: center; gap: 6px;
       }
-      .project-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; }
+      .project-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-primary); }
       .project-role { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 500; }
       .project-result { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; flex-grow: 1; }
       
@@ -421,9 +522,8 @@
         border-bottom: 1px solid rgba(0,0,0,0.03);
         font-family: "Noto Serif SC";
       }
-      @media (prefers-color-scheme: dark) {
-        .exp-group-header { background: rgba(59, 130, 246, 0.1); border-bottom-color: rgba(255,255,255,0.05); }
-      }
+      html.dark-mode .exp-group-header { background: rgba(59, 130, 246, 0.1); border-bottom-color: rgba(255,255,255,0.05); }
+      
       .exp-item {
         display: grid; grid-template-columns: 140px 1fr; gap: 2rem;
         padding: 1.2rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.03);
@@ -434,10 +534,70 @@
       .exp-role { font-weight: 600; font-size: 1rem; margin-bottom: 0.2rem; color: var(--text-primary); }
       .exp-desc { font-size: 0.9rem; color: var(--text-secondary); }
 
-      @media (prefers-color-scheme: dark) {
-        .edu-item, .project-card { border-color: rgba(255,255,255,0.05); }
-        .edu-time { background: rgba(255,255,255,0.05); color: #cbd5e1; }
-        .exp-item { border-bottom-color: rgba(255,255,255,0.05); }
+      html.dark-mode .edu-item, html.dark-mode .project-card { border-color: rgba(255,255,255,0.05); }
+      html.dark-mode .edu-time { background: rgba(255,255,255,0.05); color: #cbd5e1; }
+      html.dark-mode .exp-item { border-bottom-color: rgba(255,255,255,0.05); }
+
+      /* --- NEW: 荣誉列表 CSS --- */
+      .honors-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        width: 100%;
+      }
+      .honor-stage {
+        position: relative;
+      }
+      .honor-stage-title {
+        font-family: "Noto Serif SC";
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--text-primary);
+        border-left: 3px solid var(--accent-highlight);
+        padding-left: 0.8rem;
+      }
+      .honor-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+      .honor-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 1rem;
+        background: var(--honor-card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--honor-card-border);
+        transition: all 0.3s ease;
+      }
+      .honor-card:hover {
+        transform: translateY(-3px);
+        background: var(--honor-card-hover);
+        box-shadow: var(--shadow-soft);
+        border-color: var(--accent-highlight);
+      }
+      .honor-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+      }
+      .honor-text {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      /* 研究生阶段为空时的特殊样式 */
+      .honor-empty {
+        font-style: italic;
+        color: var(--accent);
+        opacity: 0.7;
+        font-size: 0.9rem;
+        padding-left: 0.5rem;
       }
 
       @media (max-width: 768px) {
@@ -445,6 +605,7 @@
         .edu-icon { width: 40px; height: 40px; font-size: 1.2rem; }
         .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
         .exp-time { color: var(--accent-highlight); opacity: 0.8; margin-bottom: 0.2rem; display: block; }
+        .honor-list { grid-template-columns: 1fr; }
       }
 
       .glass-card {
@@ -479,7 +640,7 @@
         position: relative; overflow: hidden; transition: transform 0.3s;
         backdrop-filter: blur(16px); box-shadow: var(--shadow-soft);
       }
-      @media (prefers-color-scheme: dark) { .stat-item { border-color: rgba(255,255,255,0.05); } }
+      html.dark-mode .stat-item { border-color: rgba(255,255,255,0.05); }
       .stat-item:hover { transform: translateY(-3px); background: var(--bg-glass-hover); }
       .stat-item::after {
         content: ''; position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.05; font-family: "Phosphor"; color: var(--text-primary); pointer-events: none;
@@ -494,7 +655,7 @@
         border-radius: 24px; padding: 1.8rem; display: flex; flex-direction: column;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-decoration: none; color: inherit; height: 100%; position: relative;
       }
-      @media (prefers-color-scheme: dark) { .repo-card { border-color: rgba(255,255,255,0.05); } }
+      html.dark-mode .repo-card { border-color: rgba(255,255,255,0.05); }
       .repo-card:hover {
         border-color: var(--accent-highlight); box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.15);
         transform: translateY(-5px); background: var(--bg-glass-hover);
@@ -881,9 +1042,8 @@
         text-decoration: none;
         box-shadow: var(--shadow-soft);
       }
-      @media (prefers-color-scheme: dark) {
-        .gallery-showcase { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-color: rgba(255,255,255,0.05); }
-      }
+      html.dark-mode .gallery-showcase { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border-color: rgba(255,255,255,0.05); }
+      
       .gallery-showcase:hover {
         background: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
         transform: translateY(-5px);
@@ -966,7 +1126,7 @@
         transition: all 0.3s ease;
         position: relative; overflow: hidden;
       }
-      @media (prefers-color-scheme: dark) { .plan-card { border-color: rgba(255,255,255,0.05); } }
+      html.dark-mode .plan-card { border-color: rgba(255,255,255,0.05); }
       .plan-card:hover {
         transform: translateY(-5px);
         box-shadow: var(--shadow-hover);
@@ -1016,7 +1176,7 @@
       .dna-segment {
         flex: 1; border-radius: 2px; background: rgba(0,0,0,0.05); transition: background 0.3s;
       }
-      @media (prefers-color-scheme: dark) { .dna-segment { background: rgba(255,255,255,0.1); } }
+      html.dark-mode .dna-segment { background: rgba(255,255,255,0.1); }
       .dna-segment.filled { background: var(--accent-highlight); box-shadow: 0 0 8px rgba(59,130,246,0.4); }
       .dna-segment.filled-done { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
 
@@ -1059,6 +1219,10 @@
             <a href="#gallery" @click.prevent="scrollTo('gallery')">光隅</a>
             <a href="#plans" @click.prevent="scrollTo('plans')">未来</a>
             <a href="#contact" @click.prevent="scrollTo('contact')">联系</a>
+            <!-- 主题切换按钮 -->
+            <button class="theme-toggle-btn" @click="toggleTheme" :aria-label="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+            </button>
             </div>
         </nav>
       </div>
@@ -1074,6 +1238,10 @@
             <a href="#gallery" @click.prevent="handleMobileClick('gallery')">光隅</a>
             <a href="#plans" @click.prevent="handleMobileClick('plans')">未来</a>
             <a href="#contact" @click.prevent="handleMobileClick('contact')">联系</a>
+            <!-- 移动端主题切换 -->
+            <button class="theme-toggle-btn" @click="toggleTheme" style="font-size: 1.5rem; margin: 0;">
+                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+            </button>
         </div>
         </div>
       </transition>
@@ -1111,28 +1279,33 @@
           </div>
         </section>
 
+        <!-- 优化后的“故事 & 扉页”板块 (Borderless V2) -->
         <div id="about" class="scatter-grid">
           <div class="section-header">
             <span class="section-label">01</span>
             <h2 class="section-title">故事<br>& 扉页</h2>
           </div>
-          <div class="section-content" style="display: block;"> 
-            <div style="font-size: 1.1rem; line-height: 1.9; color: var(--text-primary); max-width: 800px;">
-              <p style="margin-bottom: 2rem; padding: 1rem 1.5rem; background: rgba(59,130,246,0.05); border-radius: 12px; font-style: italic; color: var(--text-secondary); border-left: 3px solid var(--accent-highlight);">
-                「 我便是世上的美好，永远闪耀 」
-              </p>
-              <p style="margin-bottom: 2rem;">
-                <span style="font-size: 3rem; float: left; line-height: 0.8; margin-right: 12px; font-family: 'Noto Serif SC'; color: var(--accent-highlight);">你</span>
-                好！屏幕前的你。此情此景，我们应该是初次相遇吧？但或许，我们应该是重逢的心情。谢谢你来这里看我，无论你是好奇还是对我有些关注。在这里，我留下了一些“关于我”的信息，希望你能在这里有些收获，也期待我和你能有更多共同的语言。
-              </p>
-              <p>
+          <div class="section-content"> 
+            <!-- Removed glass-card class for borderless design -->
+            <div class="about-card">
+              <div class="about-content-wrapper">
+                <!-- Redesigned Quote -->
+                <div class="about-quote">
+                  “在路上，我便是世上的美好，永远闪耀。”
+                </div>
+                <div class="about-text">
+                  <p>
+                    <span class="about-drop-cap">你</span>
+                    好！屏幕前的你。无论是重逢还是初遇，欢迎来到我的小天地。我是虚宁。在这里，我留下了一些“关于我”的信息，记录了我的成长与热爱。希望你能通过这些文字，了解一个真实的我。
+                  </p>
+                </div>
                 <div class="tags-cloud">
                   <span class="tag">健身</span>
                   <span class="tag">摄影</span>
-                  <span class="tag">Blender</span>
-                  <span class="tag">前端</span>
+                  <span class="tag">做动画</span>
+                  <span class="tag">全栈开发</span>
                 </div>
-              </p>
+              </div>
             </div>
           </div>
         </div>
@@ -1284,13 +1457,38 @@
                 </div>
               </div>
             </div>
-            <div class="glass-card" style="padding: 2rem;">
-              <h4 style="margin-bottom: 1.5rem; font-family: 'Noto Serif SC'; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 0.5rem;">荣誉列表</h4>
-              <ul style="list-style: none; padding-left: 0; line-height: 2;">
-                <li v-for="h in resumeData.honors" :key="h" style="display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
-                  <i class="ph-fill ph-medal" style="color: #f59e0b; font-size: 1.1rem;"></i> {{ h }}
-                </li>
-              </ul>
+            <!-- 优化后的荣誉列表 -->
+            <div class="glass-card" style="padding: 2.5rem;">
+              <div class="honors-container">
+                <!-- 研究生阶段 -->
+                <div class="honor-stage">
+                  <div class="honor-stage-title">
+                    研究生阶段 (USTC)
+                  </div>
+                  <div class="honor-list">
+                     <div v-if="resumeData.honors.graduate.length === 0 || (resumeData.honors.graduate.length === 1 && resumeData.honors.graduate[0] === '（待解锁）')" class="honor-empty">
+                        <i class="ph ph-hourglass"></i> 更多精彩，敬请期待...
+                     </div>
+                     <div v-else v-for="h in resumeData.honors.graduate" class="honor-card">
+                        <i class="ph-fill ph-star honor-icon" style="color: #8b5cf6;"></i>
+                        <span class="honor-text">{{ h }}</span>
+                     </div>
+                  </div>
+                </div>
+                
+                <!-- 本科生阶段 -->
+                <div class="honor-stage">
+                  <div class="honor-stage-title">
+                    本科生阶段 (NJUST)
+                  </div>
+                  <div class="honor-list">
+                     <div v-for="h in resumeData.honors.undergraduate" class="honor-card">
+                        <i class="ph-fill ph-medal honor-icon" style="color: #f59e0b;"></i>
+                        <span class="honor-text">{{ h }}</span>
+                     </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1388,19 +1586,22 @@
               <h2 class="section-title">未来<br>& 蓝图</h2>
             </div>
             <div class="section-content" style="display: block;">
-                <!-- 计划网格：使用 quest-log 风格 -->
-                <div class="plans-grid">
+                
+                <!-- 分类1: 进行中 -->
+                <h3 class="resume-subtitle" style="margin-top: 0;">
+                    <i class="ph-fill ph-fire" style="color: var(--accent-highlight);"></i> 进行中
+                </h3>
+                <div class="plans-grid" style="margin-bottom: 3rem;">
                     <div 
-                        v-for="(plan, idx) in plansData" 
-                        :key="idx" 
-                        class="plan-card"
-                        :class="{ 'is-active': plan.status === 'ing' }"
+                        v-for="(plan, idx) in plansInProgress" 
+                        :key="'ing-'+idx" 
+                        class="plan-card is-active"
                     >
                         <div class="plan-header">
                             <div class="plan-icon-box">
                                 <i :class="plan.icon"></i>
                             </div>
-                            <span class="plan-status-badge" :class="'status-' + plan.status">
+                            <span class="plan-status-badge status-ing">
                                 {{ getStatusLabel(plan.status) }}
                             </span>
                         </div>
@@ -1408,7 +1609,6 @@
                         <h3 class="plan-title">{{ plan.title }}</h3>
                         <p class="plan-desc">{{ plan.desc }}</p>
                         
-                        <!-- 关键节点 Checklist -->
                         <ul class="milestone-list">
                             <li 
                                 v-for="(ms, mIdx) in plan.milestones" 
@@ -1421,7 +1621,6 @@
                             </li>
                         </ul>
 
-                        <!-- DNA Segmented Progress -->
                         <div class="plan-progress-container">
                             <div class="plan-progress-label">
                                 <span>Progress</span>
@@ -1433,14 +1632,67 @@
                                     :key="n" 
                                     class="dna-segment"
                                     :class="{ 
-                                        'filled': (n * 10) <= plan.progress,
-                                        'filled-done': plan.status === 'done' && (n * 10) <= plan.progress
+                                        'filled': (n * 10) <= plan.progress
                                     }"
                                 ></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 分类2: 筹备中 -->
+                <h3 class="resume-subtitle">
+                    <i class="ph-fill ph-hourglass" style="color: var(--accent);"></i> 筹备中
+                </h3>
+                <div class="plans-grid">
+                    <div 
+                        v-for="(plan, idx) in plansPlanning" 
+                        :key="'plan-'+idx" 
+                        class="plan-card"
+                    >
+                        <div class="plan-header">
+                            <div class="plan-icon-box">
+                                <i :class="plan.icon"></i>
+                            </div>
+                            <span class="plan-status-badge status-planning">
+                                {{ getStatusLabel(plan.status) }}
+                            </span>
+                        </div>
+                        
+                        <h3 class="plan-title">{{ plan.title }}</h3>
+                        <p class="plan-desc">{{ plan.desc }}</p>
+                        
+                        <ul class="milestone-list">
+                            <li 
+                                v-for="(ms, mIdx) in plan.milestones" 
+                                :key="mIdx" 
+                                class="milestone-item" 
+                                :class="{ done: ms.done }"
+                            >
+                                <i :class="ms.done ? 'ph-fill ph-check-circle' : 'ph ph-circle'"></i>
+                                {{ ms.label }}
+                            </li>
+                        </ul>
+
+                        <div class="plan-progress-container">
+                            <div class="plan-progress-label">
+                                <span>Progress</span>
+                                <span>{{ plan.progress }}%</span>
+                            </div>
+                            <div class="dna-bar">
+                                <div 
+                                    v-for="n in 10" 
+                                    :key="n" 
+                                    class="dna-segment"
+                                    :class="{ 
+                                        'filled': (n * 10) <= plan.progress
+                                    }"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -1448,7 +1700,7 @@
         <div id="contact" class="scatter-grid" style="margin-bottom: 4rem;">
           <div class="section-header">
             <span class="section-label">08</span>
-            <h2 class="section-title">保持<br>& 联络</h2>
+            <h2 class="section-title">故事<br>& 尾声</h2>
           </div>
           <div class="section-content" style="display: block; max-width: 600px;">
             <div class="contact-tabs">
@@ -1460,7 +1712,7 @@
             <transition name="switch-mode" mode="out-in">
                 <!-- 模式1: 发送邮件 -->
                 <div v-if="contactMode === 'email'" key="email">
-                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">有任何想法或合作意向？直接给我发邮件吧。</p>
+                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">有任何想法？直接给我发邮件吧。（私信）</p>
                     <form @submit.prevent="submitContact">
                         <div style="margin-bottom: 1.5rem;">
                         <input type="text" v-model="contact.name" required placeholder="你的称呼" 
@@ -1484,7 +1736,7 @@
 
                 <!-- 模式2: 发送弹幕 -->
                 <div v-else key="danmaku">
-                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">发射一条弹幕，让它飘过我的主页！(所有人可见)</p>
+                    <p style="margin-bottom: 2rem; color: var(--text-secondary);">发射一条弹幕，让它飘过我的主页！（所有人可见）</p>
                     <form @submit.prevent="submitGuestbookMessage">
                         <div style="margin-bottom: 1.5rem;">
                         <input type="text" v-model="guestbook.newName" required maxlength="20" placeholder="怎么称呼？(限20字)"
@@ -1549,7 +1801,7 @@
           name: "原神",
           icon: "ph-fill ph-sparkle",
           characters: [
-            { name: "芙宁娜", desc: "众水女王", img: "./content/game/Furina.png", color: "rgba(59, 130, 246, 0.15)", textColor: "#1e40af" },
+            { name: "芙宁娜", desc: "众水女王", img: "./content/game/Furina1.png", color: "rgba(59, 130, 246, 0.15)", textColor: "#1e40af" },
             { name: "胡桃", desc: "往生堂堂主", img: "./content/game/Hutao.png", color: "rgba(220, 38, 38, 0.1)", textColor: "#991b1b" }
           ]
         },
@@ -1565,61 +1817,60 @@
           name: "绝区零",
           icon: "ph-fill ph-television",
           characters: [
-            { name: "薇薇安", desc: "狡兔屋", img: "./content/game/Vivian.png", color: "rgba(236, 72, 153, 0.25)", textColor: "#831843" },
-            { name: "仪玄", desc: "刑侦特勤组", img: "./content/game/YiXuan.png", color: "rgba(59, 130, 246, 0.25)", textColor: "#1e40af" }
+            { name: "薇薇安", desc: "反舌鸟", img: "./content/game/Vivian.png", color: "rgba(236, 72, 153, 0.25)", textColor: "#CC6CE7" },
+            { name: "仪玄", desc: "Q宗师", img: "./content/game/YiXuan2.png", color: "rgba(254, 153, 0, 0.25)", textColor: "#FE9900" }
           ]
         }
       };
       
       const PLANS_DATA = [
         {
-          title: "SaaS 产品开发",
+          title: "个人网站搭建",
           icon: "ph-fill ph-code",
-          desc: "构建一个面向开发者的工具类产品，从构思到变现的完整闭环。",
+          desc: "使用 Vue.js 和现代前端技术栈打造个人主页，展示项目与技能。",
           status: "ing", // planning, ing, done
-          progress: 40,
+          progress: 80,
           milestones: [
-            { label: "需求分析与验证", done: true },
-            { label: "MVP 核心功能开发", done: true },
-            { label: "UI/UX 交互打磨", done: false },
-            { label: "正式上线与推广", done: false }
+            { label: "前端三大件学习", done: true },
+            { label: "Vue3、express框架学习", done: true },
+            { label: "项目部署与优化", done: true },
+            { label: "内容更新与维护", done: false }
           ]
         },
         {
-          title: "Rust 语言精进",
-          icon: "ph-fill ph-cpu",
-          desc: "掌握 Rust 内存安全机制，并尝试开发高性能 WebAssembly 模块。",
-          status: "planning",
-          progress: 10,
+          title: "开源项目贡献",
+          icon: "ph-fill ph-git-branch",
+          desc: "积极参与开源社区，贡献代码和文档，提升编程技能和协作能力。",
+          status: "ing", // planning, ing, done
+          progress: 50,
           milestones: [
-            { label: "基础语法与所有权机制", done: true },
-            { label: "完成 100 行代码小工具", done: false },
-            { label: "阅读开源项目源码", done: false }
+            { label: "寻找合适的项目", done: true },
+            { label: "提交首个 PR", done: true },
+            { label: "持续贡献与维护", done: false }
           ]
         },
         {
-          title: "日本·关西之旅",
-          icon: "ph-fill ph-airplane-tilt",
-          desc: "计划在毕业季前往京都与大阪，体验传统文化与现代都市的交融。",
-          status: "planning",
+          title: "南理工星空摄影",
+          icon: "ph-fill ph-camera",
+          desc: "利用业余时间拍摄银河动态照片，记录美丽的夜空景象。",
+          status: "planning", // planning, ing, done
           progress: 20,
           milestones: [
-            { label: "护照与签证办理", done: true },
-            { label: "行程规划与酒店预订", done: false },
-            { label: "语言基础准备", done: false }
+            { label: "地点选取", done: true },
+            { label: "摄影学习", done: false },
+            { label: "拍摄与后期处理", done: false }
           ]
         },
         {
-          title: "构建 Homelab",
-          icon: "ph-fill ph-hard-drives",
-          desc: "搭建基于 Proxmox VE 的家庭实验室，运行私有云服务。",
-          status: "ing",
-          progress: 60,
+          title: "Blender CG动画创作",
+          icon: "ph-fill ph-cube",
+          desc: "学习并使用Blender制作CG动画，提升三维建模与动画制作技能。",
+          status: "ing", // planning, ing, done
+          progress: 50,
           milestones: [
-            { label: "硬件选购与组装", done: true },
-            { label: "PVE 系统安装配置", done: true },
-            { label: "网络环境与软路由", done: true },
-            { label: "部署 NAS 与媒体中心", done: false }
+            { label: "Blender基础学习", done: true },
+            { label: "模型制作与动画", done: false },
+            { label: "渲染与后期处理", done: false }
           ]
         }
       ];
@@ -1632,9 +1883,9 @@
           { institution: "南京理工大学", major: "辐射防护与核安全", minor: "人工智能", duration: "2022.09 - 2026.06", gpa: "3.62/4.0", ranking: "3/30" }
         ],
         projects: [
-          { name: "液闪放射性测量系统的光收集系统改进", role: "项目负责人", duration: "2024.06 - 2025.09", result: "显著提高了探测效率。" },
+          { name: "液闪放射性测量系统的光收集系统改进", role: "项目负责人", duration: "2024.06 - 2025.09", result: "江苏省颗粒大赛特等奖" },
           { name: "基于LSTM/Transformer的空气质量(AQI)预测系统", role: "建模大赛作品", duration: "2024.03 - 2025.06", result: "全国大学生统计建模大赛三等奖。" },
-          { name: "基于Vue.js的个人网站", role: "项目负责人", duration: "2022.05 - 2025.01", result: "成功上线。" }
+          { name: "基于Vue.js的个人网站", role: "项目负责人", duration: "2022.05 - 2025.01", result: "成功部署上线。" }
         ],
         campusExperience: {
           graduate: [
@@ -1652,7 +1903,19 @@
           { category: "多媒体", items: ["Blender", "UE", "Pr", "Ps"] },
           { category: "办公软件", items: ["Office三件套", "WPS"] }
         ],
-        honors: ["国家励志奖学金（两次）", "全国大学生统计建模大赛三等奖", "“互联网+”创新创业大赛三等奖", "“核+X”创意大赛二等奖", "一、二等奖学金（六次）", "“三好学生”", "“社会活动积极分子”"]
+        // 优化：将荣誉列表拆分为研究生和本科生
+        honors: {
+          graduate: [], // 暂无内容
+          undergraduate: [
+            "国家励志奖学金（两次）",
+            "全国大学生统计建模大赛三等奖",
+            "“互联网+”创新创业大赛三等奖",
+            "“核+X”创意大赛二等奖",
+            "一、二等奖学金（六次）",
+            "“三好学生”",
+            "“社会活动积极分子”"
+          ]
+        }
       };
 
       const STATIC_BOOKSHELF = [
@@ -1888,6 +2151,39 @@
         return { player, togglePlay };
       };
 
+      // --- 主题管理 Hook ---
+      const useTheme = () => {
+        const isDark = ref(false);
+
+        const toggleTheme = () => {
+          isDark.value = !isDark.value;
+          updateThemeClass();
+          localStorage.setItem('theme', isDark.value ? 'dark' : 'light');
+        };
+
+        const updateThemeClass = () => {
+          if (isDark.value) {
+            document.documentElement.classList.add('dark-mode');
+          } else {
+            document.documentElement.classList.remove('dark-mode');
+          }
+        };
+
+        const initTheme = () => {
+          const savedTheme = localStorage.getItem('theme');
+          if (savedTheme) {
+            isDark.value = savedTheme === 'dark';
+          } else {
+            // 默认跟随系统
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            isDark.value = systemPrefersDark;
+          }
+          updateThemeClass();
+        };
+
+        return { isDark, toggleTheme, initTheme };
+      };
+
       createApp({
         setup() {
           const resumeData = reactive(STATIC_RESUME);
@@ -1900,6 +2196,10 @@
           const gamesData = reactive(GAMES_DATA);
           const plansData = reactive(PLANS_DATA);
           
+          // 核心逻辑：使用计算属性将 Plans 数据分组
+          const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing'));
+          const plansPlanning = computed(() => plansData.filter(p => p.status !== 'ing'));
+
           const imageCache = new Map();
           let autoRotateInterval = null;
 
@@ -1973,6 +2273,7 @@
           const isNavHidden = ref(false);
           
           const { guestbook, activeDanmaku, init: initGuestbook, submitMessage: submitGuestbookMessage } = useGuestbook();
+          const { isDark, toggleTheme, initTheme } = useTheme(); // 使用主题 Hook
 
           const toggleMobileMenu = () => {
             isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -2072,6 +2373,7 @@
           };
 
           onMounted(async () => {
+            initTheme(); // 初始化主题
             window.addEventListener('scroll', handleScroll);
             
             const observer = new IntersectionObserver((entries) => {
@@ -2115,7 +2417,7 @@
                 const ctx = canvas.getContext("2d");
                 let particles = [];
                 const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-                class P { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5} update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1} draw(){const d=window.matchMedia('(prefers-color-scheme: dark)').matches;ctx.fillStyle=d?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.3)";ctx.beginPath();ctx.arc(this.x,this.y,1.8,0,Math.PI*2);ctx.fill()}}
+                class P { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5} update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1} draw(){const d=document.documentElement.classList.contains('dark-mode');ctx.fillStyle=d?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.3)";ctx.beginPath();ctx.arc(this.x,this.y,1.8,0,Math.PI*2);ctx.fill()}}
                 
                 const init = () => { particles = Array.from({length: 60}, () => new P()); };
                 const animate = () => {
@@ -2125,7 +2427,7 @@
                         particles.forEach(p2 => {
                             const dx = p.x-p2.x, dy = p.y-p2.y, d = Math.sqrt(dx*dx+dy*dy);
                             if(d<120) { 
-                                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                const isDark = document.documentElement.classList.contains('dark-mode');
                                 ctx.strokeStyle = isDark ? `rgba(255,255,255,${0.08*(1-d/120)})` : `rgba(0,0,0,${0.08*(1-d/120)})`;
                                 ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p2.x,p2.y); ctx.stroke();
                             }
@@ -2188,7 +2490,9 @@
             isMobileMenuOpen, toggleMobileMenu, handleMobileClick,
             contactMode, guestbook, activeDanmaku, submitGuestbookMessage,
             activeGameKey, gamesData, currentGame, currentCharacter, switchGame, nextChar, prevChar,
-            plansData, getStatusLabel
+            plansData, getStatusLabel,
+            plansInProgress, plansPlanning, // 导出新的计算属性
+            isDark, toggleTheme // 导出主题状态和切换函数
           };
         }
       }).mount('#app');
