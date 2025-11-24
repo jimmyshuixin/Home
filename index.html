@@ -195,13 +195,9 @@
       .nav-container {
         position: fixed; top: 0; left: 0; right: 0;
         height: var(--nav-height);
-        
-        /* 修改1：导航栏完全透明 */
         background: transparent;
-        /* 移除背景模糊效果，实现纯透明 */
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
         border-bottom: none;
         z-index: 1000; 
         transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease; 
@@ -330,18 +326,31 @@
         width: 100%;
       }
       .hero-text { position: relative; z-index: 2; }
+      
+      /* 修复高度抖动：预留标题高度 */
       .hero-text h1 {
         font-family: "Noto Serif SC"; font-size: clamp(2.5rem, 5vw, 4.5rem);
         font-weight: 300; line-height: 1.1; margin-bottom: 2rem;
-        letter-spacing: -0.03em;
-        min-height: 2.2em; 
+        letter-spacing: -0.03em; 
+        /* 修复：增加 min-height 以容纳所有文本行（大标题2行+小诗句2行） */
+        min-height: 4em; 
         color: var(--text-primary);
       }
       .hero-text p { color: var(--text-secondary); font-size: 1.1rem; max-width: 450px; line-height: 1.8; margin-bottom: 2rem; }
       
+      /* 修复高度抖动：让按钮组一开始就占据空间，只是透明度为0 */
       .hero-btns {
         display: flex; gap: 10px; margin-top: 2rem; flex-wrap: wrap; align-items: center;
-        animation: fadeIn 1s ease-out;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 1s ease, transform 1s ease;
+        pointer-events: none; /* 隐藏时禁止点击 */
+      }
+      /* 显示状态类 */
+      .hero-btns.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
       }
       
       .hero-location {
@@ -1272,7 +1281,8 @@
                 <span>{{ heroLine4 }}</span><span v-if="activeLine === 4" class="typing-cursor"></span>
               </span>
             </h1>
-            <div v-if="showHeroButtons" class="hero-btns">
+            <!-- 修复：移除 v-if，改用 class 绑定控制显示（保留占位防止抖动） -->
+            <div class="hero-btns" :class="{ 'is-visible': showHeroButtons }">
                 <div class="hero-location"><i class="ph-fill ph-map-pin"></i> {{ resumeData.location }}</div>
                 <div class="hero-location"><i class="ph-fill ph-star"></i> 水瓶座 <span style="opacity: 0.4; margin: 0 4px;">|</span> INFP</div>
             </div>
@@ -1767,7 +1777,12 @@
         </div>
 
         <footer style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; padding: 2rem 0;">
-          <p>© 2025 虚宁 | May you always shine.</p>
+          <p>
+            Copyright&copy;{{ copyrightYear }} 虚宁
+            <span v-if="siteUptime">| 站点已运行 {{ siteUptime }}</span>
+            <span v-if="icp">| <a href="https://beian.miit.gov.cn/" target="_blank" style="color: inherit; text-decoration: none;">{{ icp }}</a></span>
+          </p>
+          <p style="margin-top: 0.5rem; opacity: 0.8;">May you always shine.</p>
         </footer>
       </main>
 
@@ -1934,7 +1949,9 @@
       const config = {
         github: { username: "jimmyshuixin" },
         music: { api: "https://music.xvyin.com/", server: "tencent", type: "playlist" },
-        guestbookApiUrl: "https://firebase.xvyin.com/messages" // 弹幕 API
+        guestbookApiUrl: "https://firebase.xvyin.com/messages", // 弹幕 API
+        siteStartDate: "2024-03-02",
+        icpNumber: "渝ICP备2025053763号-1",
       };
 
       const apiService = {
@@ -2378,10 +2395,25 @@
              showBackToTop.value = scrollTop > 300;
           };
 
+          // Footer logic integration
+          const siteUptime = ref("");
+          const icp = ref(config.icpNumber);
+          
+          const copyrightYear = computed(() => {
+              const startYear = 2022;
+              const currentYear = new Date().getFullYear();
+              return currentYear > startYear ? `${startYear}-${currentYear}` : startYear;
+          });
+
           onMounted(async () => {
             initTheme(); // 初始化主题
             window.addEventListener('scroll', handleScroll);
             
+            // Calculate uptime
+            siteUptime.value = `${Math.ceil(
+              Math.abs(new Date() - new Date(config.siteStartDate)) / 864e5
+            )} 天`;
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -2398,13 +2430,8 @@
             preloadAllImages();
             startAutoRotate();
 
-            // 核心修复2：添加状态锁，防止 Loading 重复触发
-            let isAppLoaded = false; 
-
+            // 核心修复：Loader 逻辑优化，确保在 window.onload 后再隐藏，避免资源未加载完就显示
             const finishLoading = () => {
-                if (isAppLoaded) return; // 如果已经加载过，直接退出
-                isAppLoaded = true;      // 标记为已加载
-
                 const loader = document.getElementById("loader-wrapper");
                 if(loader) {
                    loader.classList.add("is-hidden");
@@ -2503,7 +2530,8 @@
             activeGameKey, gamesData, currentGame, currentCharacter, switchGame, nextChar, prevChar,
             plansData, getStatusLabel,
             plansInProgress, plansPlanning, // 导出新的计算属性
-            isDark, toggleTheme // 导出主题状态和切换函数
+            isDark, toggleTheme, // 导出主题状态和切换函数
+            copyrightYear, siteUptime, icp // 导出 Footer 数据
           };
         }
       }).mount('#app');
