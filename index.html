@@ -7,37 +7,34 @@
     <title>虚宁 | Xu Ning's Space</title>
     <link rel="icon" href="./content/icon/32.png" />
 
-    <!-- 优化：添加国内常用CDN的预连接 -->
+    <!-- 优化：国内常用CDN预连接 -->
     <link rel="dns-prefetch" href="https://cdn.staticfile.org" />
     <link rel="preconnect" href="https://cdn.staticfile.org" crossorigin />
-    
-    <!-- 修复：更换图标CDN为 jsDelivr 国内镜像 (jsd.cdn.zzko.cn) -->
-    <link rel="dns-prefetch" href="https://jsd.cdn.zzko.cn" />
-    <link rel="preconnect" href="https://jsd.cdn.zzko.cn" crossorigin />
     
     <link rel="dns-prefetch" href="https://fonts.geekzu.org" />
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin />
     
-    <!-- 业务API域名预连接 (保留) -->
+    <!-- 业务API域名预连接 -->
     <link rel="preconnect" href="https://github.xvyin.com" />
     <link rel="preconnect" href="https://music.xvyin.com" />
     
-    <!-- 字体优化：使用极客族(Geekzu)镜像，它是国内访问Google Fonts最快的镜像之一 -->
+    <!-- 字体优化：使用极客族(Geekzu)镜像 -->
     <link
       href="https://fonts.geekzu.org/css2?family=Noto+Serif+SC:wght@300;500;700;800&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
     
-    <!-- APlayer CSS 优化：直接使用 Staticfile CDN -->
+    <!-- APlayer CSS -->
     <link
       href="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.css"
       rel="stylesheet"
     />
 
-    <!-- Phosphor Icons CSS (修复：使用 CSS 引入替代 JS，走国内镜像) -->
+    <!-- 核心修复：更换为 RemixIcon (via Staticfile CDN) -->
+    <!-- Staticfile 是国内极速稳定的 CDN，彻底解决图标加载慢/裂图的问题 -->
     <link 
       rel="stylesheet" 
-      href="https://jsd.cdn.zzko.cn/npm/@phosphor-icons/web@2.1.1/src/index.css" 
+      href="https://cdn.staticfile.org/remixicon/3.5.0/remixicon.css" 
     />
 
     <style>
@@ -676,7 +673,7 @@
       html.dark-mode .stat-item { border-color: rgba(255,255,255,0.05); }
       .stat-item:hover { transform: translateY(-3px); background: var(--bg-glass-hover); }
       .stat-item::after {
-        content: ''; position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.05; font-family: "Phosphor"; color: var(--text-primary); pointer-events: none;
+        content: ''; position: absolute; right: -10px; bottom: -15px; font-size: 5rem; opacity: 0.05; font-family: "remixicon"; color: var(--text-primary); pointer-events: none;
       }
       .stat-item.contribs::after { content: ''; } .stat-item.repos::after { content: ''; }
       .stat-item.stars::after { content: ''; } .stat-item.forks::after { content: ''; }
@@ -1242,7 +1239,7 @@
             <!-- 这里是“水印”/Logo，已改为“虚宁” -->
             <div class="logo" @click="scrollTo('app')">虚宁</div>
             <button class="mobile-menu-btn" @click="toggleMobileMenu" aria-label="Toggle Menu">
-            <i :class="isMobileMenuOpen ? 'ph ph-x' : 'ph ph-list'"></i>
+            <i :class="isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'"></i>
             </button>
             <div class="nav-links">
             <a href="#about" @click.prevent="scrollTo('about')">关于</a>
@@ -1254,7 +1251,7 @@
             <a href="#contact" @click.prevent="scrollTo('contact')">联系</a>
             <!-- 主题切换按钮 -->
             <button class="theme-toggle-btn" @click="toggleTheme" :aria-label="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+                <i :class="isDark ? 'ri-sun-fill' : 'ri-moon-fill'"></i>
             </button>
             </div>
         </nav>
@@ -1273,7 +1270,7 @@
             <a href="#contact" @click.prevent="handleMobileClick('contact')">联系</a>
             <!-- 移动端主题切换 -->
             <button class="theme-toggle-btn" @click="toggleTheme" style="font-size: 1.5rem; margin: 0;">
-                <i :class="isDark ? 'ph-fill ph-sun' : 'ph-fill ph-moon'"></i>
+                <i :class="isDark ? 'ri-sun-fill' : 'ri-moon-fill'"></i>
             </button>
         </div>
         </div>
@@ -1302,8 +1299,8 @@
             </h1>
             <!-- 修复：移除 v-if，改用 class 绑定控制显示（保留占位防止抖动） -->
             <div class="hero-btns" :class="{ 'is-visible': showHeroButtons }">
-                <div class="hero-location"><i class="ph-fill ph-map-pin"></i> {{ resumeData.location }}</div>
-                <div class="hero-location"><i class="ph-fill ph-star"></i> 水瓶座 <span style="opacity: 0.4; margin: 0 4px;">|</span> INFP</div>
+                <div class="hero-location"><i class="ri-map-pin-2-fill"></i> {{ resumeData.location }}</div>
+                <div class="hero-location"><i class="ri-star-fill"></i> 水瓶座 <span style="opacity: 0.4; margin: 0 4px;">|</span> INFP</div>
             </div>
           </div>
           <div class="hero-visual">
@@ -1351,10 +1348,10 @@
           </div>
           <div class="section-content" style="display: block;">
             
-            <div class="resume-subtitle"><i class="ph-fill ph-graduation-cap" style="color: var(--accent-highlight);"></i> 教育背景</div>
+            <div class="resume-subtitle"><i class="ri-graduation-cap-fill" style="color: var(--accent-highlight);"></i> 教育背景</div>
             <div class="edu-container">
                <div v-for="(edu, i) in resumeData.education" :key="'edu'+i" class="edu-item">
-                  <div class="edu-icon"><i class="ph-bold ph-student"></i></div>
+                  <div class="edu-icon"><i class="ri-user-smile-line"></i></div>
                   <div class="edu-content">
                     <div class="edu-header">
                        <span class="edu-school">{{ edu.institution }}</span>
@@ -1364,10 +1361,10 @@
                     
                     <div class="edu-stats-row" v-if="edu.gpa">
                         <div class="edu-stat-badge">
-                            <i class="ph-bold ph-exam"></i> GPA: {{ edu.gpa }}
+                            <i class="ri-file-list-3-line"></i> GPA: {{ edu.gpa }}
                         </div>
                         <div class="edu-stat-badge" v-if="edu.ranking">
-                            <i class="ph-bold ph-ranking"></i> Rank: {{ edu.ranking }}
+                            <i class="ri-bar-chart-grouped-line"></i> Rank: {{ edu.ranking }}
                         </div>
                     </div>
 
@@ -1375,17 +1372,17 @@
                </div>
             </div>
 
-            <div class="resume-subtitle"><i class="ph-fill ph-rocket-launch" style="color: #f59e0b;"></i> 项目与科研</div>
+            <div class="resume-subtitle"><i class="ri-rocket-2-fill" style="color: #f59e0b;"></i> 项目与科研</div>
             <div class="project-grid">
                <div v-for="(proj, i) in resumeData.projects" :key="'proj'+i" class="project-card">
-                  <div class="project-time-capsule"><i class="ph-bold ph-clock"></i> {{ proj.duration }}</div>
+                  <div class="project-time-capsule"><i class="ri-time-line"></i> {{ proj.duration }}</div>
                   <div class="project-title">{{ proj.name }}</div>
                   <div class="project-role">{{ proj.role }}</div>
                   <div class="project-result">{{ proj.result }}</div>
                </div>
             </div>
 
-            <div class="resume-subtitle"><i class="ph-fill ph-users-three" style="color: #10b981;"></i> 校园历练</div>
+            <div class="resume-subtitle"><i class="ri-team-fill" style="color: #10b981;"></i> 校园历练</div>
             <div class="exp-container glass-card" style="padding: 0;"> 
                
                <div class="exp-group-header">研究生阶段</div>
@@ -1436,13 +1433,13 @@
               <a :href="repo.link" target="_blank" rel="noopener noreferrer" class="repo-card" style="border-color: rgba(251, 191, 36, 0.4); background: linear-gradient(to bottom right, var(--bg-glass), rgba(251, 191, 36, 0.05));">
                  <div class="repo-header">
                     <span class="repo-title" style="font-size: 1.1rem;">{{ repo.repo }}</span>
-                    <i class="ph-fill ph-push-pin" style="color: #fbbf24; font-size: 1.2rem;"></i>
+                    <i class="ri-pushpin-2-fill" style="color: #fbbf24; font-size: 1.2rem;"></i>
                  </div>
                  <p class="repo-desc">{{ repo.description || '暂无描述' }}</p>
                  <div class="repo-meta">
                     <span style="font-weight: 600;"><span class="lang-dot" :style="{background: getLanguageColor(repo.language)}"></span> {{ repo.language }}</span>
-                    <span><i class="ph-fill ph-star" style="color: #fbbf24;"></i> {{ repo.stars }}</span>
-                    <span><i class="ph-fill ph-git-fork" style="color: var(--text-secondary);"></i> {{ repo.forks }}</span>
+                    <span><i class="ri-star-fill" style="color: #fbbf24;"></i> {{ repo.stars }}</span>
+                    <span><i class="ri-git-fork-line" style="color: var(--text-secondary);"></i> {{ repo.forks }}</span>
                  </div>
               </a>
             </div>
@@ -1451,12 +1448,12 @@
                <a :href="repo.html_url" target="_blank" rel="noopener noreferrer" class="repo-card">
                  <div class="repo-header">
                     <span class="repo-title">{{ repo.name }}</span>
-                    <i class="ph ph-arrow-up-right" style="font-size: 1.1rem; opacity: 0.5;"></i>
+                    <i class="ri-arrow-right-up-line" style="font-size: 1.1rem; opacity: 0.5;"></i>
                  </div>
                  <p class="repo-desc">{{ repo.description || '暂无描述。' }}</p>
                  <div class="repo-meta">
                     <span><span class="lang-dot" :style="{background: getLanguageColor(repo.language)}"></span> {{ repo.language || '纯文本' }}</span>
-                    <span><i class="ph-fill ph-star" style="color: #fbbf24;"></i> {{ repo.stargazers_count }}</span>
+                    <span><i class="ri-star-fill" style="color: #fbbf24;"></i> {{ repo.stargazers_count }}</span>
                  </div>
                </a>
             </div>
@@ -1501,10 +1498,10 @@
                   </div>
                   <div class="honor-list">
                      <div v-if="resumeData.honors.graduate.length === 0 || (resumeData.honors.graduate.length === 1 && resumeData.honors.graduate[0] === '（待解锁）')" class="honor-empty">
-                        <i class="ph ph-hourglass"></i> 更多精彩，敬请期待...
+                        <i class="ri-hourglass-line"></i> 更多精彩，敬请期待...
                      </div>
                      <div v-else v-for="h in resumeData.honors.graduate" class="honor-card">
-                        <i class="ph-fill ph-star honor-icon" style="color: #8b5cf6;"></i>
+                        <i class="ri-star-fill honor-icon" style="color: #8b5cf6;"></i>
                         <span class="honor-text">{{ h }}</span>
                      </div>
                   </div>
@@ -1517,7 +1514,7 @@
                   </div>
                   <div class="honor-list">
                      <div v-for="h in resumeData.honors.undergraduate" class="honor-card">
-                        <i class="ph-fill ph-medal honor-icon" style="color: #f59e0b;"></i>
+                        <i class="ri-medal-fill honor-icon" style="color: #f59e0b;"></i>
                         <span class="honor-text">{{ h }}</span>
                      </div>
                   </div>
@@ -1558,8 +1555,8 @@
                         </transition>
                     </div>
 
-                    <button class="nav-arrow nav-left" @click="prevChar" v-if="currentGame.characters.length > 1"><i class="ph-bold ph-caret-left"></i></button>
-                    <button class="nav-arrow nav-right" @click="nextChar" v-if="currentGame.characters.length > 1"><i class="ph-bold ph-caret-right"></i></button>
+                    <button class="nav-arrow nav-left" @click="prevChar" v-if="currentGame.characters.length > 1"><i class="ri-arrow-left-s-line"></i></button>
+                    <button class="nav-arrow nav-right" @click="nextChar" v-if="currentGame.characters.length > 1"><i class="ri-arrow-right-s-line"></i></button>
                 </div>
 
                 <div class="dock-wrapper">
@@ -1593,7 +1590,7 @@
                         <h3 class="gallery-heading">Light<br>Corner</h3>
                         <p class="gallery-desc">捕捉光影的瞬息，记录生活的美好。<br>欢迎来到我的摄影与图文社区。</p>
                         <span class="gallery-btn">
-                            前往光隅 <i class="ph-bold ph-arrow-right"></i>
+                            前往光隅 <i class="ri-arrow-right-line"></i>
                         </span>
                     </div>
                     
@@ -1624,7 +1621,7 @@
                 
                 <!-- 分类1: 进行中 -->
                 <h3 class="resume-subtitle" style="margin-top: 0;">
-                    <i class="ph-fill ph-fire" style="color: var(--accent-highlight);"></i> 进行中
+                    <i class="ri-fire-fill" style="color: var(--accent-highlight);"></i> 进行中
                 </h3>
                 <div class="plans-grid" style="margin-bottom: 3rem;">
                     <div 
@@ -1651,7 +1648,7 @@
                                 class="milestone-item" 
                                 :class="{ done: ms.done }"
                             >
-                                <i :class="ms.done ? 'ph-fill ph-check-circle' : 'ph ph-circle'"></i>
+                                <i :class="ms.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
                                 {{ ms.label }}
                             </li>
                         </ul>
@@ -1677,7 +1674,7 @@
 
                 <!-- 分类2: 筹备中 -->
                 <h3 class="resume-subtitle">
-                    <i class="ph-fill ph-hourglass" style="color: var(--accent);"></i> 筹备中
+                    <i class="ri-hourglass-fill" style="color: var(--accent);"></i> 筹备中
                 </h3>
                 <div class="plans-grid">
                     <div 
@@ -1704,7 +1701,7 @@
                                 class="milestone-item" 
                                 :class="{ done: ms.done }"
                             >
-                                <i :class="ms.done ? 'ph-fill ph-check-circle' : 'ph ph-circle'"></i>
+                                <i :class="ms.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
                                 {{ ms.label }}
                             </li>
                         </ul>
@@ -1763,7 +1760,7 @@
                         </div>
                         <button type="submit" :disabled="contact.sending"
                                 style="padding: 12px 35px; background: var(--text-primary); color: var(--bg-body); border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                        {{ contact.sending ? '发送中...' : '发送邮件' }} <i class="ph-bold ph-arrow-right" style="vertical-align: middle;"></i>
+                        {{ contact.sending ? '发送中...' : '发送邮件' }} <i class="ri-arrow-right-line" style="vertical-align: middle;"></i>
                         </button>
                         <p v-if="contact.status" style="margin-top: 1rem; color: var(--accent-highlight);">{{ contact.status }}</p>
                     </form>
@@ -1783,8 +1780,8 @@
                         </div>
                         <button type="submit" :disabled="guestbook.isSubmitting"
                                 style="padding: 12px 35px; background: var(--accent-highlight); color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
-                        <i v-if="guestbook.isSubmitting" class="ph ph-spinner-gap animate-spin"></i>
-                        {{ guestbook.isSubmitting ? '发射中...' : '发射弹幕' }} <i class="ph-bold ph-paper-plane-tilt" style="vertical-align: middle;"></i>
+                        <i v-if="guestbook.isSubmitting" class="ri-loader-4-line animate-spin"></i>
+                        {{ guestbook.isSubmitting ? '发射中...' : '发射弹幕' }} <i class="ri-send-plane-fill" style="vertical-align: middle;"></i>
                         </button>
                         <p v-if="guestbook.status.message" :style="{ color: guestbook.status.type === 'error' ? 'red' : 'var(--accent-highlight)' }" style="margin-top: 1rem;">
                         {{ guestbook.status.message }}
@@ -1814,15 +1811,15 @@
             <div class="music-artist">{{ music.currentSong.artist }}</div>
           </div>
           <!-- Loading 状态显示逻辑 -->
-          <i v-if="music.isLoading" class="ph ph-spinner-gap animate-spin" style="font-size: 1.2rem; color: var(--text-primary);"></i>
-          <i v-else :class="music.isPlaying ? 'ph-fill ph-pause' : 'ph-fill ph-play'" style="font-size: 1.2rem; color: var(--text-primary);"></i>
+          <i v-if="music.isLoading" class="ri-loader-4-line animate-spin" style="font-size: 1.2rem; color: var(--text-primary);"></i>
+          <i v-else :class="music.isPlaying ? 'ri-pause-fill' : 'ri-play-fill'" style="font-size: 1.2rem; color: var(--text-primary);"></i>
         </div>
       </div>
       <div id="aplayer-hidden" style="display: none;"></div>
       
       <!-- 回到顶部按钮 -->
       <button class="back-to-top" :class="{ show: showBackToTop }" @click="scrollToTop">
-        <i class="ph-bold ph-arrow-up"></i>
+        <i class="ri-arrow-up-line"></i>
       </button>
     </div>
 
@@ -1837,7 +1834,7 @@
       const GAMES_DATA = {
         genshin: {
           name: "原神",
-          icon: "ph-fill ph-sparkle",
+          icon: "ri-sparkling-fill",
           characters: [
             { name: "芙宁娜", desc: "众水女王", img: "./content/game/Furina1.png", color: "rgba(59, 130, 246, 0.15)", textColor: "#1e40af" },
             { name: "胡桃", desc: "往生堂堂主", img: "./content/game/Hutao.png", color: "rgba(220, 38, 38, 0.1)", textColor: "#991b1b" }
@@ -1845,7 +1842,7 @@
         },
         starrail: {
           name: "崩坏：星穹铁道",
-          icon: "ph-fill ph-train",
+          icon: "ri-train-fill",
           characters: [
             { name: "流萤", desc: "格拉默铁骑", img: "./content/game/Firefly.png", color: "rgba(16, 185, 129, 0.15)", textColor: "#047857" },
             { name: "三月七", desc: "列车元气少女", img: "./content/game/March7th.png", color: "rgba(236, 72, 153, 0.15)", textColor: "#be185d" }
@@ -1853,7 +1850,7 @@
         },
         zzz: {
           name: "绝区零",
-          icon: "ph-fill ph-television",
+          icon: "ri-tv-fill",
           characters: [
             { name: "薇薇安", desc: "反舌鸟", img: "./content/game/Vivian.png", color: "rgba(236, 72, 153, 0.25)", textColor: "#CC6CE7" },
             { name: "仪玄", desc: "Q宗师", img: "./content/game/YiXuan2.png", color: "rgba(254, 153, 0, 0.25)", textColor: "#FE9900" }
@@ -1864,7 +1861,7 @@
       const PLANS_DATA = [
         {
           title: "个人网站搭建",
-          icon: "ph-fill ph-code",
+          icon: "ri-code-box-fill",
           desc: "使用 Vue.js 和现代前端技术栈打造个人主页，展示项目与技能。",
           status: "ing", // planning, ing, done
           progress: 80,
@@ -1877,7 +1874,7 @@
         },
         {
           title: "开源项目贡献",
-          icon: "ph-fill ph-git-branch",
+          icon: "ri-git-branch-fill",
           desc: "积极参与开源社区，贡献代码和文档，提升编程技能和协作能力。",
           status: "ing", // planning, ing, done
           progress: 50,
@@ -1889,7 +1886,7 @@
         },
         {
           title: "南理工星空摄影",
-          icon: "ph-fill ph-camera",
+          icon: "ri-camera-fill",
           desc: "利用业余时间拍摄银河动态照片，记录美丽的夜空景象。",
           status: "planning", // planning, ing, done
           progress: 20,
@@ -1901,7 +1898,7 @@
         },
         {
           title: "Blender CG动画创作",
-          icon: "ph-fill ph-cube",
+          icon: "ri-box-3-fill",
           desc: "学习并使用Blender制作CG动画，提升三维建模与动画制作技能。",
           status: "ing", // planning, ing, done
           progress: 50,
