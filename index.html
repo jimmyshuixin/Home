@@ -7,17 +7,25 @@
     <title>虚宁 | Xu Ning's Space</title>
     <link rel="icon" href="./content/icon/32.png" />
 
-    <link rel="preconnect" href="https://source.xvyin.com" />
-    <link rel="preconnect" href="https://github.xvyin.com" />
+    <!-- 优化：添加国内常用CDN的预连接 -->
+    <link rel="dns-prefetch" href="https://cdn.staticfile.org" />
+    <link rel="preconnect" href="https://cdn.staticfile.org" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.geekzu.org" />
+    <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin />
     
-    <!-- 字体 -->
+    <!-- 业务API域名预连接 (保留) -->
+    <link rel="preconnect" href="https://github.xvyin.com" />
+    <link rel="preconnect" href="https://music.xvyin.com" />
+    
+    <!-- 字体优化：使用极客族(Geekzu)镜像，它是国内访问Google Fonts最快的镜像之一 -->
     <link
-      href="https://source.xvyin.com/?target=https%3A%2F%2Ffonts.loli.net%2Fcss2%3Ffamily%3DNoto%2BSerif%2BSC%3Awght%40300%3B500%3B700%3B800%26family%3DInter%3Awght%40300%3B400%3B500%3B600%26display%3Dswap"
+      href="https://fonts.geekzu.org/css2?family=Noto+Serif+SC:wght@300;500;700;800&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <!-- APlayer CSS -->
+    
+    <!-- APlayer CSS 优化：直接使用 Staticfile CDN -->
     <link
-      href="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.css"
+      href="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.css"
       rel="stylesheet"
     />
 
@@ -1289,7 +1297,7 @@
           </div>
           <div class="hero-visual">
             <div class="hero-img-box">
-              <img src="./content/icon/512.png" alt="Avatar" loading="lazy" onerror="this.src='https://placehold.co/400x600/e2e8f0/64748b?text=Xu'">
+              <img src="./content/icon/512.png" alt="Avatar" loading="lazy" onerror="this.src='https://via.placeholder.com/400x600/e2e8f0/64748b?text=Xu'">
             </div>
           </div>
         </section>
@@ -1579,15 +1587,16 @@
                     </div>
                     
                     <!-- 右侧：拍立得堆叠效果 -->
+                    <!-- 优化建议：Unsplash 图片在国内加载较慢，建议替换为本地图片或国内图床 -->
                     <div class="gallery-visuals">
                         <div class="polaroid p1">
-                            <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview">
+                            <img src="./content/Photos/1.jpg" alt="Gallery Preview" loading="lazy">
                         </div>
                         <div class="polaroid p2">
-                            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview">
+                            <img src="./content/Photos/2.jpg" alt="Gallery Preview" loading="lazy">
                         </div>
                         <div class="polaroid p3">
-                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Gallery Preview">
+                            <img src="./content/Photos/3.jpg" alt="Gallery Preview" loading="lazy">
                         </div>
                     </div>
                 </a>
@@ -1806,12 +1815,12 @@
       </button>
     </div>
 
-    <!-- CDN -->
-    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fvue%2F3.2.47%2Fvue.global.prod.js"></script>
-    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Fmarked%2F4.3.0%2Fmarked.min.js"></script>
-    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.bootcdn.net%2Fajax%2Flibs%2Faplayer%2F1.10.1%2FAPlayer.min.js"></script>
-    <!-- 核心修复：将 Phosphor Icons 脚本移至 body 底部，并添加 defer 属性，避免阻塞渲染和网络问题 -->
-    <script src="https://source.xvyin.com/?target=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40phosphor-icons%2Fweb" defer></script>
+    <!-- CDN 优化：替换为国内 Staticfile CDN (七牛云)，速度极快 -->
+    <script src="https://cdn.staticfile.org/vue/3.2.47/vue.global.prod.min.js"></script>
+    <script src="https://cdn.staticfile.org/marked/4.3.0/marked.min.js"></script>
+    <script src="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.js"></script>
+    <!-- Phosphor Icons 脚本优化 -->
+    <script src="https://cdn.staticfile.org/@phosphor-icons/web/2.1.1/index.min.js" defer></script>
 
     <script>
       const { createApp, ref, reactive, onMounted, onUnmounted, nextTick, computed } = Vue;
