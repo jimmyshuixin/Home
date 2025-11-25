@@ -10,6 +10,10 @@
     <!-- 优化：添加国内常用CDN的预连接 -->
     <link rel="dns-prefetch" href="https://cdn.staticfile.org" />
     <link rel="preconnect" href="https://cdn.staticfile.org" crossorigin />
+    <!-- 新增：饿了么CDN预连接，确保图标秒开 -->
+    <link rel="dns-prefetch" href="https://npm.elemecdn.com" />
+    <link rel="preconnect" href="https://npm.elemecdn.com" crossorigin />
+    
     <link rel="dns-prefetch" href="https://fonts.geekzu.org" />
     <link rel="preconnect" href="https://fonts.geekzu.org" crossorigin />
     
@@ -1819,8 +1823,8 @@
     <script src="https://cdn.staticfile.org/vue/3.2.47/vue.global.prod.min.js"></script>
     <script src="https://cdn.staticfile.org/marked/4.3.0/marked.min.js"></script>
     <script src="https://cdn.staticfile.org/aplayer/1.10.1/APlayer.min.js"></script>
-    <!-- Phosphor Icons 脚本优化 -->
-    <script src="https://cdn.staticfile.org/@phosphor-icons/web/2.1.1/index.min.js" defer></script>
+    <!-- Phosphor Icons 脚本优化：切换至 npm.elemecdn.com (饿了么CDN)，解决国内加载图标失败问题 -->
+    <script src="https://npm.elemecdn.com/@phosphor-icons/web@2.1.1/index.min.js" defer></script>
 
     <script>
       const { createApp, ref, reactive, onMounted, onUnmounted, nextTick, computed } = Vue;
