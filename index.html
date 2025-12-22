@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="虚宁的个人主页">
+    <meta name="description" content="虚宁的个人主页 - 开发者、创造者、记录者">
     <title>虚宁 | Xu Ning's Space</title>
     <link rel="icon" href="./content/icon/32.png" />
 
@@ -1549,6 +1549,7 @@
             <div class="part-content">
                 <span class="part-vol">VOLUME.1</span>
                 <h2 class="part-title-main">探索与求索</h2>
+                <!-- 更新描述，移除"未来蓝图"部分 -->
                 <p class="part-desc">这是我的主线剧情，记录了我的学术生涯、技能树点亮过程。</p>
             </div>
         </div>
@@ -2086,21 +2087,21 @@
           title: "个人网站搭建",
           icon: "ri-code-box-fill",
           desc: "使用 Vue.js 和现代前端技术栈打造个人主页，展示项目与技能。",
-          status: "ing", 
-          progress: 80,
+          status: "done", 
+          progress: 100,
           milestones: [
             { label: "前端三大件学习", done: true },
             { label: "Vue3、express框架学习", done: true },
             { label: "项目部署与优化", done: true },
-            { label: "内容更新与维护", done: false }
+            { label: "内容更新与维护", done: true }
           ]
         },
         {
           title: "开源项目贡献",
           icon: "ri-git-branch-fill",
-          desc: "积极参与开源社区，贡献代码和文档，提升编程技能和协作能力。",
-          status: "ing",
-          progress: 50,
+          desc: "无聊玩玩而已。",
+          status: "done",
+          progress: 100,
           milestones: [
             { label: "寻找合适的项目", done: true },
             { label: "提交首个 PR", done: true },
@@ -2108,9 +2109,9 @@
           ]
         },
         {
-          title: "南理工星空摄影",
+          title: "星空摄影",
           icon: "ri-camera-fill",
-          desc: "利用业余时间拍摄银河动态照片，记录美丽的夜空景象。",
+          desc: "有朝一日，希望与银河同框。",
           status: "planning",
           progress: 20,
           milestones: [
@@ -2122,7 +2123,7 @@
         {
           title: "Blender CG动画创作",
           icon: "ri-box-3-fill",
-          desc: "学习并使用Blender制作CG动画，提升三维建模与动画制作技能。",
+          desc: "学习并使用Blender制作动画，做一名合格的B站UP主。",
           status: "ing",
           progress: 50,
           milestones: [
@@ -2130,7 +2131,31 @@
             { label: "模型制作与动画", done: false },
             { label: "渲染与后期处理", done: false }
           ]
+        },
+        {
+          title: "健身",
+          icon: "ri-heart-pulse-fill",
+          desc: "身体健康，便是热爱。",
+          status: "ing",
+          progress: 99,
+          milestones: [
+            { label: "标准10个引体", done: true },
+            { label: "标准30个俯卧撑", done: true },
+            { label: "俄挺突破", done: true },
+            { label: "标准俄挺5s", done: false }
+          ]
+        },
+        {
+          title: "学习竹笛",
+          icon: "ri-music-2-fill",
+          desc: "我喜欢纯音乐。",
+          status: "planning",
+          progress: 10,
+          milestones: [
+            { label: "音阶练习", done: false }
+          ]
         }
+
       ];
 
       const STATIC_RESUME = {
@@ -2147,7 +2172,7 @@
         ],
         campusExperience: {
           graduate: [
-             { role: "科研项目/助教", description: "（未来即将开启的旅程...）" } 
+             { role: "科研项目", description: "（未来即将开启的旅程...）" } 
           ],
           undergraduate: [
             { role: "学习委员", description: "建立帮扶机制，班级获“零挂科”、“先进班集体”称号。" },
