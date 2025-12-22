@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="虚宁的个人主页 - 开发者、创造者、记录者">
+    <meta name="description" content="虚宁的个人主页">
     <title>虚宁 | Xu Ning's Space</title>
     <link rel="icon" href="./content/icon/32.png" />
 
@@ -1911,18 +1911,27 @@
               <h2 class="section-title">未来<br>& 蓝图</h2>
             </div>
             <div class="section-content" style="display: block;">
-                <!-- 分类1: 进行中 -->
+                <!-- 分类1: 进行中 & 已达成 -->
                 <h3 class="resume-subtitle" style="margin-top: 0;">
-                    <i class="ri-fire-fill" style="color: var(--accent-highlight);"></i> 进行中
+                    <i class="ri-fire-fill" style="color: var(--accent-highlight);"></i> 进行中 / 已达成
                 </h3>
                 <div class="plans-grid" style="margin-bottom: 3rem;">
                     <div v-for="(plan, idx) in plansInProgress" :key="'ing-'+idx" class="plan-card is-active">
                         <div class="plan-header">
                             <div class="plan-icon-box"><i :class="plan.icon"></i></div>
-                            <span class="plan-status-badge status-ing">{{ getStatusLabel(plan.status) }}</span>
+                            <span class="plan-status-badge" :class="'status-' + plan.status">{{ getStatusLabel(plan.status) }}</span>
                         </div>
                         <h3 class="plan-title">{{ plan.title }}</h3>
                         <p class="plan-desc">{{ plan.desc }}</p>
+                        
+                        <!-- Fixed: Added Milestone List Display -->
+                        <ul class="milestone-list" v-if="plan.milestones && plan.milestones.length">
+                            <li v-for="(m, mi) in plan.milestones" :key="mi" class="milestone-item" :class="{ done: m.done }">
+                                <i :class="m.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
+                                {{ m.label }}
+                            </li>
+                        </ul>
+
                         <div class="plan-progress-container">
                             <div class="plan-progress-label"><span>Progress</span><span>{{ plan.progress }}%</span></div>
                             <div class="dna-bar">
@@ -1944,6 +1953,15 @@
                         </div>
                         <h3 class="plan-title">{{ plan.title }}</h3>
                         <p class="plan-desc">{{ plan.desc }}</p>
+
+                        <!-- Fixed: Added Milestone List Display -->
+                        <ul class="milestone-list" v-if="plan.milestones && plan.milestones.length">
+                            <li v-for="(m, mi) in plan.milestones" :key="mi" class="milestone-item" :class="{ done: m.done }">
+                                <i :class="m.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
+                                {{ m.label }}
+                            </li>
+                        </ul>
+
                         <div class="plan-progress-container">
                             <div class="plan-progress-label"><span>Progress</span><span>{{ plan.progress }}%</span></div>
                             <div class="dna-bar">
@@ -2479,8 +2497,8 @@
           const gamesData = reactive(GAMES_DATA);
           const plansData = reactive(PLANS_DATA);
           
-          const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing'));
-          const plansPlanning = computed(() => plansData.filter(p => p.status !== 'ing'));
+          const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing' || p.status === 'done'));
+          const plansPlanning = computed(() => plansData.filter(p => p.status === 'planning'));
 
           // --- NEW: Fitness Duration Calculation ---
           const fitnessDayCount = ref(0);
