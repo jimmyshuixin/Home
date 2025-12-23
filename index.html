@@ -111,7 +111,7 @@
         line-height: 1.8;
         overflow-x: hidden;
         transition: background-color 0.5s ease, color 0.5s ease;
-        padding-top: var(--nav-height); 
+        padding-top: 0; /* Hero 全屏优化：移除 padding-top，由 hero 自身控制 */
       }
 
       a { text-decoration: none; color: inherit; transition: all 0.3s; }
@@ -372,15 +372,18 @@
         grid-column: 5 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;
       }
 
-      /* --- Hero --- */
+      /* --- Hero Optimization --- */
       .hero-wrapper {
-        min-height: 80vh; 
+        min-height: 100vh; /* 修改：强制铺满屏幕高度 */
+        height: 100vh; /* 确保移动端也是全屏 */
         display: grid; grid-template-columns: 1.2fr 1fr; align-items: center;
-        margin: 0 auto 4rem; 
+        margin: 0 auto 0; /* 底部 margin 改为 0 */
         gap: 2rem; position: relative;
-        padding-top: 2rem;
+        padding-top: 0; /* 移除顶部内边距 */
         width: 100%;
+        box-sizing: border-box;
       }
+      
       .hero-text { position: relative; z-index: 2; }
       
       .hero-text h1 {
@@ -426,7 +429,58 @@
       .hero-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.5s ease; }
       .hero-img-box:hover img { transform: scale(1.05); }
 
+      /* --- 特效名字：流光渐变 --- */
+      .highlight-name {
+          font-weight: 900;
+          /* 渐变色：从文字色 -> 蓝色 -> 橙色 循环 */
+          background: linear-gradient(120deg, var(--text-primary) 0%, var(--accent-highlight) 50%, #f59e0b 100%);
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gradientText 3s ease infinite;
+          display: inline-block;
+          position: relative;
+      }
+      @keyframes gradientText {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+      }
+
+      /* --- 底部下滑提示 --- */
+      .scroll-hint {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        opacity: 0;
+        animation: fadeInHint 1s ease 4s forwards, bounceHint 2s infinite 5s; /* 延迟出现 */
+        cursor: pointer;
+        z-index: 10;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .scroll-hint i {
+        font-size: 1.5rem;
+        margin-top: 5px;
+        color: var(--accent-highlight);
+      }
+      @keyframes fadeInHint { to { opacity: 0.7; } }
+      @keyframes bounceHint {
+        0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+        40% { transform: translateX(-50%) translateY(10px); }
+        60% { transform: translateX(-50%) translateY(5px); }
+      }
+
+
       /* --- About Section (Borderless V2) --- */
+      /* 增加 margin-top 确保全屏翻页后有合适间距 */
+      #about { margin-top: 4rem; }
       .about-card {
         grid-column: 1 / -1;
         padding: 0;
@@ -905,6 +959,15 @@
         .read-now-section { padding: 1.5rem; }
         .read-list-section { padding: 1.5rem; }
         .fit-content-left { padding: 1.8rem; }
+        
+        /* 移动端 Hero 修复 */
+        .hero-wrapper { 
+            grid-template-columns: 1fr; 
+            text-align: center; 
+            gap: 2rem; 
+            height: 100vh; /* 确保移动端高度也占满 */
+            align-content: center;
+        }
       }
 
       .activity-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(127,127,127,0.1); max-width: 350px; width: 100%; }
@@ -1170,12 +1233,7 @@
         /* 针对大屏幕Bento Grid的重置 (在移动端变回单列) */
         /* .lifestyle-grid { display: grid; grid-template-columns: 1fr; }  Moved to media query above */
         
-        .hero-wrapper { grid-template-columns: 1fr; text-align: center; gap: 3rem; min-height: auto; padding-top: 2rem; }
-        .hero-btns { justify-content: center; } 
-        
-        .hero-visual { justify-content: center; order: -1; }
-        .hero-text h1 { margin-bottom: 1rem; }
-        .hero-text p { margin: 0 auto 2rem; }
+        /* Hero 移动端样式已统一处理 */
         
         .project-grid { grid-template-columns: 1fr; }
         
@@ -1512,7 +1570,8 @@
           <div class="hero-text">
             <h1>
               <span>{{ heroLine1 }}</span><span v-if="activeLine === 1" class="typing-cursor"></span><br>
-              <span>{{ heroLine2 }}</span><span v-if="activeLine === 2" class="typing-cursor"></span><br>
+              <!-- 优化：将第二行拆分为 前缀 + 名字，以便单独给名字加特效 -->
+              <span>{{ heroLine2Pre }}</span><span class="highlight-name">{{ heroLine2Name }}</span><span v-if="activeLine === 2" class="typing-cursor"></span><br>
               <span style="font-size: 0.5em; color: var(--text-secondary); line-height: 1.5; display: block; margin-top: 10px;">
                 <span>{{ heroLine3 }}</span><span v-if="activeLine === 3" class="typing-cursor"></span><br>
                 <span>{{ heroLine4 }}</span><span v-if="activeLine === 4" class="typing-cursor"></span>
@@ -1525,13 +1584,18 @@
           </div>
           <div class="hero-visual">
             <div class="hero-img-box">
-              <!-- 优化：替换 fallback image 为 placehold.co (更稳定) 且增加 loading="lazy" -->
               <img src="./content/icon/512.png" alt="Avatar" onerror="this.src='https://placehold.co/400x600/e2e8f0/64748b?text=Xu'">
             </div>
           </div>
+          
+          <!-- 底部下滑提示 -->
+          <div class="scroll-hint" @click="scrollTo('about')">
+            <span>Scroll to Explore</span>
+            <i class="ri-arrow-down-double-line"></i>
+          </div>
         </section>
 
-        <!-- 01 About (移出 Mainline，作为序章) -->
+        <!-- 01 About (序章) -->
         <div id="about" class="scatter-grid">
           <div class="section-header">
             <span class="section-label">01</span>
@@ -1561,7 +1625,6 @@
             <div class="part-content">
                 <span class="part-vol">VOLUME.1</span>
                 <h2 class="part-title-main">探索与求索</h2>
-                <!-- 更新描述，移除"未来蓝图"部分 -->
                 <p class="part-desc">这是我的主线剧情，记录了我的学术生涯、技能树点亮过程。</p>
             </div>
         </div>
@@ -1727,8 +1790,6 @@
             </div>
         </div>
 
-        <!-- Plans 移出，此处原位删除 -->
-
         <!-- ==================== PART 2: SIDELINE ==================== -->
         <div class="part-header" style="margin-top: 8rem;">
             <div class="part-bg-text">SIDELINE</div>
@@ -1748,12 +1809,9 @@
             
             <div class="lifestyle-grid">
                 
-                <!-- Enhanced Fitness Card (Deeply Redesigned) -->
+                <!-- Enhanced Fitness Card -->
                 <div class="ls-card-base fitness-card-enhanced">
-                    
-                    <!-- Right Side Background Image (Transparent Style) -->
                     <div class="fit-bg-img-container">
-                        <!-- 优化：增加 loading="lazy" -->
                         <img src="./content/Photos/6.png" class="fit-bg-img" alt="Fitness Figure" loading="lazy">
                     </div>
 
@@ -1778,7 +1836,6 @@
                             <div class="chart-label">近期训练强度 (Intensity)</div>
                             <div class="fit-chart-wrapper">
                                 <svg class="heart-rate-svg" viewBox="0 0 400 60" preserveAspectRatio="none">
-                                    <!-- 手绘风格的心率折线路径 -->
                                     <path class="heart-rate-path" d="M0,50 L20,50 L30,20 L40,50 L70,50 L80,10 L90,50 L120,50 L130,30 L140,50 L180,50 L190,5 L200,50 L240,50 L250,25 L260,50 L300,50 L310,15 L320,50 L360,50 L370,35 L380,50 L400,50" />
                                 </svg>
                             </div>
@@ -1787,13 +1844,12 @@
 
                 </div>
 
-                <!-- Enhanced Reading Card (Redesigned) -->
+                <!-- Enhanced Reading Card -->
                 <div class="ls-card-base reading-card-enhanced">
                     
-                    <!-- Top: Currently Reading (Changed to Editor's Pick) -->
+                    <!-- Top: Currently Reading -->
                     <div class="read-now-section">
                         <div class="read-cover-wrapper">
-                             <!-- Using first book as current -->
                              <img :src="bookshelf[0].coverUrl" class="read-cover-img" alt="Current Read" @error="handleImgError" loading="lazy">
                         </div>
                         <div class="read-info">
@@ -1811,14 +1867,13 @@
                         </div>
                     </div>
 
-                    <!-- Bottom: Reading List (Changed to Favorites) -->
+                    <!-- Bottom: Reading List -->
                     <div class="read-list-section">
                         <div class="read-list-title">Favorites Collection / 珍藏书单</div>
                         <div class="read-list-row">
                              <div v-for="(book, i) in bookshelf.slice(1)" :key="i" class="mini-book-item" @click="switchBook(i)">
                                 <img :src="book.coverUrl" class="mini-book-cover" :alt="book.title" @error="handleImgError" loading="lazy">
                              </div>
-                             <!-- Placeholder for more -->
                              <div class="mini-book-item" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.05);border-radius:4px;height:75px;">
                                 <i class="ri-more-fill" style="color:var(--accent);"></i>
                              </div>
@@ -1937,7 +1992,6 @@
                         <h3 class="plan-title">{{ plan.title }}</h3>
                         <p class="plan-desc">{{ plan.desc }}</p>
                         
-                        <!-- Fixed: Added Milestone List Display -->
                         <ul class="milestone-list" v-if="plan.milestones && plan.milestones.length">
                             <li v-for="(m, mi) in plan.milestones" :key="mi" class="milestone-item" :class="{ done: m.done }">
                                 <i :class="m.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
@@ -1967,7 +2021,6 @@
                         <h3 class="plan-title">{{ plan.title }}</h3>
                         <p class="plan-desc">{{ plan.desc }}</p>
 
-                        <!-- Fixed: Added Milestone List Display -->
                         <ul class="milestone-list" v-if="plan.milestones && plan.milestones.length">
                             <li v-for="(m, mi) in plan.milestones" :key="mi" class="milestone-item" :class="{ done: m.done }">
                                 <i :class="m.done ? 'ri-checkbox-circle-fill' : 'ri-checkbox-blank-circle-line'"></i>
@@ -2062,7 +2115,6 @@
 
       <div class="floating-bar" v-if="music.currentSong.name">
         <div class="music-pill" @click="music.togglePlay">
-          <!-- 优化：增加 loading="lazy" -->
           <img :src="music.currentSong.cover" class="music-cover" :class="{ 'animate-spin': music.isPlaying }" @error="handleImgError" loading="lazy">
           <div class="music-info">
             <div class="music-title">{{ music.currentSong.name }}</div>
@@ -2534,15 +2586,12 @@
           const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing' || p.status === 'done'));
           const plansPlanning = computed(() => plansData.filter(p => p.status === 'planning'));
 
-          // --- NEW: Fitness Duration Calculation ---
           const fitnessDayCount = ref(0);
           
           const calculateFitnessDays = () => {
               const startDate = new Date('2022-11-21');
               const now = new Date();
-              // Calculate difference in milliseconds
               const diffTime = Math.abs(now - startDate);
-              // Convert to days (ceil to include today)
               const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
               fitnessDayCount.value = diffDays;
           };
@@ -2631,7 +2680,12 @@
             setTimeout(() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }, 350);
           };
 
-          const heroLine1 = ref(""); const heroLine2 = ref(""); const heroLine3 = ref(""); const heroLine4 = ref(""); 
+          // 修改：heroLine2 拆分为 pre 和 name
+          const heroLine1 = ref(""); 
+          const heroLine2Pre = ref("");
+          const heroLine2Name = ref("");
+          const heroLine3 = ref(""); 
+          const heroLine4 = ref(""); 
           const activeLine = ref(1); const showHeroButtons = ref(false);
 
           const { player, togglePlay } = useMusicPlayer();
@@ -2644,7 +2698,6 @@
 
           const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
           const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-          // 优化：将 handleImgError 的 fallback 替换为 placehold.co，比 via.placeholder 更快且支持 https
           const handleImgError = (e) => e.target.src = 'https://placehold.co/300x450/e2e8f0/64748b?text=Cover';
           
           const languageColors = {
@@ -2695,15 +2748,18 @@
 
           const startTypewriter = async () => {
             activeLine.value = 1; await typeLine(heroLine1, "Hi! "); 
-            activeLine.value = 2; await typeLine(heroLine2, "I'm 虚宁"); 
+            
+            // 第二行分段打印：先打印 "I'm "，再打印 "虚宁"
+            activeLine.value = 2; 
+            await typeLine(heroLine2Pre, "I'm "); 
+            await typeLine(heroLine2Name, "虚宁");
+
             activeLine.value = 3; await typeLine(heroLine3, "路漫漫其修远兮"); 
             activeLine.value = 4; await typeLine(heroLine4, "吾将上下而求索"); 
             showHeroButtons.value = true;
           };
 
-          // --- Book Switch Logic ---
           const switchBook = (index) => {
-             // 列表是 bookshelf.slice(1)，所以列表中的 index 对应原数组的 index + 1
              const realIndex = index + 1;
              const temp = bookshelf.value[0];
              bookshelf.value[0] = bookshelf.value[realIndex];
@@ -2740,7 +2796,7 @@
 
           onMounted(async () => {
             initTheme(); 
-            calculateFitnessDays(); // Calculate initial fitness days
+            calculateFitnessDays(); 
 
             window.addEventListener('scroll', handleScroll);
             
@@ -2777,15 +2833,12 @@
                 startTypewriter();
             };
 
-            // 优化：Cloudflare 在中国访问时常会因为某个资源挂起导致 window load 不触发
-            // 这里增加一个 5 秒的强制超时兜底，确保 Loading 动画一定消失
             setTimeout(finishLoading, 5000);
 
             if (document.readyState === 'complete') {
                 finishLoading();
             } else {
                 window.addEventListener('load', finishLoading);
-                // 原始的8秒保留作为最后防线
                 setTimeout(finishLoading, 8000);
             }
 
@@ -2799,7 +2852,6 @@
                 class P { constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.5;this.vy=(Math.random()-0.5)*0.5} update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1} draw(){const d=document.documentElement.classList.contains('dark-mode');ctx.fillStyle=d?"rgba(255,255,255,0.4)":"rgba(0,0,0,0.3)";ctx.beginPath();ctx.arc(this.x,this.y,1.8,0,Math.PI*2);ctx.fill()}}
                 
                 const init = () => { 
-                    // 优化：移动端 (宽度小于768px) 减少粒子数量至 25，PC端保持 60
                     const count = window.innerWidth < 768 ? 25 : 60;
                     particles = Array.from({length: count}, () => new P()); 
                 };
@@ -2862,7 +2914,7 @@
             scrollTo, handleImgError, scrollToTop, showBackToTop, isNavHidden,
             resumeData, bookshelf, github, music, 
             contact, submitContact, filteredAndSortedRepos,
-            heroLine1, heroLine2, heroLine3, heroLine4, activeLine, showHeroButtons,
+            heroLine1, heroLine2Pre, heroLine2Name, heroLine3, heroLine4, activeLine, showHeroButtons,
             loadMoreRepos, getLanguageColor,
             isMobileMenuOpen, toggleMobileMenu, handleMobileClick,
             contactMode, guestbook, activeDanmaku, submitGuestbookMessage,
@@ -2871,7 +2923,7 @@
             plansInProgress, plansPlanning,
             isDark, toggleTheme,
             copyrightYear, siteUptime, icp,
-            fitnessDayCount, switchBook // Export fitness day count and book switcher
+            fitnessDayCount, switchBook 
           };
         }
       }).mount('#app');
