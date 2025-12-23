@@ -962,11 +962,31 @@
         
         /* 移动端 Hero 修复 */
         .hero-wrapper { 
-            grid-template-columns: 1fr; 
+            display: flex; /* 改用 Flex 布局以便控制顺序 */
+            flex-direction: column-reverse; /* 图片在上，文字在下 */
+            justify-content: center;
+            align-items: center;
             text-align: center; 
             gap: 2rem; 
-            height: 100vh; /* 确保移动端高度也占满 */
-            align-content: center;
+            height: 100vh; 
+            padding-bottom: 10vh; /* 留出底部空间给提示 */
+        }
+
+        .hero-img-box {
+            /* 移动端缩小图片尺寸，避免挤压文字 */
+            width: 220px;
+            height: 280px;
+            flex-shrink: 0; /* 防止被压缩 */
+        }
+
+        .hero-text h1 {
+            font-size: 2.2rem; /* 稍微调小标题字体 */
+            margin-bottom: 1.5rem;
+            min-height: auto; /* 移除最小高度限制，防止占位过大 */
+        }
+        
+        .hero-btns {
+            justify-content: center;
         }
       }
 
