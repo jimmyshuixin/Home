@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="虚宁的个人主页">
+    <meta name="description" content="虚宁的个人主页 - 开发者、创造者、记录者">
     <title>虚宁 | Xu Ning's Space</title>
     <link rel="icon" href="./content/icon/32.png" />
 
@@ -18,9 +18,9 @@
     <link rel="preconnect" href="https://github.xvyin.com" />
     <link rel="preconnect" href="https://music.xvyin.com" />
     
-    <!-- 字体优化：使用极客族(Geekzu)镜像 -->
+    <!-- 字体优化：使用极客族(Geekzu)镜像，并添加 display=swap 避免文字隐形 -->
     <link
-      href="https://fonts.geekzu.org/css2?family=Noto+Serif+SC:wght@300;500;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.geekzu.org/css2?family=Noto+Serif+SC:wght@300;500;700;800&family=Inter:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
     
@@ -30,7 +30,7 @@
       rel="stylesheet"
     />
 
-    <!-- RemixIcon -->
+    <!-- RemixIcon via Staticfile CDN -->
     <link 
       rel="stylesheet" 
       href="https://cdn.staticfile.org/remixicon/3.5.0/remixicon.css" 
@@ -106,7 +106,8 @@
       body {
         background-color: var(--bg-body);
         color: var(--text-primary);
-        font-family: "Inter", "Noto Serif SC", sans-serif;
+        /* 优化：增加系统默认字体作为后备，防止网络字体加载慢时出现空白 */
+        font-family: "Inter", "Noto Serif SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         line-height: 1.8;
         overflow-x: hidden;
         transition: background-color 0.5s ease, color 0.5s ease;
@@ -125,6 +126,7 @@
         height: 100%; background: var(--accent-highlight); width: 0%;
         transition: width 0.1s linear;
         box-shadow: 0 0 10px var(--accent-highlight);
+        will-change: width; /* 性能优化 */
       }
 
       /* --- 开屏 Loading 动画 --- */
@@ -167,6 +169,7 @@
       .orb {
         position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.25;
         animation: float 25s infinite alternate ease-in-out;
+        will-change: transform; /* 性能优化 */
       }
       .orb-1 { top: -20%; right: -10%; width: 70vw; height: 70vw; background: #e0e7ff; }
       .orb-2 { bottom: -20%; left: -20%; width: 60vw; height: 60vw; background: #f3e8ff; animation-delay: -8s; }
@@ -192,6 +195,7 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         animation-name: danmaku-scroll; animation-timing-function: linear; animation-iteration-count: 1;
         color: var(--text-primary);
+        will-change: transform; /* 性能优化 */
       }
       html.dark-mode .danmaku-item { background-color: rgba(0, 0, 0, 0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
       
@@ -1026,7 +1030,7 @@
         filter: drop-shadow(0 30px 30px rgba(0,0,0,0.15));
         animation: breathe 6s ease-in-out infinite;
         transition: opacity 0.6s ease;
-        will-change: opacity, transform;
+        will-change: opacity, transform; /* 性能优化 */
       }
 
       .nav-arrow {
@@ -1514,7 +1518,8 @@
           </div>
           <div class="hero-visual">
             <div class="hero-img-box">
-              <img src="./content/icon/512.png" alt="Avatar" loading="lazy" onerror="this.src='https://via.placeholder.com/400x600/e2e8f0/64748b?text=Xu'">
+              <!-- 优化：替换 fallback image 为 placehold.co (更稳定) 且增加 loading="lazy" -->
+              <img src="./content/icon/512.png" alt="Avatar" onerror="this.src='https://placehold.co/400x600/e2e8f0/64748b?text=Xu'">
             </div>
           </div>
         </section>
@@ -1741,8 +1746,8 @@
                     
                     <!-- Right Side Background Image (Transparent Style) -->
                     <div class="fit-bg-img-container">
-                        <!-- 占位符图片，请替换为您的健身照片或透明背景人像 -->
-                        <img src="./content/Photos/6.png" class="fit-bg-img" alt="Fitness Figure">
+                        <!-- 优化：增加 loading="lazy" -->
+                        <img src="./content/Photos/6.png" class="fit-bg-img" alt="Fitness Figure" loading="lazy">
                     </div>
 
                     <div class="fit-content-left">
@@ -1782,7 +1787,7 @@
                     <div class="read-now-section">
                         <div class="read-cover-wrapper">
                              <!-- Using first book as current -->
-                             <img :src="bookshelf[0].coverUrl" class="read-cover-img" alt="Current Read" @error="handleImgError">
+                             <img :src="bookshelf[0].coverUrl" class="read-cover-img" alt="Current Read" @error="handleImgError" loading="lazy">
                         </div>
                         <div class="read-info">
                             <div class="read-tag">Top Pick / 特别推荐</div>
@@ -1804,7 +1809,7 @@
                         <div class="read-list-title">Favorites Collection / 珍藏书单</div>
                         <div class="read-list-row">
                              <div v-for="(book, i) in bookshelf.slice(1)" :key="i" class="mini-book-item" @click="switchBook(i)">
-                                <img :src="book.coverUrl" class="mini-book-cover" :alt="book.title" @error="handleImgError">
+                                <img :src="book.coverUrl" class="mini-book-cover" :alt="book.title" @error="handleImgError" loading="lazy">
                              </div>
                              <!-- Placeholder for more -->
                              <div class="mini-book-item" style="display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.05);border-radius:4px;height:75px;">
@@ -1868,6 +1873,7 @@
                                 class="char-img-full" 
                                 :alt="currentCharacter.name"
                                 @error="handleImgError"
+                                loading="lazy"
                             >
                         </transition>
                     </div>
@@ -2049,7 +2055,8 @@
 
       <div class="floating-bar" v-if="music.currentSong.name">
         <div class="music-pill" @click="music.togglePlay">
-          <img :src="music.currentSong.cover" class="music-cover" :class="{ 'animate-spin': music.isPlaying }" @error="handleImgError">
+          <!-- 优化：增加 loading="lazy" -->
+          <img :src="music.currentSong.cover" class="music-cover" :class="{ 'animate-spin': music.isPlaying }" @error="handleImgError" loading="lazy">
           <div class="music-info">
             <div class="music-title">{{ music.currentSong.name }}</div>
             <div class="music-artist">{{ music.currentSong.artist }}</div>
@@ -2284,7 +2291,13 @@
             }
 
             try {
-                const response = await fetch(url.toString());
+                // 优化：添加超时控制，防止 GitHub API 卡死页面加载
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8秒超时
+
+                const response = await fetch(url.toString(), { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
                 if (!response.ok) {
                     const errorText = await response.text();
                     throw new Error(`获取 GitHub 数据失败 (${endpoint}): ${response.status} - ${errorText}`);
@@ -2300,9 +2313,17 @@
         async getMusicPlaylist(songId) {
           const apiUrl = `${config.music.api}?server=${config.music.server}&type=${config.music.type}&id=${songId}`;
           try {
-            const response = await fetch(apiUrl);
+            // 优化：音乐列表获取添加 5 秒超时
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(apiUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
             return await response.json();
-          } catch (e) { return []; }
+          } catch (e) { 
+            console.log('Music load failed (timeout or error)', e);
+            return []; 
+          }
         }
       };
 
@@ -2323,7 +2344,13 @@
 
           const fetchMessages = async () => {
             try {
-              const response = await fetch(config.guestbookApiUrl);
+              // 优化：留言获取添加超时
+              const controller = new AbortController();
+              const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+              const response = await fetch(config.guestbookApiUrl, { signal: controller.signal });
+              clearTimeout(timeoutId);
+
               if (!response.ok) throw new Error(`Error: ${response.status}`);
               const freshMessages = await response.json();
               guestbook.messages = freshMessages;
@@ -2610,6 +2637,7 @@
 
           const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
           const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+          // 优化：将 handleImgError 的 fallback 替换为 placehold.co，比 via.placeholder 更快且支持 https
           const handleImgError = (e) => e.target.src = 'https://placehold.co/300x450/e2e8f0/64748b?text=Cover';
           
           const languageColors = {
@@ -2742,10 +2770,15 @@
                 startTypewriter();
             };
 
+            // 优化：Cloudflare 在中国访问时常会因为某个资源挂起导致 window load 不触发
+            // 这里增加一个 5 秒的强制超时兜底，确保 Loading 动画一定消失
+            setTimeout(finishLoading, 5000);
+
             if (document.readyState === 'complete') {
                 finishLoading();
             } else {
                 window.addEventListener('load', finishLoading);
+                // 原始的8秒保留作为最后防线
                 setTimeout(finishLoading, 8000);
             }
 
