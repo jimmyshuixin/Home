@@ -369,8 +369,26 @@
         display: inline-flex; align-items: center; gap: 8px; font-weight: bold;
         border: var(--sketch-border); padding: 8px 20px; border-radius: var(--radius-2);
         background: var(--card-bg); box-shadow: 2px 2px 0 var(--ink-primary);
-        transform: rotate(-1deg);
+        transform: rotate(-1deg); cursor: pointer;
       }
+      
+      /* 吸睛抖动动画 */
+      .btn-shake {
+        animation: sketch-shake 2.5s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        transform-origin: center;
+      }
+      .btn-shake:hover {
+        animation-play-state: paused;
+        transform: translateY(-2px) rotate(1deg) scale(1.05);
+        box-shadow: 4px 4px 0 var(--marker-highlight);
+      }
+      @keyframes sketch-shake {
+        0%, 80%, 100% { transform: rotate(-1deg) scale(1); box-shadow: 2px 2px 0 var(--ink-primary); }
+        85% { transform: rotate(-4deg) scale(1.05); box-shadow: 4px 4px 0 var(--marker-highlight); }
+        90% { transform: rotate(3deg) scale(1.05); box-shadow: 4px 4px 0 var(--marker-highlight); }
+        95% { transform: rotate(-4deg) scale(1.05); box-shadow: 4px 4px 0 var(--marker-highlight); }
+      }
+
       .sketch-tag:nth-child(2) { transform: rotate(1deg); background: var(--marker-blue); color: #000; }
 
       .hero-visual { display: flex; justify-content: center; position: relative; z-index: 2; }
@@ -761,8 +779,8 @@
               </span>
             </h1>
             <div class="hero-btns" :class="{ 'is-visible': showHeroButtons }">
-                <!-- 这里替换为年度摄影记录按钮，触发 B站弹窗 -->
-                <div class="sketch-tag" @click="showVideoModal = true" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px) rotate(-1deg)'" onmouseout="this.style.transform='rotate(-1deg)'">
+                <!-- 带有抖动特效的年度摄影记录按钮 -->
+                <div class="sketch-tag btn-shake" @click="showVideoModal = true">
                     <i class="ri-camera-lens-fill"></i> 年度摄影记录
                 </div>
                 <div class="sketch-tag"><i class="ri-star-fill"></i> 双鱼座 / INFJ-A</div>
@@ -1022,13 +1040,39 @@
                 </div>
             </div>
 
-            <!-- 新增 Blender 作品 B站UP主的日常模块 -->
+            <!-- Blender 作品 B站UP主的日常模块 -->
             <div style="grid-column: 1 / -1; margin-top: 1.5rem;">
                 <h3 class="resume-subtitle"><i class="ri-bilibili-line" style="color: #00A1D6;"></i> B站UP主的日常</h3>
                 <div class="sketch-card" style="padding: 1.5rem;">
                     <div class="iframe-container">
                         <iframe src="//player.bilibili.com/player.html?bvid=BV1r2fjBwEQ6&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
                     </div>
+                </div>
+            </div>
+            
+            <!-- 新增社交联系方式模块 -->
+            <div style="grid-column: 1 / -1; margin-top: 1.5rem;">
+                <h3 class="resume-subtitle"><i class="ri-links-fill" style="color: var(--marker-highlight);"></i> 社交连接</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 1.5rem;">
+                    <!-- B站卡片 -->
+                    <a href="https://space.bilibili.com/520237303" target="_blank" class="sketch-card" style="display: flex; align-items: center; gap: 1.2rem; padding: 1.5rem; text-decoration: none; border: 2px solid #00A1D6;">
+                        <i class="ri-bilibili-fill" style="font-size: 2.5rem; color: #00A1D6;"></i>
+                        <div style="flex: 1;">
+                            <div style="font-family: 'Zhi Mang Xing'; font-size: 1.8rem; line-height: 1.2; color: var(--ink-primary);">哔哩哔哩</div>
+                            <div style="font-weight: bold; color: var(--ink-secondary);">UID: 520237303</div>
+                        </div>
+                        <i class="ri-arrow-right-up-line" style="font-size: 1.5rem; color: #00A1D6;"></i>
+                    </a>
+                    
+                    <!-- 抖音卡片 -->
+                    <a href="https://www.douyin.com/search/tidingjinluo" target="_blank" class="sketch-card" style="display: flex; align-items: center; gap: 1.2rem; padding: 1.5rem; text-decoration: none; border: 2px solid #fe2c55;">
+                        <i class="ri-tiktok-fill" style="font-size: 2.5rem; color: #fe2c55;"></i>
+                        <div style="flex: 1;">
+                            <div style="font-family: 'Zhi Mang Xing'; font-size: 1.8rem; line-height: 1.2; color: var(--ink-primary);">抖音</div>
+                            <div style="font-weight: bold; color: var(--ink-secondary);">ID: tidingjinluo</div>
+                        </div>
+                        <i class="ri-arrow-right-up-line" style="font-size: 1.5rem; color: #fe2c55;"></i>
+                    </a>
                 </div>
             </div>
 
