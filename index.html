@@ -209,7 +209,7 @@
 
       .nav-header {
         display: flex; justify-content: space-between; align-items: center;
-        height: 100%; padding: 0 2rem; max-width: 1200px; margin: 0 auto;
+        height: 100%; padding: 0 2rem; margin: 0 auto;
       }
       .logo { 
         font-family: "Zhi Mang Xing", cursive; font-size: 2.5rem; 
@@ -274,7 +274,7 @@
         color: var(--ink-primary); background: var(--card-bg);
         box-shadow: 2px 2px 0 var(--ink-primary);
       }
-      .mobile-links { display: flex; flex-direction: column; gap: 0.8rem; flex: 1; align-items: stretch; }
+      .mobile-links { display: flex; flex-direction: column; gap: 0.8rem; flex: 1; align-items: stretch; top: 5%; position: relative;}
       .mobile-links a {
         font-family: "Zhi Mang Xing", cursive; font-size: 1.8rem; color: var(--ink-primary);
         display: flex; align-items: center; gap: 10px; padding: 5px 0;
@@ -470,6 +470,38 @@
 
       /* --- Lifestyle --- */
       .fit-big-num { font-family: "Zhi Mang Xing"; font-size: 5rem; color: var(--marker-highlight); line-height: 1; }
+            /* === 运动打卡卡片：背景人物图样式 === */
+      .fit-bg-img-container {
+        position: absolute; top: 0; left: 20%;
+        width: 100%;       /* 控制图片大小 */
+        height: 100%;
+        z-index: 0;         /* 确保在文字和折线图的下层 */
+        pointer-events: none; /* 防止鼠标误触图片影响文字选择 */
+        transform: rotate(-3deg); /* 增加一点手账剪贴画的随意倾斜感 */
+      }
+
+      .fit-bg-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        mix-blend-mode: multiply; 
+      }
+
+      /* 针对暗黑模式的特殊优化 */
+      html.dark-mode .fit-bg-img {
+        /* 在暗黑模式下，将黑白反转，使其变成白色素描底纹 */
+        filter: grayscale(100%) invert(0.8);
+        mix-blend-mode: screen; /* 暗色底用 screen 融合效果更好 */
+        opacity: 0.1;
+      }
+
+      /* 手机端适配：如果屏幕较小，适当缩小背景图防止喧宾夺主 */
+      @media (max-width: 600px) {
+        .fit-bg-img-container {
+          width: 100%; height: 100%;
+          right: -10px;
+        }
+      }
       
       /* 手绘风心率图 */
       .fit-chart-wrapper { width: 100%; height: 60px; border-bottom: 2px solid var(--ink-primary); border-left: 2px solid var(--ink-primary); position: relative; }
@@ -540,7 +572,7 @@
           min-height: auto; padding-top: calc(var(--nav-height) + 3rem); padding-bottom: 3rem; 
         }
         .hero-text { order: 2; }
-        .hero-visual { order: 1; margin-bottom: 2rem; }
+        .hero-visual { order: 1; }
         
         .hero-img-box { width: 220px; height: 280px; margin: 0 auto; }
         .hero-btns { justify-content: center; }
@@ -632,14 +664,6 @@
 <transition name="slide-fade">
         <div v-if="isMobileMenuOpen" class="mobile-menu-overlay" @click.self="toggleMobileMenu">
           <div class="mobile-menu-drawer">
-            <!-- 抽屉头部 -->
-            <div class="mobile-menu-header">
-              <span style="font-family: 'Zhi Mang Xing', cursive; font-size: 2rem; color: var(--ink-primary);">站点导航</span>
-              <button class="mobile-menu-close" @click="toggleMobileMenu">
-                <i class="ri-close-line"></i>
-              </button>
-            </div>
-            
             <!-- 抽屉链接 -->
             <div class="mobile-links">
                 <div class="mobile-section-label">故事主线</div>
@@ -896,25 +920,36 @@
             </div>
             
             <div class="lifestyle-grid">
-                <div class="sketch-card">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                        <div>
-                            <h3 style="font-family: 'Zhi Mang Xing'; font-size: 2rem;">运动律动</h3>
-                            <div style="font-weight: bold; color: var(--ink-secondary);">累计健身天数</div>
+                <!-- 找到这个位置：04 Lifestyle 下的第一个 sketch-card -->
+                <div class="sketch-card" style="position: relative; overflow: hidden; z-index: 1;">
+                    
+                    <!-- ====== 插入你的运动人物图片 ====== -->
+                    <div class="fit-bg-img-container">
+                        <img src="./content/Photos/6.png" class="fit-bg-img" alt="Fitness Figure" loading="lazy">
+                    </div>
+                    <!-- ================================ -->
+
+                    <!-- 为了保证文字在图片上方，给内容层加上相对定位和 z-index -->
+                    <div style="position: relative; z-index: 2;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="font-family: 'Zhi Mang Xing'; font-size: 2rem;">运动律动</h3>
+                                <div style="font-weight: bold; color: var(--ink-secondary);">累计健身天数</div>
+                            </div>
+                            <i class="ri-run-line" style="font-size: 2rem; color: var(--marker-highlight);"></i>
                         </div>
-                        <i class="ri-run-line" style="font-size: 2rem; color: var(--marker-highlight);"></i>
-                    </div>
-                    <div style="margin-bottom: 2rem;">
-                        <span class="fit-big-num">{{ fitnessDayCount }}</span>
-                        <span style="font-weight: 900; font-size: 1.2rem;">Days</span>
-                    </div>
-                    <div>
-                        <div style="font-weight: bold; margin-bottom: 10px;">近期训练强度图：</div>
-                        <div class="fit-chart-wrapper">
-                            <svg class="heart-rate-svg" viewBox="0 0 400 60" preserveAspectRatio="none" style="width: 100%; height: 100%;">
-                                <!-- 手绘风格的锯齿线段 -->
-                                <path class="heart-rate-path" d="M0,50 L30,48 L45,20 L60,52 L100,45 L110,10 L130,55 L160,48 L180,30 L200,50 L250,45 L265,5 L280,55 L320,48 L340,15 L360,50 L400,48" />
-                            </svg>
+                        <div style="margin-bottom: 2rem;">
+                            <span class="fit-big-num">{{ fitnessDayCount }}</span>
+                            <span style="font-weight: 900; font-size: 1.2rem;">Days</span>
+                        </div>
+                        <div>
+                            <div style="font-weight: bold; margin-bottom: 10px;">近期训练强度图：</div>
+                            <div class="fit-chart-wrapper">
+                                <svg class="heart-rate-svg" viewBox="0 0 400 60" preserveAspectRatio="none" style="width: 100%; height: 100%;">
+                                    <!-- 手绘风格的锯齿线段 -->
+                                    <path class="heart-rate-path" d="M0,50 L30,48 L45,20 L60,52 L100,45 L110,10 L130,55 L160,48 L180,30 L200,50 L250,45 L265,5 L280,55 L320,48 L340,15 L360,50 L400,48" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -923,7 +958,6 @@
                     <div class="read-now-section" style="padding: 2rem;">
                         <img :src="bookshelf[0].coverUrl" class="read-cover-img" alt="Current Read" @error="handleImgError" loading="lazy">
                         <div style="display: flex; flex-direction: column; justify-content: center; flex: 1;">
-                            <div style="font-weight: 900; background: var(--marker-yellow); display: inline-block; padding: 2px 8px; border-radius: 4px; border: 2px solid var(--ink-primary); width: max-content; margin-bottom: 5px; color: #000;">阅读推荐</div>
                             <div style="font-family: 'Zhi Mang Xing'; font-size: 1.8rem; line-height: 1.2;">{{ bookshelf[0].title }}</div>
                             <div style="font-weight: bold; color: var(--ink-secondary); margin-bottom: 10px;">{{ bookshelf[0].author }}</div>
                             <div style="color: var(--marker-highlight); font-size: 1.2rem;">
