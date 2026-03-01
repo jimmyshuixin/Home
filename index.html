@@ -505,14 +505,6 @@
         mix-blend-mode: multiply; 
       }
 
-      /* 针对暗黑模式的特殊优化 */
-      html.dark-mode .fit-bg-img {
-        /* 在暗黑模式下，将黑白反转，使其变成白色素描底纹 */
-        filter: grayscale(100%) invert(0.8);
-        mix-blend-mode: screen; /* 暗色底用 screen 融合效果更好 */
-        opacity: 0.1;
-      }
-
       /* 手机端适配：如果屏幕较小，适当缩小背景图防止喧宾夺主 */
       @media (max-width: 600px) {
         .fit-bg-img-container {
