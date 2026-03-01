@@ -246,7 +246,7 @@
       }
       .mobile-menu-btn { display: none; }
       
-/* === 移动端侧滑抽屉菜单重构 === */
+      /* === 移动端侧滑抽屉菜单重构 === */
       .mobile-menu-overlay {
         position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 999;
         backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
@@ -470,7 +470,7 @@
 
       /* --- Lifestyle --- */
       .fit-big-num { font-family: "Zhi Mang Xing"; font-size: 5rem; color: var(--marker-highlight); line-height: 1; }
-            /* === 运动打卡卡片：背景人物图样式 === */
+      /* === 运动打卡卡片：背景人物图样式 === */
       .fit-bg-img-container {
         position: absolute; top: 0; left: 20%;
         width: 100%;       /* 控制图片大小 */
@@ -556,6 +556,37 @@
       @keyframes spin { to { transform: rotate(360deg); } }
       .typing-cursor { display: inline-block; width: 4px; height: 1em; background-color: var(--ink-primary); animation: blink 1s infinite; vertical-align: text-bottom; margin-left: 2px; }
       @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+      /* ==============================================================
+         B站内嵌与视频模态框 (新增样式)
+         ============================================================== */
+      .video-modal-overlay {
+        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 10000;
+        display: flex; justify-content: center; align-items: center; padding: 1rem;
+        backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      }
+      .video-modal-content {
+        width: 100%; max-width: 800px; position: relative;
+        background: var(--bg-paper); padding: 2rem;
+        border-radius: var(--radius-2); border: var(--sketch-border);
+        box-shadow: var(--sketch-shadow);
+      }
+      .modal-close-btn {
+        position: absolute; top: -15px; right: -15px; width: 45px; height: 45px;
+        border-radius: 50%; border: var(--sketch-border); background: var(--marker-yellow);
+        font-size: 1.8rem; display: flex; justify-content: center; align-items: center;
+        cursor: pointer; box-shadow: 2px 2px 0 var(--ink-primary); z-index: 10;
+        transition: transform 0.2s;
+      }
+      .modal-close-btn:hover { transform: scale(1.1) rotate(5deg); }
+      .iframe-container {
+        position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
+        border: 2px solid var(--ink-primary); border-radius: var(--radius-1); overflow: hidden;
+        background: #000;
+      }
+      .iframe-container iframe {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      }
 
       /* ==============================================================
          Responsive Media Queries (全方位移动端适配)
@@ -661,7 +692,7 @@
         </nav>
       </div>
 
-<transition name="slide-fade">
+      <transition name="slide-fade">
         <div v-if="isMobileMenuOpen" class="mobile-menu-overlay" @click.self="toggleMobileMenu">
           <div class="mobile-menu-drawer">
             <!-- 抽屉链接 -->
@@ -690,6 +721,21 @@
       </transition>
 
       <main class="main-container">
+        
+        <!-- 新增视频模态框 -->
+        <transition name="slide-fade">
+          <div v-if="showVideoModal" class="video-modal-overlay" @click.self="showVideoModal = false">
+            <div class="video-modal-content sketch-card">
+              <button class="modal-close-btn" @click="showVideoModal = false"><i class="ri-close-line"></i></button>
+              <h3 style="font-family: 'Zhi Mang Xing'; font-size: 2.5rem; margin-bottom: 1rem; text-align: center;">年度摄影记录</h3>
+              <div class="iframe-container">
+                <!-- 替换为你想要的 B站 BV号 -->
+                <iframe src="//player.bilibili.com/player.html?bvid=BV1b5ZpBsELe&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+              </div>
+            </div>
+          </div>
+        </transition>
+
         <section class="hero-wrapper" id="hero">
           
           <div class="danmaku-container" aria-hidden="true">
@@ -715,7 +761,10 @@
               </span>
             </h1>
             <div class="hero-btns" :class="{ 'is-visible': showHeroButtons }">
-                <div class="sketch-tag"><i class="ri-map-pin-2-fill"></i> {{ resumeData.location }}</div>
+                <!-- 这里替换为年度摄影记录按钮，触发 B站弹窗 -->
+                <div class="sketch-tag" @click="showVideoModal = true" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px) rotate(-1deg)'" onmouseout="this.style.transform='rotate(-1deg)'">
+                    <i class="ri-camera-lens-fill"></i> 年度摄影记录
+                </div>
                 <div class="sketch-tag"><i class="ri-star-fill"></i> 双鱼座 / INFJ-A</div>
             </div>
           </div>
@@ -920,16 +969,14 @@
             </div>
             
             <div class="lifestyle-grid">
-                <!-- 找到这个位置：04 Lifestyle 下的第一个 sketch-card -->
+                <!-- 04 Lifestyle 下的第一个 sketch-card -->
                 <div class="sketch-card" style="position: relative; overflow: hidden; z-index: 1;">
-                    
                     <!-- ====== 插入你的运动人物图片 ====== -->
                     <div class="fit-bg-img-container">
                         <img src="./content/Photos/6.png" class="fit-bg-img" alt="Fitness Figure" loading="lazy">
                     </div>
                     <!-- ================================ -->
 
-                    <!-- 为了保证文字在图片上方，给内容层加上相对定位和 z-index -->
                     <div style="position: relative; z-index: 2;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                             <div>
@@ -946,7 +993,6 @@
                             <div style="font-weight: bold; margin-bottom: 10px;">近期训练强度图：</div>
                             <div class="fit-chart-wrapper">
                                 <svg class="heart-rate-svg" viewBox="0 0 400 60" preserveAspectRatio="none" style="width: 100%; height: 100%;">
-                                    <!-- 手绘风格的锯齿线段 -->
                                     <path class="heart-rate-path" d="M0,50 L30,48 L45,20 L60,52 L100,45 L110,10 L130,55 L160,48 L180,30 L200,50 L250,45 L265,5 L280,55 L320,48 L340,15 L360,50 L400,48" />
                                 </svg>
                             </div>
@@ -975,6 +1021,17 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 新增 Blender 作品 B站UP主的日常模块 -->
+            <div style="grid-column: 1 / -1; margin-top: 1.5rem;">
+                <h3 class="resume-subtitle"><i class="ri-bilibili-line" style="color: #00A1D6;"></i> B站UP主的日常</h3>
+                <div class="sketch-card" style="padding: 1.5rem;">
+                    <div class="iframe-container">
+                        <iframe src="//player.bilibili.com/player.html?bvid=BV1r2fjBwEQ6&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="part-header" style="margin-top: 6rem;">
@@ -1452,6 +1509,8 @@
           const contact = reactive({ name: '', email: '', message: '', sending: false, status: '' });
           const contactMode = ref('email'); 
           
+          const showVideoModal = ref(false); // 新增视频模态框状态
+
           const plansInProgress = computed(() => plansData.filter(p => p.status === 'ing' || p.status === 'done'));
           const plansPlanning = computed(() => plansData.filter(p => p.status === 'planning'));
 
@@ -1583,7 +1642,7 @@
           return { 
             scrollTo, handleImgError, scrollToTop, showBackToTop, isNavHidden, resumeData, bookshelf, github, music, 
             contact, submitContact, filteredAndSortedRepos, heroLine1, heroLine2Pre, heroLine2Name, heroLine3, heroLine4, activeLine, showHeroButtons,
-            isMobileMenuOpen, toggleMobileMenu, handleMobileClick, contactMode, guestbook, activeDanmaku, submitGuestbookMessage,
+            isMobileMenuOpen, toggleMobileMenu, handleMobileClick, contactMode, guestbook, activeDanmaku, submitGuestbookMessage, showVideoModal,
             plansData, getStatusLabel, plansInProgress, plansPlanning, isDark, toggleTheme, copyrightYear, siteUptime, icp, fitnessDayCount, switchBook 
           };
         }
