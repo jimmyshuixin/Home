@@ -1169,7 +1169,7 @@
                         <p style="margin-bottom: 1.5rem; font-weight: bold;">把想说的话写在这里，会通过私信送达。</p>
                         <form @submit.prevent="submitContact">
                             <input type="text" v-model="contact.name" required placeholder="你的名字">
-                            <input type="email" v-model="contact.email" required placeholder="邮箱地址">
+                            <input type="email" v-model="contact.email" required placeholder="你的邮箱地址">
                             <textarea v-model="contact.message" rows="4" required placeholder="正文写点什么..."></textarea>
                             <button type="submit" :disabled="contact.sending" class="load-more-btn" style="margin: 0; width: 100%;">
                                 {{ contact.sending ? '投递中...' : '贴上邮票，发送！' }} 
